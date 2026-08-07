@@ -21,7 +21,10 @@ def run_compute_team(team='all', system='3eloC', normalize=False, startdate=None
     os.makedirs(data_dir, exist_ok=True)
     
     dataset_path = os.path.join(data_dir, 'results.csv')
-    df = multielo.load_dataset(path=dataset_path)
+    if os.path.exists(dataset_path):
+        df = multielo.load_dataset(path=dataset_path)
+    else:
+        df = multielo.load_dataset()
     
     # Resolve system key
     sys_str = str(system).lower().strip()
