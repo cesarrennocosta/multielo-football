@@ -54,7 +54,7 @@ def build_website_views():
     fig_no1.add_vline(x=1.0, line_dash="dash", line_color="gray")
     fig_no1.update_layout(template="plotly_dark", height=580)
     
-    plotly_html_no1 = fig_no1.to_html(full_html=False, include_plotlyjs='cdn')
+    plotly_html_no1 = f"\n\n```{{=html}}\n{fig_no1.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
     
     index_qmd = f"""---
 title: "Multi-Dimensional Elo Ratings & Forecasting"
@@ -175,7 +175,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     fig_spain.update_yaxes(title_text="Overall Rating Points (R^e)", secondary_y=False)
     fig_spain.update_yaxes(title_text="Style Rating Points (R^o, R^d)", secondary_y=True)
     
-    plotly_html_spain = f"\n\n{fig_spain.to_html(full_html=False, include_plotlyjs='cdn')}\n\n"
+    plotly_html_spain = f"\n\n```{{=html}}\n{fig_spain.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
     
     ratings_qmd = f"""---
 title: "Interactive Team Trajectories Explorer"
@@ -210,7 +210,7 @@ format:
     fig_style.update_traces(textposition='top center')
     fig_style.update_layout(template="plotly_dark", height=620)
     
-    plotly_html_style = fig_style.to_html(full_html=False, include_plotlyjs='cdn')
+    plotly_html_style = f"\n\n```{{=html}}\n{fig_style.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
     
     style_space_qmd = f"""---
 title: "Normalized Tactical Style Space"
