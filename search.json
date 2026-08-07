@@ -26,5 +26,12 @@
     "title": "Poisson GLM Model Hierarchy (M01–M32)",
     "section": "",
     "text": "We systematically evaluate a 5-dimensional binary feature grid of 32 GLM specifications (\\(M_{01}\\) through \\(M_{32}\\)):\n\n\n\n\n\n\n\n\n\n\n\nModel Code\nDistribution\nParameter Coupling\nRating Response\nTemporal Decay (T)\nCompetition Weight (C)\n\n\n\n\nM01\nPoisson\nShared\nLinear\nNo\nNo\n\n\nM02\nPoisson\nShared\nLinear\nNo\nYes\n\n\nM03\nPoisson\nShared\nLinear\nYes\nNo\n\n\nM04\nPoisson\nShared\nLinear\nYes\nYes\n\n\nM05\nPoisson\nShared\nQuadratic\nNo\nNo\n\n\nM06\nPoisson\nShared\nQuadratic\nNo\nYes\n\n\nM07\nPoisson\nShared\nQuadratic\nYes\nNo\n\n\nM08\nPoisson\nShared\nQuadratic\nYes\nYes\n\n\nM09\nPoisson\nIndependent\nLinear\nNo\nNo\n\n\nM10\nPoisson\nIndependent\nLinear\nNo\nYes\n\n\nM11\nPoisson\nIndependent\nLinear\nYes\nNo\n\n\nM12\nPoisson\nIndependent\nLinear\nYes\nYes\n\n\nM13\nPoisson\nIndependent\nQuadratic\nNo\nNo\n\n\nM14\nPoisson\nIndependent\nQuadratic\nNo\nYes\n\n\nM15\nPoisson\nIndependent\nQuadratic\nYes\nNo\n\n\nM16\nPoisson\nIndependent\nQuadratic\nYes\nYes\n\n\nM17\nDixonColes\nShared\nLinear\nNo\nNo\n\n\nM18\nDixonColes\nShared\nLinear\nNo\nYes\n\n\nM19\nDixonColes\nShared\nLinear\nYes\nNo\n\n\nM20\nDixonColes\nShared\nLinear\nYes\nYes\n\n\nM21\nDixonColes\nShared\nQuadratic\nNo\nNo\n\n\nM22\nDixonColes\nShared\nQuadratic\nNo\nYes\n\n\nM23\nDixonColes\nShared\nQuadratic\nYes\nNo\n\n\nM24\nDixonColes\nShared\nQuadratic\nYes\nYes\n\n\nM25\nDixonColes\nIndependent\nLinear\nNo\nNo\n\n\nM26\nDixonColes\nIndependent\nLinear\nNo\nYes\n\n\nM27\nDixonColes\nIndependent\nLinear\nYes\nNo\n\n\nM28\nDixonColes\nIndependent\nLinear\nYes\nYes\n\n\nM29\nDixonColes\nIndependent\nQuadratic\nNo\nNo\n\n\nM30\nDixonColes\nIndependent\nQuadratic\nNo\nYes\n\n\nM31\nDixonColes\nIndependent\nQuadratic\nYes\nNo\n\n\nM32\nDixonColes\nIndependent\nQuadratic\nYes\nYes"
+  },
+  {
+    "objectID": "ratings.html",
+    "href": "ratings.html",
+    "title": "Interactive Team Trajectories Explorer",
+    "section": "",
+    "text": "Use the Team Dropdown menu below to switch between national teams and the Range Slider at the bottom to adjust the historical time window. Overall Elo (\\(R^e\\)) and Tactical Style (\\(R^o, R^d\\)) are displayed on decoupled subplot axes."
   }
 ]
