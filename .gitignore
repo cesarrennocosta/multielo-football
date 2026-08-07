@@ -13,7 +13,9 @@ build/
 paper_scripts/data/*
 !paper_scripts/data/.gitkeep
 !paper_scripts/data/results.csv
-!paper_scripts/data/ratings_3eloC_spain.csv
+!paper_scripts/data/ratings_3eloC_*.csv
+paper_scripts/data/ratings_3eloC_all_norm.csv
+paper_scripts/data/ratings_3eloC.csv
 
 paper_scripts/figures/*
 !paper_scripts/figures/.gitkeep

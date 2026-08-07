@@ -170,29 +170,86 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     with open(os.path.join(website_dir, 'index.qmd'), 'w') as f:
         f.write(index_qmd)
 
-    # 2. Build ratings.qmd
-    df_spain = pd.read_csv(spain_csv_path)
-    df_spain['date'] = pd.to_datetime(df_spain['date'])
-    df_spain = df_spain[df_spain['date'] >= '2000-01-01'].sort_values('date')
+    # 2. Build ratings.qmd (Multi-Team Trajectory Explorer)
+    teams_to_compute = ['Spain', 'Brazil', 'Germany', 'Argentina', 'Italy', 'France', 'England', 'Netherlands', 'Uruguay', 'Portugal']
     
-    fig_spain = make_subplots(specs=[[{"secondary_y": True}]])
-    fig_spain.add_trace(go.Scatter(x=df_spain['date'], y=df_spain['elo'], name="Overall Elo (R^e)", line=dict(color='#ef4444', width=3)), secondary_y=False)
-    fig_spain.add_trace(go.Scatter(x=df_spain['date'], y=df_spain['elo_off'], name="Offensive Elo (R^o)", line=dict(color='#f59e0b', width=2, dash='dash')), secondary_y=True)
-    fig_spain.add_trace(go.Scatter(x=df_spain['date'], y=df_spain['elo_def'], name="Defensive Elo (R^d)", line=dict(color='#6366f1', width=2, dash='dot')), secondary_y=True)
+    from run_compute_team import run_compute_team
+    for t in teams_to_compute:
+        t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
+        if not os.path.exists(t_csv):
+            print(f"Pre-computing {t} rating trajectory...")
+            run_compute_team(team=t, system='3eloC', normalize=False)
+
+    fig_ratings = make_subplots(
+        rows=2, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.12,
+        subplot_titles=("Overall Rating Points (R^e)", "Tactical Style Ratings: Offensive (R^o) & Defensive (R^d)")
+    )
     
-    fig_spain.update_layout(title="Spain Historical Elo Rating Dynamics (2000–2026)", template="plotly_dark", height=580, xaxis_title="Match Calendar Date")
-    fig_spain.update_yaxes(title_text="Overall Rating Points (R^e)", secondary_y=False)
-    fig_spain.update_yaxes(title_text="Style Rating Points (R^o, R^d)", secondary_y=True)
+    buttons = []
+    num_teams = len(teams_to_compute)
     
-    plotly_html_spain = f"\n\n```{{=html}}\n{fig_spain.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
+    for i, t in enumerate(teams_to_compute):
+        t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
+        df_t = pd.read_csv(t_csv)
+        df_t['date'] = pd.to_datetime(df_t['date'])
+        df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date')
+        
+        is_visible = (i == 0)  # Spain default visible
+        
+        # Row 1: Overall Elo
+        fig_ratings.add_trace(
+            go.Scatter(x=df_t['date'], y=df_t['elo'], name="Overall Elo (R^e)", line=dict(color='#ef4444', width=3), visible=is_visible),
+            row=1, col=1
+        )
+        # Row 2: Offensive & Defensive Elo (Decoupled in Row 2)
+        fig_ratings.add_trace(
+            go.Scatter(x=df_t['date'], y=df_t['elo_off'], name="Offensive Elo (R^o)", line=dict(color='#f59e0b', width=2.5), visible=is_visible),
+            row=2, col=1
+        )
+        fig_ratings.add_trace(
+            go.Scatter(x=df_t['date'], y=df_t['elo_def'], name="Defensive Elo (R^d)", line=dict(color='#3b82f6', width=2.5), visible=is_visible),
+            row=2, col=1
+        )
+        
+        vis_mask = [False] * (num_teams * 3)
+        vis_mask[i*3 : i*3+3] = [True, True, True]
+        
+        buttons.append(dict(
+            label=t,
+            method="update",
+            args=[{"visible": vis_mask}, {"title": f"{t} Historical Rating Dynamics & Tactical Style (1950–2026)"}]
+        ))
+
+    fig_ratings.update_layout(
+        title="Spain Historical Rating Dynamics & Tactical Style (1950–2026)",
+        updatemenus=[dict(
+            active=0,
+            buttons=buttons,
+            x=0.0, y=1.18,
+            xanchor="left", yanchor="top",
+            bgcolor="#1e293b", bordercolor="#475569", font=dict(color="#f8fafc", size=14)
+        )],
+        template="plotly_dark",
+        height=720,
+        xaxis2=dict(
+            rangeslider=dict(visible=True),
+            type="date"
+        )
+    )
+    
+    plotly_html_spain = f"\n\n```{{=html}}\n{fig_ratings.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
     
     ratings_qmd = f"""---
 title: "Interactive Team Trajectories Explorer"
-subtitle: "Explore Historical Overall, Offensive, and Defensive Elo Evolution (2000–2026)"
+subtitle: "Select National Teams & Filter Historical Time Range (1950–2026)"
 format:
   html:
     page-layout: full
 ---
+
+Use the **Team Dropdown** menu below to switch between national teams and the **Range Slider** at the bottom to adjust the historical time window. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot axes.
 
 {plotly_html_spain}
 """
