@@ -1,0 +1,28 @@
+---
+title: "Poisson GLM Model Hierarchy (M01–M32)"
+subtitle: "Architectural Design Grid & Parameter Complexity Specifications"
+format:
+  html:
+    page-layout: full
+---
+
+We systematically evaluate a 5-dimensional binary feature grid of 32 GLM specifications ($M_{01}$ through $M_{32}$):
+
+```{python}
+import pandas as pd
+import multielo
+
+models_data = []
+for code, specs in multielo.GLM_TAXONOMY.items():
+    models_data.append({
+        'Model Code': code,
+        'Distribution': specs['dist'],
+        'Coupling': specs['coupling'],
+        'Rating Response': specs['response'],
+        'Temporal Decay (T)': specs['decay'],
+        'Competition Weight (C)': specs['competition']
+    })
+
+df_models = pd.DataFrame(models_data)
+df_models
+```

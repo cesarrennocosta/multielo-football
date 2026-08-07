@@ -1,0 +1,141 @@
+---
+title: "Multi-Dimensional Elo Ratings & Forecasting"
+subtitle: "Interactive Data Platform for International Football Strength & Tactical Style"
+format:
+  html:
+    page-layout: full
+---
+
+::: {.hero-banner}
+# MultiElo Football
+
+Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Models ($M_{01}$–$M_{32}$) for national team football forecasting (1872–2026).
+
+[View on GitHub](https://github.com/cesarrennocosta/multielo-football){.btn .btn-primary .btn-lg role="button"}
+[Read Methodology](models.html){.btn .btn-outline-light .btn-lg role="button"}
+:::
+
+::: {.row}
+::: {.col-md-3}
+::: {.card-metric}
+::: {.metric-value}
+49,518
+:::
+::: {.metric-label}
+Match Records Analyzed
+:::
+:::
+:::
+
+::: {.col-md-3}
+::: {.card-metric}
+::: {.metric-value}
+32 GLMs
+:::
+::: {.metric-label}
+Model Architecture Grid
+:::
+:::
+:::
+
+::: {.col-md-3}
+::: {.card-metric}
+::: {.metric-value}
+3-Elo Complete
+:::
+::: {.metric-label}
+Top Performing Architecture
+:::
+:::
+:::
+
+::: {.col-md-3}
+::: {.card-metric}
+::: {.metric-value}
+-4.5%
+:::
+::: {.metric-label}
+Loss Reduction vs Benchmark
+:::
+:::
+:::
+:::
+
+---
+
+## ⚡ Quickstart Python Package
+
+Install the `multielo-football` library directly via `pip`:
+
+```bash
+pip install multielo-football
+```
+
+Compute ratings and predict match outcomes in Python:
+
+```{python}
+import multielo
+
+# 1. Load Match Dataset
+df = multielo.load_dataset()
+
+# 2. Compute 3-Elo Complete Ratings
+df_rated = multielo.compute_ratings(df, system='3elo-complete')
+
+# 3. Predict Spain vs England (Neutral Venue)
+spain_ratings = {'elo': 2279.0, 'off': 2276.6, 'def': 2412.4}
+england_ratings = {'elo': 2117.7, 'off': 2341.5, 'def': 2226.9}
+
+pred = multielo.predict(spain_ratings, england_ratings, model_specs='M32', is_neutral=True)
+
+print(f"P(Spain Win)   : {pred['p_win_a']*100:.1f}%")
+print(f"P(Draw)        : {pred['p_draw']*100:.1f}%")
+print(f"P(England Win) : {pred['p_win_b']*100:.1f}%")
+print(f"Most Likely Score: {pred['most_likely_score'][0]} - {pred['most_likely_score'][1]}")
+```
+
+---
+
+## 📊 World #1 Tactical Style Space (Interactive)
+
+Explore how historical World #1 nations and World Cup Champions align across normalized offensive ($R^o / R^o_{\text{10th}}$) and defensive ($R^d / R^d_{\text{10th}}$) style coordinates:
+
+```{python}
+import plotly.express as px
+import pandas as pd
+import numpy as np
+
+# Load dataset and prepare interactive plot
+try:
+    df_norm = pd.read_csv('../paper_scripts/data/ratings_3eloC_all_norm.csv')
+    df_norm['date'] = pd.to_datetime(df_norm['date'])
+    
+    # Filter 1950 onwards
+    df_norm = df_norm[df_norm['date'] >= '1950-01-01']
+    
+    # Extract daily World #1 leaders
+    idx_max = df_norm.groupby('date')['elo'].idxmax()
+    df_no1 = df_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
+    df_no1 = df_no1[df_no1['team'] != 'Tahiti']
+    
+    fig = px.scatter(
+        df_no1,
+        x='norm_def',
+        y='norm_off',
+        color='team',
+        hover_data=['date', 'elo', 'norm_elo'],
+        labels={
+            'norm_def': 'Defensive Score (R^d / R^d_10th)',
+            'norm_off': 'Offensive Score (R^o / R^o_10th)',
+            'team': 'World #1 Nation'
+        },
+        title="Interactive World #1 Tactical Style Positions (1950–2026)"
+    )
+    
+    fig.add_hline(y=1.0, line_dash="dash", line_color="gray", annotation_text="Top 10 Baseline")
+    fig.add_vline(x=1.0, line_dash="dash", line_color="gray")
+    fig.update_layout(template="plotly_dark", height=600)
+    fig.show()
+except Exception as e:
+    print(f"Notice: Interactive plot requires pre-computed ratings dataset ({e}).")
+```

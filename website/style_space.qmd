@@ -1,0 +1,45 @@
+---
+title: "Normalized Tactical Style Space"
+subtitle: "Evaluating National Playing Philosophies in Non-Dimensional Coordinates"
+format:
+  html:
+    page-layout: full
+---
+
+The **Normalized Style Space** maps national team attack ($S_{\text{Off}} = R^o / R^o_{\text{10th}}$) and defense ($S_{\text{Def}} = R^d / R^d_{\text{10th}}$) against the 10th-place world threshold ($1.0$).
+
+```{python}
+import plotly.express as px
+import pandas as pd
+import os
+
+data_path = '../paper_scripts/data/ratings_3eloC_all_norm.csv'
+
+if os.path.exists(data_path):
+    df = pd.read_csv(data_path)
+    df['date'] = pd.to_datetime(df['date'])
+    df = df[df['date'] >= '1950-01-01']
+    
+    # Calculate team averages
+    df_avg = df.groupby('team')[['norm_def', 'norm_off', 'elo']].mean().reset_index()
+    df_avg = df_avg[df_avg['elo'] > 1400].sort_values('elo', ascending=False).head(30)
+    
+    fig = px.scatter(
+        df_avg,
+        x='norm_def',
+        y='norm_off',
+        text='team',
+        size='elo',
+        color='elo',
+        color_continuous_scale='Viridis',
+        labels={'norm_def': 'Defensive Score (R^d / R^d_10th)', 'norm_off': 'Offensive Score (R^o / R^o_10th)'},
+        title="Multi-Decade Average Style Profiles for Top 30 National Teams (1950–2026)"
+    )
+    
+    fig.add_hline(y=1.0, line_dash="dash", line_color="gray")
+    fig.add_vline(x=1.0, line_dash="dash", line_color="gray")
+    fig.update_traces(textposition='top center')
+    fig.update_layout(template="plotly_dark", height=650)
+    
+    fig.show()
+```

@@ -1,0 +1,57 @@
+---
+title: "Interactive Team Trajectories Explorer"
+subtitle: "Explore Historical Overall, Offensive, and Defensive Elo Evolution (2000–2026)"
+format:
+  html:
+    page-layout: full
+---
+
+Select a national team to inspect its dynamic match-by-match trajectory under the **3-Elo Complete** model:
+
+```{python}
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import pandas as pd
+import os
+
+data_path = '../paper_scripts/data/ratings_3eloC_spain.csv'
+
+if os.path.exists(data_path):
+    df_spain = pd.read_csv(data_path)
+    df_spain['date'] = pd.to_datetime(df_spain['date'])
+    df_spain = df_spain[df_spain['date'] >= '2000-01-01'].sort_values('date')
+    
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    
+    # Overall Elo
+    fig.add_trace(
+        go.Scatter(x=df_spain['date'], y=df_spain['elo'], name="Overall Elo (R^e)", line=dict(color='#ef4444', width=3)),
+        secondary_y=False
+    )
+    
+    # Offensive Elo
+    fig.add_trace(
+        go.Scatter(x=df_spain['date'], y=df_spain['elo_off'], name="Offensive Elo (R^o)", line=dict(color='#f59e0b', width=2, dash='dash')),
+        secondary_y=True
+    )
+    
+    # Defensive Elo
+    fig.add_trace(
+        go.Scatter(x=df_spain['date'], y=df_spain['elo_def'], name="Defensive Elo (R^d)", line=dict(color='#6366f1', width=2, dash='dot')),
+        secondary_y=True
+    )
+    
+    fig.update_layout(
+        title="Spain Historical Elo Rating Dynamics (2000–2026)",
+        template="plotly_dark",
+        height=600,
+        xaxis_title="Match Calendar Date"
+    )
+    
+    fig.update_yaxes(title_text="Overall Rating Points (R^e)", secondary_y=False)
+    fig.update_yaxes(title_text="Style Rating Points (R^o, R^d)", secondary_y=True)
+    
+    fig.show()
+else:
+    print("Ratings data file for Spain not found. Run `python paper_scripts/run_compute_team.py spain` to generate.")
+```
