@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Multi-Dimensional Elo Ratings & Forecasting",
     "section": "",
-    "text": "Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Models (\\(M_{01}\\)–\\(M_{32}\\)) for national team football forecasting (1872–2026).\nView on GitHub Read Methodology"
+    "text": "Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Models (\\(M_{01}\\)–\\(M_{32}\\)) for national team football forecasting (1872–2026).\nView on GitHub Explore World #1 Style Space"
   },
   {
     "objectID": "index.html#quickstart-python-package",
@@ -14,11 +14,11 @@
     "text": "⚡ Quickstart Python Package\nInstall the multielo-football library directly via pip:\npip install multielo-football\nCompute ratings and predict match outcomes in Python:\nimport multielo\n\n# 1. Load Match Dataset\ndf = multielo.load_dataset()\n\n# 2. Compute 3-Elo Complete Ratings\ndf_rated = multielo.compute_ratings(df, system='3elo-complete')\n\n# 3. Predict Spain vs England (Neutral Venue)\nspain_ratings = {'elo': 2279.0, 'off': 2276.6, 'def': 2412.4}\nengland_ratings = {'elo': 2117.7, 'off': 2341.5, 'def': 2226.9}\n\npred = multielo.predict(spain_ratings, england_ratings, model_specs='M32', is_neutral=True)\n\nprint(f\"P(Spain Win)   : {pred['p_win_a']*100:.1f}%\")\nprint(f\"P(Draw)        : {pred['p_draw']*100:.1f}%\")\nprint(f\"P(England Win) : {pred['p_win_b']*100:.1f}%\")\nprint(f\"Most Likely Score: {pred['most_likely_score'][0]} - {pred['most_likely_score'][1]}\")"
   },
   {
-    "objectID": "index.html#world-1-tactical-style-space-interactive",
-    "href": "index.html#world-1-tactical-style-space-interactive",
-    "title": "Multi-Dimensional Elo Ratings & Forecasting",
-    "section": "📊 World #1 Tactical Style Space (Interactive)",
-    "text": "📊 World #1 Tactical Style Space (Interactive)"
+    "objectID": "world_no1.html",
+    "href": "world_no1.html",
+    "title": "World #1 Tactical Style Space",
+    "section": "",
+    "text": "This visualization plots the relative offensive (\\(R^o / R^o_{10th}\\)) and defensive (\\(R^d / R^d_{10th}\\)) rating coordinates of teams holding the World #1 Elo Ranking on match calendar dates. World Cup Champion Eras are highlighted with star-diamond markers (⭐)."
   },
   {
     "objectID": "models.html",
@@ -32,6 +32,6 @@
     "href": "ratings.html",
     "title": "Interactive Team Trajectories Explorer",
     "section": "",
-    "text": "Use the Team Checkboxes below to add or remove national teams dynamically. Overall Elo (\\(R^e\\)) and Tactical Style (\\(R^o, R^d\\)) are displayed on decoupled subplot panels to prevent visual overlay.\n\n\n  \n    ⚽ Select Teams to Compare:\n  \n  \n    \n        \n           Spain\n        \n        \n           Brazil\n        \n        \n           Germany\n        \n        \n           Argentina\n        \n        \n           Italy\n        \n        \n           France\n        \n        \n           England\n        \n        \n           Netherlands\n        \n        \n           Uruguay\n        \n        \n           Portugal\n        \n  \n  \n  \n    📊 Subplot Component Controls:\n  \n  \n    \n       Top Panel: Overall Rating ($R^e$)\n    \n    \n       Bottom Panel: Offensive Rating ($R^o$)\n    \n    \n       Bottom Panel: Defensive Rating ($R^d$)"
+    "text": "Use the Team Checkboxes below to add or remove national teams dynamically. Overall Elo (\\(R^e\\)) and Tactical Style (\\(R^o, R^d\\)) are displayed on decoupled subplot panels with FIFA World Cup tournament markers (1950–2026).\n\n\n  \n    ⚽ Select Teams to Compare:\n  \n  \n    \n        \n           Spain\n        \n        \n           Brazil\n        \n        \n           Germany\n        \n        \n           Argentina\n        \n        \n           Italy\n        \n        \n           France\n        \n        \n           England\n        \n        \n           Netherlands\n        \n        \n           Uruguay\n        \n        \n           Portugal\n        \n  \n  \n  \n    📊 Subplot Component Controls:\n  \n  \n    \n       Top Panel: Overall Rating ($R^e$)\n    \n    \n       Bottom Panel: Offensive Rating ($R^o$, Solid)\n    \n    \n       Bottom Panel: Defensive Rating ($R^d$, Dashed)"
   }
 ]
