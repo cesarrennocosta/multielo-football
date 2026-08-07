@@ -4,10 +4,6 @@ on:
   push:
     branches: [main]
 
-env:
-  PYTHONPATH: /opt/hostedtoolcache/Python/3.10.20/x64/lib/python3.10/site-packages
-  QUARTO_PYTHON: /opt/hostedtoolcache/Python/3.10.20/x64/bin/python3
-
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -26,13 +22,11 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Install Python Dependencies & Jupyter
+      - name: Install Package & Jupyter Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          python -m pip install jupyter nbformat nbclient ipykernel notebook pandas numpy scipy statsmodels optuna matplotlib plotly kagglehub
+          pip install kagglehub
           pip install -e .
-          sudo apt-get update && sudo apt-get install -y python3-pip python3-setuptools
-          python3 -m pip install jupyter nbformat nbclient ipykernel notebook --break-system-packages || true
 
       - name: Build Interactive Website Views
         run: |

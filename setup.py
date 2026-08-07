@@ -10,7 +10,12 @@ setup(
         "scipy>=1.7.0",
         "statsmodels>=0.13.0",
         "optuna>=3.0.0",
-        "matplotlib>=3.4.0"
+        "matplotlib>=3.4.0",
+        "plotly>=5.0.0",
+        "jupyter>=1.0.0",
+        "nbformat>=5.0.0",
+        "nbclient>=0.5.0",
+        "ipykernel>=6.0.0"
     ],
     author="César Rennó-Costa, László Csató",
     author_email="cesar@imd.ufrn.br",
