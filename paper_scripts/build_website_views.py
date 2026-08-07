@@ -175,7 +175,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     fig_spain.update_yaxes(title_text="Overall Rating Points (R^e)", secondary_y=False)
     fig_spain.update_yaxes(title_text="Style Rating Points (R^o, R^d)", secondary_y=True)
     
-    plotly_html_spain = fig_spain.to_html(full_html=False, include_plotlyjs='cdn')
+    plotly_html_spain = f"\n\n{fig_spain.to_html(full_html=False, include_plotlyjs='cdn')}\n\n"
     
     ratings_qmd = f"""---
 title: "Interactive Team Trajectories Explorer"
