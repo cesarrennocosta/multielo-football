@@ -637,6 +637,14 @@ We systematically evaluate a 5-dimensional binary feature grid of 32 GLM specifi
     with open(os.path.join(website_dir, 'models.qmd'), 'w') as f:
         f.write(models_qmd)
         
+    # 6. Copy Jupyter Notebook demo to website folder
+    import shutil
+    demo_nb_src = os.path.join(pkg_root, 'examples', 'demo_group_simulation.ipynb')
+    demo_nb_dst = os.path.join(website_dir, 'demo_simulation.ipynb')
+    if os.path.exists(demo_nb_src):
+        shutil.copy(demo_nb_src, demo_nb_dst)
+        print(f"Copied simulation demo notebook to: {demo_nb_dst}")
+        
     print("Successfully built pre-rendered website views and interactive graphics!")
 
 if __name__ == '__main__':

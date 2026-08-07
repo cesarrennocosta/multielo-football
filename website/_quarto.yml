@@ -19,6 +19,8 @@ website:
         href: world_no1.qmd
       - text: "Style Space"
         href: style_space.qmd
+      - text: "Simulation Demo"
+        href: demo_simulation.ipynb
       - text: "Model Hierarchy"
         href: models.qmd
     right:
