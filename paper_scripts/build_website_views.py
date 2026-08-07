@@ -186,12 +186,33 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     with open(os.path.join(website_dir, 'index.qmd'), 'w') as f:
         f.write(index_qmd)
 
-    # 2. Build world_no1.qmd (World #1 Style Space - White Theme, Golden Stars for WC Victories, Faded Gray Off-State)
+    # 2. Build world_no1.qmd (World #1 Style Space - Downsampled, >= 6 Months Stints, Golden Stars)
     idx_max = df_norm.groupby('date')['elo'].idxmax()
     df_no1 = df_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
     df_no1 = df_no1[df_no1['team'] != 'Tahiti']
     
-    unique_teams = sorted(df_no1['team'].unique())
+    # Identify contiguous World #1 stints
+    df_no1['team_change'] = (df_no1['team'] != df_no1['team'].shift(1)).astype(int)
+    df_no1['stint_id'] = df_no1['team_change'].cumsum()
+    
+    stints = []
+    for stint_id, group in df_no1.groupby('stint_id'):
+        team = group['team'].iloc[0]
+        start_date = group['date'].min()
+        end_date = group['date'].max()
+        duration_days = (end_date - start_date).days
+        
+        # Only keep nations holding #1 for at least 6 months (180 days)
+        if duration_days >= 180:
+            group = group.copy()
+            group['year'] = group['date'].dt.year
+            group['half'] = np.where(group['date'].dt.month <= 6, 1, 2)
+            # Sample max 2 points per year (one per half-year)
+            for (yr, hf), subg in group.groupby(['year', 'half']):
+                stints.append(subg.iloc[len(subg)//2])
+                
+    df_no1_sampled = pd.DataFrame(stints).reset_index(drop=True)
+    unique_teams = sorted(df_no1_sampled['team'].unique())
     
     fig_no1 = go.Figure()
     
@@ -199,7 +220,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     team_trace_map = {}
     
     for i, t in enumerate(unique_teams):
-        df_t = df_no1[df_no1['team'] == t]
+        df_t = df_no1_sampled[df_no1_sampled['team'] == t]
         c = TEAM_COLORS.get(t, '#64748b')
         
         # Team scatter points
@@ -208,7 +229,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
             y=df_t['norm_off'],
             mode='markers',
             name=t,
-            marker=dict(size=9, color=c, opacity=0.85, line=dict(width=0.8, color='#1e293b')),
+            marker=dict(size=10, color=c, opacity=0.9, line=dict(width=1, color='#1e293b')),
             customdata=np.stack((df_t['date'].dt.strftime('%Y-%m-%d'), df_t['elo'].round(1), df_t['norm_elo'].round(3)), axis=-1),
             hovertemplate="<b>" + t + "</b><br>Date: %{customdata[0]}<br>Defensive Score: %{x:.3f}<br>Offensive Score: %{y:.3f}<br>Elo Rating: %{customdata[1]}<extra></extra>"
         ))
@@ -263,7 +284,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     no1_div_id = "world-no1-chart"
     plotly_inner_no1 = fig_no1.to_html(full_html=False, include_plotlyjs='cdn', div_id=no1_div_id)
 
-    # Build Team Checkboxes (Light gray faded when off)
+    # Build Team Checkboxes (Soft clear transparent gray when off)
     no1_team_checkboxes = ""
     for i, t in enumerate(unique_teams):
         c = TEAM_COLORS.get(t, '#475569')
@@ -276,7 +297,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
 <div class="team-selector-box" style="background: #f8fafc; padding: 16px; border-radius: 10px; margin-bottom: 18px; border: 1px solid #cbd5e1;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
     <div style="font-weight: 700; color: #0f172a; font-size: 1.05rem;">
-      ⚽ Filter World #1 Nations (Off = Light Gray Cloud):
+      ⚽ Filter World #1 Nations (Off = Soft Clear Gray Cloud):
     </div>
     <label style="color: #b45309; font-weight: 700; cursor: pointer; background: #fef3c7; padding: 6px 14px; border-radius: 20px; border: 1px solid #fde68a;">
       <input type="checkbox" id="chk-wc-stars" checked onchange="updateNo1Chart()"> ⭐ Highlight World Cup Champions
@@ -297,16 +318,19 @@ function updateNo1Chart() {{
     var numTeams = {len(unique_teams)};
     var colorUpdates = [];
     var opacityUpdates = [];
+    var sizeUpdates = [];
     
     for (var i = 0; i < numTeams; i++) {{
         var chk = document.getElementById('chk-no1-' + i);
         if (chk && chk.checked) {{
             colorUpdates.push(defaultTeamColors[i]);
-            opacityUpdates.push(0.85);
+            opacityUpdates.push(0.9);
+            sizeUpdates.push(10);
         }} else {{
-            // Light transparent gray when off
-            colorUpdates.push('rgba(203, 213, 225, 0.25)');
-            opacityUpdates.push(0.2);
+            // Soft clear transparent gray when off
+            colorUpdates.push('rgba(226, 232, 240, 0.22)');
+            opacityUpdates.push(0.12);
+            sizeUpdates.push(6);
         }}
     }}
     
@@ -314,7 +338,8 @@ function updateNo1Chart() {{
     for (var i = 0; i < numTeams; i++) {{
         Plotly.restyle(gd, {{
             'marker.color': colorUpdates[i],
-            'marker.opacity': opacityUpdates[i]
+            'marker.opacity': opacityUpdates[i],
+            'marker.size': sizeUpdates[i]
         }}, [i]);
     }}
     
@@ -336,9 +361,9 @@ format:
     page-layout: full
 ---
 
-This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defensive ($R^d / R^d_{{10th}}$) coordinates of teams holding the **World #1 Elo Ranking**. 
+This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defensive ($R^d / R^d_{{10th}}$) coordinates of nations holding the **World #1 Elo Ranking** for at least 6 months (sampled at most 2 points per year for maximum responsiveness). 
 
-Unchecking a team fades its points into a **light transparent gray cloud** so you can view team positions relative to the entire historical distribution. Exact **World Cup Victories** are marked with Golden Stars (⭐) and text labels.
+Unchecking a team fades its points into a **soft clear transparent gray background cloud** so active teams stand out vividly. Exact **World Cup Victories** are marked with Golden Stars (⭐) and text labels.
 
 {plotly_full_no1}
 """
