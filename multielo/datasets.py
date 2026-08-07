@@ -15,25 +15,36 @@ def load_dataset(path=None):
     pd.DataFrame
         DataFrame containing cleaned international match records sorted chronologically.
     """
+    pkg_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_path = None
+    
     if path and os.path.exists(path):
         target_path = path
     else:
         # Search candidate locations
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         candidates = [
-            os.path.join(base_dir, 'datset', 'results.csv'),
-            os.path.join(base_dir, 'repository', 'multiElo', 'data', 'results.csv'),
-            os.path.join(base_dir, 'world_cup_features_dataset.csv'),
+            os.path.join(pkg_dir, 'paper_scripts', 'data', 'results.csv'),
+            os.path.join(os.getcwd(), 'paper_scripts', 'data', 'results.csv'),
+            os.path.join(pkg_dir, 'data', 'results.csv'),
             'results.csv'
         ]
-        target_path = None
         for c in candidates:
             if os.path.exists(c):
                 target_path = c
                 break
                 
     if not target_path or not os.path.exists(target_path):
-        raise FileNotFoundError("Could not locate match dataset. Please provide path or run multielo.download_dataset().")
+        # Auto-download via HTTPS fallback if dataset is missing
+        print("Dataset missing. Attempting automatic download from raw.githubusercontent.com...")
+        try:
+            import urllib.request
+            target_path = os.path.join(pkg_dir, 'paper_scripts', 'data', 'results.csv')
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            url = "https://raw.githubusercontent.com/martj42/international_results/master/results.csv"
+            urllib.request.urlretrieve(url, target_path)
+            print(f"Successfully downloaded match dataset to: {target_path}")
+        except Exception as e:
+            raise FileNotFoundError(f"Could not locate or download match dataset. Error: {e}")
         
     print(f"Loading match dataset from: {target_path}")
     df = pd.read_csv(target_path, low_memory=False)
