@@ -172,6 +172,18 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
 
     # 2. Build ratings.qmd (Multi-Team Trajectory Explorer)
     teams_to_compute = ['Spain', 'Brazil', 'Germany', 'Argentina', 'Italy', 'France', 'England', 'Netherlands', 'Uruguay', 'Portugal']
+    team_colors = {
+        'Spain': '#ef4444',
+        'Brazil': '#eab308',
+        'Germany': '#94a3b8',
+        'Argentina': '#06b6d4',
+        'France': '#3b82f6',
+        'Italy': '#0284c7',
+        'England': '#f43f5e',
+        'Netherlands': '#f97316',
+        'Uruguay': '#38bdf8',
+        'Portugal': '#10b981'
+    }
     
     from run_compute_team import run_compute_team
     for t in teams_to_compute:
@@ -183,12 +195,13 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     fig_ratings = make_subplots(
         rows=2, cols=1,
         shared_xaxes=True,
-        vertical_spacing=0.12,
-        subplot_titles=("Overall Rating Points (R^e)", "Tactical Style Ratings: Offensive (R^o) & Defensive (R^d)")
+        vertical_spacing=0.10,
+        subplot_titles=("Top Panel: Overall Rating Points (R^e)", "Bottom Panel: Tactical Style Ratings — Offensive (R^o) & Defensive (R^d)")
     )
     
-    buttons = []
-    num_teams = len(teams_to_compute)
+    # Add traces for all 10 teams
+    # Spain and Brazil checked by default
+    default_checked = ['Spain', 'Brazil']
     
     for i, t in enumerate(teams_to_compute):
         t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
@@ -196,62 +209,112 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
         df_t['date'] = pd.to_datetime(df_t['date'])
         df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date')
         
-        is_visible = (i == 0)  # Spain default visible
+        c = team_colors[t]
+        is_vis = (t in default_checked)
         
-        # Row 1: Overall Elo
+        # Trace 0: Overall Elo
         fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo'], name="Overall Elo (R^e)", line=dict(color='#ef4444', width=3), visible=is_visible),
+            go.Scatter(x=df_t['date'], y=df_t['elo'], name=f"{t} (R^e)", line=dict(color=c, width=3), visible=is_vis),
             row=1, col=1
         )
-        # Row 2: Offensive & Defensive Elo (Decoupled in Row 2)
+        # Trace 1: Offensive Elo
         fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo_off'], name="Offensive Elo (R^o)", line=dict(color='#f59e0b', width=2.5), visible=is_visible),
+            go.Scatter(x=df_t['date'], y=df_t['elo_off'], name=f"{t} Offense (R^o)", line=dict(color=c, width=2, dash='solid'), visible=is_vis),
             row=2, col=1
         )
+        # Trace 2: Defensive Elo
         fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo_def'], name="Defensive Elo (R^d)", line=dict(color='#3b82f6', width=2.5), visible=is_visible),
+            go.Scatter(x=df_t['date'], y=df_t['elo_def'], name=f"{t} Defense (R^d)", line=dict(color=c, width=2, dash='dot'), visible=is_vis),
             row=2, col=1
         )
-        
-        vis_mask = [False] * (num_teams * 3)
-        vis_mask[i*3 : i*3+3] = [True, True, True]
-        
-        buttons.append(dict(
-            label=t,
-            method="update",
-            args=[{"visible": vis_mask}, {"title": f"{t} Historical Rating Dynamics & Tactical Style (1950–2026)"}]
-        ))
 
+    chart_div_id = "ratings-plotly-chart"
+    
     fig_ratings.update_layout(
-        title="Spain Historical Rating Dynamics & Tactical Style (1950–2026)",
-        updatemenus=[dict(
-            active=0,
-            buttons=buttons,
-            x=0.0, y=1.18,
-            xanchor="left", yanchor="top",
-            bgcolor="#1e293b", bordercolor="#475569", font=dict(color="#f8fafc", size=14)
-        )],
         template="plotly_dark",
         height=720,
+        legend=dict(orientation="h", y=1.12, x=0.0),
         xaxis2=dict(
             rangeslider=dict(visible=True),
             type="date"
         )
     )
     
-    plotly_html_spain = f"\n\n```{{=html}}\n{fig_ratings.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
+    # Generate Plotly HTML string
+    plotly_inner_html = fig_ratings.to_html(full_html=False, include_plotlyjs='cdn', div_id=chart_div_id)
+    
+    # Build Checkbox Controls HTML + JS
+    team_checkboxes_html = ""
+    for i, t in enumerate(teams_to_compute):
+        c = team_colors[t]
+        is_chk = "checked" if t in default_checked else ""
+        team_checkboxes_html += f"""
+        <label style="color: {c}; font-weight: 600; cursor: pointer; background: #0f172a; padding: 6px 12px; border-radius: 6px; border: 1px solid #334155;">
+          <input type="checkbox" id="chk-team-{i}" {is_chk} onchange="updateRatingsChart()"> {t}
+        </label>"""
+
+    control_panel_html = f"""
+<div class="team-selector-box" style="background: #1e293b; padding: 18px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155;">
+  <div style="font-weight: 600; color: #f8fafc; margin-bottom: 10px; font-size: 1.05rem;">
+    ⚽ Select Teams to Compare:
+  </div>
+  <div class="team-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+    {team_checkboxes_html}
+  </div>
+  <hr style="border-color: #334155; margin: 12px 0;">
+  <div style="font-weight: 600; color: #f8fafc; margin-bottom: 10px; font-size: 1.05rem;">
+    📊 Subplot Component Controls:
+  </div>
+  <div class="metric-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 18px;">
+    <label style="color: #f8fafc; font-weight: 600; cursor: pointer;">
+      <input type="checkbox" id="chk-elo" checked onchange="updateRatingsChart()"> Top Panel: Overall Rating ($R^e$)
+    </label>
+    <label style="color: #f59e0b; font-weight: 600; cursor: pointer;">
+      <input type="checkbox" id="chk-off" checked onchange="updateRatingsChart()"> Bottom Panel: Offensive Rating ($R^o$)
+    </label>
+    <label style="color: #3b82f6; font-weight: 600; cursor: pointer;">
+      <input type="checkbox" id="chk-def" checked onchange="updateRatingsChart()"> Bottom Panel: Defensive Rating ($R^d$)
+    </label>
+  </div>
+</div>
+
+<script type="text/javascript">
+function updateRatingsChart() {{
+    var gd = document.getElementById('{chart_div_id}');
+    if (!gd) return;
+    
+    var showElo = document.getElementById('chk-elo').checked;
+    var showOff = document.getElementById('chk-off').checked;
+    var showDef = document.getElementById('chk-def').checked;
+    
+    var visArray = [];
+    var numTeams = {len(teams_to_compute)};
+    
+    for (var i = 0; i < numTeams; i++) {{
+        var teamChk = document.getElementById('chk-team-' + i).checked;
+        visArray.push(teamChk && showElo);
+        visArray.push(teamChk && showOff);
+        visArray.push(teamChk && showDef);
+    }}
+    
+    Plotly.restyle(gd, {{visible: visArray}});
+}}
+</script>
+"""
+
+    plotly_full_block = f"\n\n```{{=html}}\n{control_panel_html}\n{plotly_inner_html}\n```\n\n"
     
     ratings_qmd = f"""---
 title: "Interactive Team Trajectories Explorer"
-subtitle: "Select National Teams & Filter Historical Time Range (1950–2026)"
+subtitle: "Multi-Team Side-by-Side Comparison Suite & Time Range Filter (1950–2026)"
 format:
   html:
     page-layout: full
 ---
 
-Use the **Team Dropdown** menu below to switch between national teams and the **Range Slider** at the bottom to adjust the historical time window. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot axes.
+Use the **Team Checkboxes** below to add or remove national teams dynamically. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot panels to prevent visual overlay.
 
-{plotly_html_spain}
+{plotly_full_block}
 """
     with open(os.path.join(website_dir, 'ratings.qmd'), 'w') as f:
         f.write(ratings_qmd)
