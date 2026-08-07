@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>⚽ MultiElo Football: Match Monte Carlo &amp; World Cup Group Stage Simulation – MultiElo Football</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./https://raw.githubusercontent.com/cesarrennocosta/multielo-football/main/docs/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-cad0b34184409c1de83ef3d27fa2bbd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-84c77964e532c0c9e8e43cea4da41e6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-cad0b34184409c1de83ef3d27fa2bbd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">MultiElo Football</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./ratings.html"> 
+<span class="menu-text">Team Trajectories</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./ratings_norm.html"> 
+<span class="menu-text">Normalized Trajectories</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./world_no1.html"> 
+<span class="menu-text">World #1 Style</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./style_space.html"> 
+<span class="menu-text">Style Space</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./demo_simulation.html" aria-current="page"> 
+<span class="menu-text">Simulation Demo</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./models.html"> 
+<span class="menu-text">Model Hierarchy</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/cesarrennocosta/multielo-football"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" id="toc-part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" class="nav-link active" data-scroll-target="#part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap">Part 1: Two-Team Match Prediction &amp; 1,000 Monte Carlo Score Heatmap</a></li>
+  <li><a href="#part-2-4-team-fifa-world-cup-group-stage-simulation" id="toc-part-2-4-team-fifa-world-cup-group-stage-simulation" class="nav-link" data-scroll-target="#part-2-4-team-fifa-world-cup-group-stage-simulation">Part 2: 4-Team FIFA World Cup Group Stage Simulation</a>
+  <ul class="collapse">
+  <li><a href="#monte-carlo-group-stage-tournaments-finishing-position-heatmap" id="toc-monte-carlo-group-stage-tournaments-finishing-position-heatmap" class="nav-link" data-scroll-target="#monte-carlo-group-stage-tournaments-finishing-position-heatmap">1,000 Monte Carlo Group Stage Tournaments &amp; Finishing Position Heatmap</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">⚽ MultiElo Football: Match Monte Carlo &amp; World Cup Group Stage Simulation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This notebook demonstrates how to use the <code>multielo-football</code> library to: 1. Load multi-dimensional team ratings (<span class="math inline">\(R^e, R^o, R^d\)</span>) and compute Poisson match expectations (<span class="math inline">\(\lambda_A, \lambda_B\)</span>). 2. Perform <strong>1,000 Monte Carlo match simulations</strong> between two top national teams and plot a 2D scoreline probability heatmap. 3. Simulate a 4-team <strong>FIFA World Cup Group Stage round-robin</strong> under official FIFA tiebreaker rules (Points <span class="math inline">\(\rightarrow\)</span> Goal Difference <span class="math inline">\(\rightarrow\)</span> Goals For <span class="math inline">\(\rightarrow\)</span> Head-to-Head). 4. Run <strong>1,000 Monte Carlo group stage tournaments</strong> to calculate empirical probabilities for each team finishing in 1st, 2nd, 3rd, and 4th place, visualized as a heatmap.</p>
+<div id="7aa014d2" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T21:49:24.811378Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T21:49:24.811076Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T21:49:25.760434Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T21:49:25.760140Z&quot;}}" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Import multielo library</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> multielo</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Set clean white plotting style</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'font.sans-serif'</span>] <span class="op">=</span> <span class="st">'Inter'</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">120</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"multielo version: </span><span class="sc">{</span>multielo<span class="sc">.</span><span class="va">__file__</span><span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>multielo version: /Users/rennocosta/matchdataset/multielo_package/multielo/__init__.py</code></pre>
+</div>
+</div>
+<section id="part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap">Part 1: Two-Team Match Prediction &amp; 1,000 Monte Carlo Score Heatmap</h2>
+<p>We evaluate a neutral-venue match between <strong>Spain</strong> and <strong>England</strong> using model specification <strong><span class="math inline">\(M_{32}\)</span></strong> (3-Elo Complete Bivariate Poisson GLM).</p>
+<div id="3731b1d1" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T21:49:25.761628Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T21:49:25.761510Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T21:49:25.764439Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T21:49:25.764214Z&quot;}}" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Define Multi-Dimensional Ratings (Overall Elo, Offensive, Defensive)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>spain_ratings <span class="op">=</span> {<span class="st">'elo'</span>: <span class="fl">2279.0</span>, <span class="st">'off'</span>: <span class="fl">2276.6</span>, <span class="st">'def'</span>: <span class="fl">2412.4</span>}</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>england_ratings <span class="op">=</span> {<span class="st">'elo'</span>: <span class="fl">2117.7</span>, <span class="st">'off'</span>: <span class="fl">2341.5</span>, <span class="st">'def'</span>: <span class="fl">2226.9</span>}</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Predict match expectations under M32 Poisson GLM model</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> multielo.predict(spain_ratings, england_ratings, model_specs<span class="op">=</span><span class="st">'M32'</span>, is_neutral<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Analytical Model Prediction ==="</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Spain Win Probability   : </span><span class="sc">{</span>pred[<span class="st">'p_win_a'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Draw Probability        : </span><span class="sc">{</span>pred[<span class="st">'p_draw'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"England Win Probability : </span><span class="sc">{</span>pred[<span class="st">'p_win_b'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Goals (Spain)  : </span><span class="sc">{</span>pred[<span class="st">'expected_goals_a'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Goals (England): </span><span class="sc">{</span>pred[<span class="st">'expected_goals_b'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analytical Most Likely Score: </span><span class="sc">{</span>pred[<span class="st">'most_likely_score'</span>][<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>pred[<span class="st">'most_likely_score'</span>][<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== Analytical Model Prediction ===
+Spain Win Probability   : 45.2%
+Draw Probability        : 26.6%
+England Win Probability : 28.2%
+Expected Goals (Spain)  : 1.518
+Expected Goals (England): 1.142
+Analytical Most Likely Score: 1 - 1</code></pre>
+</div>
+</div>
+<div id="51e57471" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T21:49:25.765441Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T21:49:25.765370Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T21:49:25.968558Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T21:49:25.968317Z&quot;}}" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Perform 1,000 Monte Carlo Match Simulations</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>N_SIMS <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>lambda_spain <span class="op">=</span> pred[<span class="st">'expected_goals_a'</span>]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>lambda_england <span class="op">=</span> pred[<span class="st">'expected_goals_b'</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>sim_goals_spain <span class="op">=</span> np.random.poisson(lambda_spain, N_SIMS)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>sim_goals_england <span class="op">=</span> np.random.poisson(lambda_england, N_SIMS)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Construct 2D Score Frequency Matrix (0 to 5+ goals)</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>max_goals <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>score_matrix <span class="op">=</span> np.zeros((max_goals <span class="op">+</span> <span class="dv">1</span>, max_goals <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> g_s, g_e <span class="kw">in</span> <span class="bu">zip</span>(sim_goals_spain, sim_goals_england):</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    r_s <span class="op">=</span> <span class="bu">min</span>(g_s, max_goals)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    r_e <span class="op">=</span> <span class="bu">min</span>(g_e, max_goals)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    score_matrix[r_s, r_e] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>score_matrix_pct <span class="op">=</span> (score_matrix <span class="op">/</span> N_SIMS) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Plot Score Probability Heatmap</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">6</span>))</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> [<span class="bu">str</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_goals)] <span class="op">+</span> [<span class="ss">f'</span><span class="sc">{</span>max_goals<span class="sc">}</span><span class="ss">+'</span>]</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.heatmap(</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    score_matrix_pct,</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    annot<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    fmt<span class="op">=</span><span class="st">".1f"</span>,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"YlGnBu"</span>,</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Empirical Probability (%)'</span>},</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    xticklabels<span class="op">=</span>labels,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    yticklabels<span class="op">=</span>labels,</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    linewidths<span class="op">=</span><span class="fl">0.5</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Monte Carlo Scoreline Probabilities (%)</span><span class="ch">\n</span><span class="st">Spain vs England (1,000 Simulations)"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"England Goals"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Spain Goals"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>plt.gca().invert_yaxis()</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="demo_simulation_files/figure-html/cell-4-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="part-2-4-team-fifa-world-cup-group-stage-simulation" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-4-team-fifa-world-cup-group-stage-simulation">Part 2: 4-Team FIFA World Cup Group Stage Simulation</h2>
+<p>We evaluate a 4-team World Cup “Group of Death”: - 🇪🇸 <strong>Spain</strong> - 🇧🇷 <strong>Brazil</strong> - 🇩🇪 <strong>Germany</strong> - 🇯🇵 <strong>Japan</strong></p>
+<p>We implement official <strong>FIFA World Cup Tiebreaker Rules</strong>: 1. Points (<span class="math inline">\(3\)</span> for win, <span class="math inline">\(1\)</span> for draw, <span class="math inline">\(0\)</span> for loss) 2. Goal Difference (<span class="math inline">\(GD = GF - GA\)</span>) 3. Goals For (<span class="math inline">\(GF\)</span>) 4. Head-to-head match result / Random coin toss</p>
+<div id="ca904247" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T21:49:25.969652Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T21:49:25.969568Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T21:49:25.974068Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T21:49:25.973874Z&quot;}}" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Group Teams and Multi-Dimensional Ratings</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>group_teams <span class="op">=</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Spain'</span>: {<span class="st">'elo'</span>: <span class="fl">2279.0</span>, <span class="st">'off'</span>: <span class="fl">2276.6</span>, <span class="st">'def'</span>: <span class="fl">2412.4</span>},</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Brazil'</span>: {<span class="st">'elo'</span>: <span class="fl">2250.0</span>, <span class="st">'off'</span>: <span class="fl">2310.0</span>, <span class="st">'def'</span>: <span class="fl">2350.0</span>},</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Germany'</span>: {<span class="st">'elo'</span>: <span class="fl">2180.0</span>, <span class="st">'off'</span>: <span class="fl">2240.0</span>, <span class="st">'def'</span>: <span class="fl">2260.0</span>},</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Japan'</span>: {<span class="st">'elo'</span>: <span class="fl">1980.0</span>, <span class="st">'off'</span>: <span class="fl">2020.0</span>, <span class="st">'def'</span>: <span class="fl">2010.0</span>}</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_match(team_a, team_b):</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> multielo.predict(group_teams[team_a], group_teams[team_b], model_specs<span class="op">=</span><span class="st">'M32'</span>, is_neutral<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    g_a <span class="op">=</span> np.random.poisson(pred[<span class="st">'expected_goals_a'</span>])</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    g_b <span class="op">=</span> np.random.poisson(pred[<span class="st">'expected_goals_b'</span>])</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g_a, g_b</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_group_stage():</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    teams <span class="op">=</span> <span class="bu">list</span>(group_teams.keys())</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    stats <span class="op">=</span> {t: {<span class="st">'pld'</span>: <span class="dv">0</span>, <span class="st">'w'</span>: <span class="dv">0</span>, <span class="st">'d'</span>: <span class="dv">0</span>, <span class="st">'l'</span>: <span class="dv">0</span>, <span class="st">'gf'</span>: <span class="dv">0</span>, <span class="st">'ga'</span>: <span class="dv">0</span>, <span class="st">'gd'</span>: <span class="dv">0</span>, <span class="st">'pts'</span>: <span class="dv">0</span>} <span class="cf">for</span> t <span class="kw">in</span> teams}</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    matches <span class="op">=</span> [</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Brazil'</span>), (<span class="st">'Germany'</span>, <span class="st">'Japan'</span>),</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Germany'</span>), (<span class="st">'Brazil'</span>, <span class="st">'Japan'</span>),</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Japan'</span>), (<span class="st">'Brazil'</span>, <span class="st">'Germany'</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    match_results <span class="op">=</span> []</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t_a, t_b <span class="kw">in</span> matches:</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        g_a, g_b <span class="op">=</span> simulate_match(t_a, t_b)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        match_results.append((t_a, g_a, g_b, t_b))</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'pld'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'pld'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'gf'</span>] <span class="op">+=</span> g_a<span class="op">;</span> stats[t_a][<span class="st">'ga'</span>] <span class="op">+=</span> g_b</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        stats[t_b][<span class="st">'gf'</span>] <span class="op">+=</span> g_b<span class="op">;</span> stats[t_b][<span class="st">'ga'</span>] <span class="op">+=</span> g_a</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'gd'</span>] <span class="op">+=</span> (g_a <span class="op">-</span> g_b)<span class="op">;</span> stats[t_b][<span class="st">'gd'</span>] <span class="op">+=</span> (g_b <span class="op">-</span> g_a)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> g_a <span class="op">&gt;</span> g_b:</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>            stats[t_a][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span> stats[t_a][<span class="st">'w'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'l'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> g_b <span class="op">&gt;</span> g_a:</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>            stats[t_b][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span> stats[t_b][<span class="st">'w'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_a][<span class="st">'l'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>            stats[t_a][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_a][<span class="st">'d'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'d'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply FIFA World Cup Tiebreaker Sorting: Pts -&gt; GD -&gt; GF -&gt; Random Tiebreaker</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    sorted_teams <span class="op">=</span> <span class="bu">sorted</span>(teams, key<span class="op">=</span><span class="kw">lambda</span> t: (</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'pts'</span>],</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'gd'</span>],</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'gf'</span>],</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>        np.random.rand()</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    ), reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sorted_teams, stats, match_results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="2ed306e0" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T21:49:25.975074Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T21:49:25.974998Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T21:49:25.982383Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T21:49:25.982185Z&quot;}}" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run a Single Group Stage Simulation</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">101</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>standings, stats, match_results <span class="op">=</span> run_group_stage()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Single Tournament Group Stage Match Results ==="</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t_a, g_a, g_b, t_b <span class="kw">in</span> match_results:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>t_a<span class="sc">:10s}</span><span class="ss"> </span><span class="sc">{</span>g_a<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>g_b<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>t_b<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Final Group Classification (FIFA WC Tiebreakers) ==="</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>df_standings <span class="op">=</span> pd.DataFrame([</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Rank'</span>: pos <span class="op">+</span> <span class="dv">1</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Team'</span>: team,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Pld'</span>: stats[team][<span class="st">'pld'</span>],</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">'W'</span>: stats[team][<span class="st">'w'</span>],</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">'D'</span>: stats[team][<span class="st">'d'</span>],</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">'L'</span>: stats[team][<span class="st">'l'</span>],</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GF'</span>: stats[team][<span class="st">'gf'</span>],</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GA'</span>: stats[team][<span class="st">'ga'</span>],</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GD'</span>: <span class="ss">f"</span><span class="sc">{</span>stats[team][<span class="st">'gd'</span>]<span class="sc">:+d}</span><span class="ss">"</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Pts'</span>: stats[team][<span class="st">'pts'</span>]</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pos, team <span class="kw">in</span> <span class="bu">enumerate</span>(standings)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>df_standings</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== Single Tournament Group Stage Match Results ===
+Spain      1 - 0 Brazil
+Germany    3 - 2 Japan
+Spain      1 - 0 Germany
+Brazil     3 - 1 Japan
+Spain      3 - 0 Japan
+Brazil     0 - 2 Germany
+
+=== Final Group Classification (FIFA WC Tiebreakers) ===</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Rank</th>
+<th data-quarto-table-cell-role="th">Team</th>
+<th data-quarto-table-cell-role="th">Pld</th>
+<th data-quarto-table-cell-role="th">W</th>
+<th data-quarto-table-cell-role="th">D</th>
+<th data-quarto-table-cell-role="th">L</th>
+<th data-quarto-table-cell-role="th">GF</th>
+<th data-quarto-table-cell-role="th">GA</th>
+<th data-quarto-table-cell-role="th">GD</th>
+<th data-quarto-table-cell-role="th">Pts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>1</td>
+<td>Spain</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>0</td>
+<td>+5</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>2</td>
+<td>Germany</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>1</td>
+<td>5</td>
+<td>3</td>
+<td>+2</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>3</td>
+<td>Brazil</td>
+<td>3</td>
+<td>1</td>
+<td>0</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>-1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>4</td>
+<td>Japan</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>3</td>
+<td>9</td>
+<td>-6</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="monte-carlo-group-stage-tournaments-finishing-position-heatmap" class="level3">
+<h3 class="anchored" data-anchor-id="monte-carlo-group-stage-tournaments-finishing-position-heatmap">1,000 Monte Carlo Group Stage Tournaments &amp; Finishing Position Heatmap</h3>
+<p>Now we simulate the group stage <strong>1,000 times</strong> to compute the empirical probability distribution of each team finishing in <strong>1st, 2nd, 3rd, and 4th place</strong>.</p>
+<div id="e353acfe" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T21:49:25.983274Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T21:49:25.983213Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T21:49:26.490088Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T21:49:26.489779Z&quot;}}" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run 1,000 Full Group Stage Tournament Simulations</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>N_GROUPS <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>rank_counts <span class="op">=</span> {t: [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>] <span class="cf">for</span> t <span class="kw">in</span> group_teams.keys()}</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_GROUPS):</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    st, _, _ <span class="op">=</span> run_group_stage()</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pos, team <span class="kw">in</span> <span class="bu">enumerate</span>(st):</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        rank_counts[team][pos] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate percentages (%)</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>df_rank_pct <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    rank_counts,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">'1st Place (Winner)'</span>, <span class="st">'2nd Place (Runner-up)'</span>, <span class="st">'3rd Place'</span>, <span class="st">'4th Place'</span>]</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>).T</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>df_rank_pct <span class="op">=</span> (df_rank_pct <span class="op">/</span> N_GROUPS) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Empirical Finishing Position Probabilities (%) ==="</span>)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>display(df_rank_pct.<span class="bu">round</span>(<span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== Empirical Finishing Position Probabilities (%) ===</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">1st Place (Winner)</th>
+<th data-quarto-table-cell-role="th">2nd Place (Runner-up)</th>
+<th data-quarto-table-cell-role="th">3rd Place</th>
+<th data-quarto-table-cell-role="th">4th Place</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Spain</th>
+<td>41.4</td>
+<td>31.7</td>
+<td>23.4</td>
+<td>3.5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Brazil</th>
+<td>39.2</td>
+<td>34.0</td>
+<td>22.2</td>
+<td>4.6</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Germany</th>
+<td>18.5</td>
+<td>31.3</td>
+<td>41.8</td>
+<td>8.4</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Japan</th>
+<td>0.9</td>
+<td>3.0</td>
+<td>12.6</td>
+<td>83.5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="2a397ec8" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T21:49:26.491373Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T21:49:26.491277Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T21:49:26.640705Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T21:49:26.640469Z&quot;}}" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Group Stage Finishing Probabilities Heatmap</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.heatmap(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    df_rank_pct,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    annot<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    fmt<span class="op">=</span><span class="st">".1f"</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"OrRd"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Finishing Probability (%)'</span>},</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    linewidths<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    annot_kws<span class="op">=</span>{<span class="st">"size"</span>: <span class="dv">11</span>, <span class="st">"weight"</span>: <span class="st">"bold"</span>}</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"FIFA World Cup Group Stage Finishing Probabilities (%)</span><span class="ch">\n</span><span class="st">(1,000 Monte Carlo Tournament Simulations)"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Finishing Position"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"National Team"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter
+findfont: Generic family 'sans-serif' not found because none of the following families were found: Inter</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="demo_simulation_files/figure-html/cell-8-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
