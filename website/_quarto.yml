@@ -13,6 +13,8 @@ website:
         href: index.qmd
       - text: "Team Trajectories"
         href: ratings.qmd
+      - text: "Normalized Trajectories"
+        href: ratings_norm.qmd
       - text: "World #1 Style"
         href: world_no1.qmd
       - text: "Style Space"

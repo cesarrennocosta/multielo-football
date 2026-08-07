@@ -14,7 +14,6 @@ if pkg_root not in sys.path:
 
 import multielo
 
-# Exact World Cup Victory Final Dates & Champions (1950-2026)
 WC_VICTORIES = [
     ('Uruguay', '1950-07-16', "Uruguay '50"),
     ('Germany', '1954-07-04', "Germany '54"),
@@ -39,7 +38,7 @@ WC_VICTORIES = [
 
 TEAM_COLORS = {
     'Spain': '#dc2626',
-    'Brazil': '#eab308',
+    'Brazil': '#d97706',
     'Germany': '#475569',
     'Argentina': '#0891b2',
     'France': '#2563eb',
@@ -47,10 +46,7 @@ TEAM_COLORS = {
     'England': '#e11d48',
     'Netherlands': '#ea580c',
     'Uruguay': '#0284c7',
-    'Portugal': '#059669',
-    'Hungary': '#059669',
-    'Netherlands': '#ea580c',
-    'Belgium': '#b91c1c'
+    'Portugal': '#059669'
 }
 
 def build_website_views():
@@ -186,12 +182,11 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     with open(os.path.join(website_dir, 'index.qmd'), 'w') as f:
         f.write(index_qmd)
 
-    # 2. Build world_no1.qmd (World #1 Style Space - Downsampled, >= 6 Months Stints, Golden Stars)
+    # 2. Build world_no1.qmd (World #1 Style Space)
     idx_max = df_norm.groupby('date')['elo'].idxmax()
     df_no1 = df_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
     df_no1 = df_no1[df_no1['team'] != 'Tahiti']
     
-    # Identify contiguous World #1 stints
     df_no1['team_change'] = (df_no1['team'] != df_no1['team'].shift(1)).astype(int)
     df_no1['stint_id'] = df_no1['team_change'].cumsum()
     
@@ -202,12 +197,10 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
         end_date = group['date'].max()
         duration_days = (end_date - start_date).days
         
-        # Only keep nations holding #1 for at least 6 months (180 days)
         if duration_days >= 180:
             group = group.copy()
             group['year'] = group['date'].dt.year
             group['half'] = np.where(group['date'].dt.month <= 6, 1, 2)
-            # Sample max 2 points per year (one per half-year)
             for (yr, hf), subg in group.groupby(['year', 'half']):
                 stints.append(subg.iloc[len(subg)//2])
                 
@@ -216,14 +209,10 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     
     fig_no1 = go.Figure()
     
-    # Track traces per team for JS toggling
-    team_trace_map = {}
-    
     for i, t in enumerate(unique_teams):
         df_t = df_no1_sampled[df_no1_sampled['team'] == t]
         c = TEAM_COLORS.get(t, '#64748b')
         
-        # Team scatter points
         fig_no1.add_trace(go.Scatter(
             x=df_t['norm_def'],
             y=df_t['norm_off'],
@@ -233,9 +222,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
             customdata=np.stack((df_t['date'].dt.strftime('%Y-%m-%d'), df_t['elo'].round(1), df_t['norm_elo'].round(3)), axis=-1),
             hovertemplate="<b>" + t + "</b><br>Date: %{customdata[0]}<br>Defensive Score: %{x:.3f}<br>Offensive Score: %{y:.3f}<br>Elo Rating: %{customdata[1]}<extra></extra>"
         ))
-        team_trace_map[t] = i
 
-    # Identify World Cup Victory exact dates in df_norm
     wc_stars_x = []
     wc_stars_y = []
     wc_stars_text = []
@@ -243,7 +230,6 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     
     for tm, dt_str, label in WC_VICTORIES:
         dt_val = pd.to_datetime(dt_str)
-        # Find closest match date for team
         df_tm = df_norm[(df_norm['team'] == tm) & (df_norm['date'] >= dt_val - pd.Timedelta(days=14)) & (df_norm['date'] <= dt_val + pd.Timedelta(days=14))]
         if not df_tm.empty:
             row_wc = df_tm.iloc[0]
@@ -252,7 +238,6 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
             wc_stars_text.append(label)
             wc_stars_hover.append(f"⭐ <b>{label}</b><br>Date: {row_wc['date'].strftime('%Y-%m-%d')}<br>Defensive Score: {row_wc['norm_def']:.3f}<br>Offensive Score: {row_wc['norm_off']:.3f}")
 
-    # Trace for World Cup Golden Stars (Always Top Layer)
     star_trace_idx = len(unique_teams)
     fig_no1.add_trace(go.Scatter(
         x=wc_stars_x,
@@ -284,7 +269,6 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     no1_div_id = "world-no1-chart"
     plotly_inner_no1 = fig_no1.to_html(full_html=False, include_plotlyjs='cdn', div_id=no1_div_id)
 
-    # Build Team Checkboxes (Soft clear transparent gray when off)
     no1_team_checkboxes = ""
     for i, t in enumerate(unique_teams):
         c = TEAM_COLORS.get(t, '#475569')
@@ -327,14 +311,12 @@ function updateNo1Chart() {{
             opacityUpdates.push(0.9);
             sizeUpdates.push(10);
         }} else {{
-            // Soft clear transparent gray when off
             colorUpdates.push('rgba(226, 232, 240, 0.22)');
             opacityUpdates.push(0.12);
             sizeUpdates.push(6);
         }}
     }}
     
-    // Update team trace colors & opacities
     for (var i = 0; i < numTeams; i++) {{
         Plotly.restyle(gd, {{
             'marker.color': colorUpdates[i],
@@ -343,7 +325,6 @@ function updateNo1Chart() {{
         }}, [i]);
     }}
     
-    // Toggle World Cup Star Markers
     var chkStars = document.getElementById('chk-wc-stars');
     var showStars = chkStars ? chkStars.checked : true;
     
@@ -387,7 +368,7 @@ Unchecking a team fades its points into a **soft clear transparent gray backgrou
     with open(os.path.join(website_dir, 'world_no1.qmd'), 'w') as f:
         f.write(world_no1_qmd)
 
-    # 3. Build ratings.qmd (Multi-Team Trajectory Explorer - White Theme, Faded Gray Off-State, Straight Offense / Dashed Defense)
+    # 3. Build ratings.qmd (Lightweight Downsampled Team Trajectories - Raw Elo Points)
     teams_to_compute = ['Spain', 'Brazil', 'Germany', 'Argentina', 'Italy', 'France', 'England', 'Netherlands', 'Uruguay', 'Portugal']
     
     from run_compute_team import run_compute_team
@@ -397,96 +378,111 @@ Unchecking a team fades its points into a **soft clear transparent gray backgrou
             print(f"Pre-computing {t} rating trajectory...")
             run_compute_team(team=t, system='3eloC', normalize=False)
 
-    fig_ratings = make_subplots(
-        rows=2, cols=1,
-        shared_xaxes=True,
-        vertical_spacing=0.10,
-        subplot_titles=("Top Panel: Overall Rating Points (R^e)", "Bottom Panel: Tactical Style Ratings — Offensive (R^o, Solid) & Defensive (R^d, Dashed)")
-    )
-    
-    default_checked = ['Spain', 'Brazil']
-    
-    for i, t in enumerate(teams_to_compute):
-        t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
-        df_t = pd.read_csv(t_csv)
-        df_t['date'] = pd.to_datetime(df_t['date'])
-        df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date')
+    def generate_trajectory_page(is_normalized=False):
+        fig_ratings = make_subplots(
+            rows=2, cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.10,
+            subplot_titles=("Top Panel: Overall Rating Points (R^e)" if not is_normalized else "Top Panel: Normalized Overall Rating (R^e / R^e_10th)",
+                            "Bottom Panel: Tactical Style Ratings — Offensive (R^o, Solid) & Defensive (R^d, Dashed)" if not is_normalized else "Bottom Panel: Normalized Tactical Style Ratios — Offensive (R^o / R^o_10th) & Defensive (R^d / R^d_10th)")
+        )
         
-        c = TEAM_COLORS.get(t, '#334155')
-        is_vis = (t in default_checked)
+        default_checked = ['Spain', 'Brazil']
         
-        # Trace 0: Overall Elo (Solid line)
-        fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo'], name=f"{t} (R^e)", line=dict(color=c, width=3, dash='solid'), visible=is_vis),
-            row=1, col=1
-        )
-        # Trace 1: Offensive Elo (Straight/Solid line)
-        fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo_off'], name=f"{t} Offense (R^o)", line=dict(color=c, width=2.2, dash='solid'), visible=is_vis),
-            row=2, col=1
-        )
-        # Trace 2: Defensive Elo (Dashed line)
-        fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo_def'], name=f"{t} Defense (R^d)", line=dict(color=c, width=2.2, dash='dash'), visible=is_vis),
-            row=2, col=1
-        )
+        for i, t in enumerate(teams_to_compute):
+            if is_normalized:
+                t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}_norm.csv')
+                if not os.path.exists(t_csv):
+                    print(f"Pre-computing {t} normalized trajectory...")
+                    run_compute_team(team=t, system='3eloC', normalize=True)
+            else:
+                t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
+                
+            df_t = pd.read_csv(t_csv)
+            df_t['date'] = pd.to_datetime(df_t['date'])
+            df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date')
+            
+            # Downsample: Keep match dates or sample bi-weekly to make rendering ultra-light
+            if 'played_match_today' in df_t.columns:
+                df_t = df_t[(df_t['played_match_today'] == True) | (df_t.index % 7 == 0)]
+            else:
+                df_t = df_t.iloc[::5]
+                
+            c = TEAM_COLORS.get(t, '#334155')
+            is_vis = (t in default_checked)
+            
+            y_elo = df_t['norm_elo'] if (is_normalized and 'norm_elo' in df_t.columns) else df_t['elo']
+            y_off = df_t['norm_off'] if (is_normalized and 'norm_off' in df_t.columns) else df_t['elo_off']
+            y_def = df_t['norm_def'] if (is_normalized and 'norm_def' in df_t.columns) else df_t['elo_def']
+            
+            fig_ratings.add_trace(
+                go.Scatter(x=df_t['date'], y=y_elo, name=f"{t} (R^e)", line=dict(color=c, width=3, dash='solid'), visible=is_vis),
+                row=1, col=1
+            )
+            fig_ratings.add_trace(
+                go.Scatter(x=df_t['date'], y=y_off, name=f"{t} Offense (R^o)", line=dict(color=c, width=2.2, dash='solid'), visible=is_vis),
+                row=2, col=1
+            )
+            fig_ratings.add_trace(
+                go.Scatter(x=df_t['date'], y=y_def, name=f"{t} Defense (R^d)", line=dict(color=c, width=2.2, dash='dash'), visible=is_vis),
+                row=2, col=1
+            )
 
-    # Add FIFA World Cup Tournament Markers (1950–2026)
-    world_cup_years = [
-        (1950, "WC '50"), (1954, "WC '54"), (1958, "WC '58"), (1962, "WC '62"),
-        (1966, "WC '66"), (1970, "WC '70"), (1974, "WC '74"), (1978, "WC '78"),
-        (1982, "WC '82"), (1986, "WC '86"), (1990, "WC '90"), (1994, "WC '94"),
-        (1998, "WC '98"), (2002, "WC '02"), (2006, "WC '06"), (2010, "WC '10"),
-        (2014, "WC '14"), (2018, "WC '18"), (2022, "WC '22"), (2026, "WC '26")
-    ]
-    
-    for yr, label in world_cup_years:
-        wc_date = f"{yr}-06-15"
-        fig_ratings.add_vline(
-            x=wc_date,
-            line_dash="dot",
-            line_color="rgba(148, 163, 184, 0.45)",
-            line_width=1.2
-        )
-        fig_ratings.add_annotation(
-            x=wc_date, y=1.02, yref="y domain",
-            text=label, showarrow=False,
-            font=dict(size=9, color="#64748b"),
-            row=1, col=1
-        )
+        world_cup_years = [
+            (1950, "WC '50"), (1954, "WC '54"), (1958, "WC '58"), (1962, "WC '62"),
+            (1966, "WC '66"), (1970, "WC '70"), (1974, "WC '74"), (1978, "WC '78"),
+            (1982, "WC '82"), (1986, "WC '86"), (1990, "WC '90"), (1994, "WC '94"),
+            (1998, "WC '98"), (2002, "WC '02"), (2006, "WC '06"), (2010, "WC '10"),
+            (2014, "WC '14"), (2018, "WC '18"), (2022, "WC '22"), (2026, "WC '26")
+        ]
+        
+        for yr, label in world_cup_years:
+            wc_date = f"{yr}-06-15"
+            fig_ratings.add_vline(
+                x=wc_date,
+                line_dash="dot",
+                line_color="rgba(148, 163, 184, 0.45)",
+                line_width=1.2
+            )
+            fig_ratings.add_annotation(
+                x=wc_date, y=1.02, yref="y domain",
+                text=label, showarrow=False,
+                font=dict(size=9, color="#64748b"),
+                row=1, col=1
+            )
 
-    ratings_div_id = "ratings-plotly-chart"
-    
-    fig_ratings.update_layout(
-        template="plotly_white",
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        height=740,
-        showlegend=False,
-        margin=dict(t=50, b=40, l=60, r=40),
-        font=dict(color="#0f172a", family="Inter, sans-serif"),
-        xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-        yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-        xaxis2=dict(
-            gridcolor="#e2e8f0", zerolinecolor="#cbd5e1",
-            rangeslider=dict(visible=True),
-            type="date"
-        ),
-        yaxis2=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
-    )
-    
-    plotly_inner_ratings = fig_ratings.to_html(full_html=False, include_plotlyjs='cdn', div_id=ratings_div_id)
-    
-    team_checkboxes_html = ""
-    for i, t in enumerate(teams_to_compute):
-        c = TEAM_COLORS.get(t, '#334155')
-        is_chk = "checked" if t in default_checked else ""
-        team_checkboxes_html += f"""
-        <label style="color: {c}; font-weight: 600; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
-          <input type="checkbox" id="chk-team-{i}" {is_chk} onchange="updateRatingsChart()"> {t}
-        </label>"""
+        ratings_div_id = "ratings-norm-chart" if is_normalized else "ratings-plotly-chart"
+        
+        fig_ratings.update_layout(
+            template="plotly_white",
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+            height=740,
+            showlegend=False,
+            margin=dict(t=50, b=40, l=60, r=40),
+            font=dict(color="#0f172a", family="Inter, sans-serif"),
+            xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+            yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+            xaxis2=dict(
+                gridcolor="#e2e8f0", zerolinecolor="#cbd5e1",
+                rangeslider=dict(visible=True),
+                type="date"
+            ),
+            yaxis2=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
+        )
+        
+        plotly_inner_ratings = fig_ratings.to_html(full_html=False, include_plotlyjs='cdn', div_id=ratings_div_id)
+        
+        team_checkboxes_html = ""
+        for i, t in enumerate(teams_to_compute):
+            c = TEAM_COLORS.get(t, '#334155')
+            is_chk = "checked" if t in default_checked else ""
+            team_checkboxes_html += f"""
+            <label style="color: {c}; font-weight: 600; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
+              <input type="checkbox" id="chk-team-{i}{'-norm' if is_normalized else ''}" {is_chk} onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> {t}
+            </label>"""
 
-    control_panel_ratings = f"""
+        control_panel_ratings = f"""
 <div class="team-selector-box" style="background: #f1f5f9; padding: 18px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #cbd5e1;">
   <div style="font-weight: 600; color: #0f172a; margin-bottom: 10px; font-size: 1.05rem;">
     ⚽ Select Teams to Compare:
@@ -500,31 +496,31 @@ Unchecking a team fades its points into a **soft clear transparent gray backgrou
   </div>
   <div class="metric-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 18px;">
     <label style="color: #0f172a; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-elo" checked onchange="updateRatingsChart()"> Top Panel: Overall Rating ($R^e$)
+      <input type="checkbox" id="chk-elo{'-norm' if is_normalized else ''}" checked onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> Top Panel: {'Normalized Rating ($R^e / R^e_{{10th}}$)' if is_normalized else 'Overall Rating ($R^e$)'}
     </label>
     <label style="color: #d97706; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-off" checked onchange="updateRatingsChart()"> Bottom Panel: Offensive Rating ($R^o$, Solid)
+      <input type="checkbox" id="chk-off{'-norm' if is_normalized else ''}" checked onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> Bottom Panel: {'Normalized Offense ($R^o / R^o_{{10th}}$, Solid)' if is_normalized else 'Offensive Rating ($R^o$, Solid)'}
     </label>
     <label style="color: #2563eb; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-def" checked onchange="updateRatingsChart()"> Bottom Panel: Defensive Rating ($R^d$, Dashed)
+      <input type="checkbox" id="chk-def{'-norm' if is_normalized else ''}" checked onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> Bottom Panel: {'Normalized Defense ($R^d / R^d_{{10th}}$, Dashed)' if is_normalized else 'Defensive Rating ($R^d$, Dashed)'}
     </label>
   </div>
 </div>
 
 <script type="text/javascript">
-function updateRatingsChart() {{
+function updateRatingsChart{'_norm' if is_normalized else ''}() {{
     var gd = document.getElementById('{ratings_div_id}');
     if (!gd) return;
     
-    var showElo = document.getElementById('chk-elo').checked;
-    var showOff = document.getElementById('chk-off').checked;
-    var showDef = document.getElementById('chk-def').checked;
+    var showElo = document.getElementById('chk-elo{'-norm' if is_normalized else ''}').checked;
+    var showOff = document.getElementById('chk-off{'-norm' if is_normalized else ''}').checked;
+    var showDef = document.getElementById('chk-def{'-norm' if is_normalized else ''}').checked;
     
     var visArray = [];
     var numTeams = {len(teams_to_compute)};
     
     for (var i = 0; i < numTeams; i++) {{
-        var teamChk = document.getElementById('chk-team-' + i).checked;
+        var teamChk = document.getElementById('chk-team-' + i + '{'-norm' if is_normalized else ''}').checked;
         visArray.push(teamChk && showElo);
         visArray.push(teamChk && showOff);
         visArray.push(teamChk && showDef);
@@ -535,8 +531,11 @@ function updateRatingsChart() {{
 </script>
 """
 
-    plotly_full_ratings = f"\n\n```{{=html}}\n{control_panel_ratings}\n{plotly_inner_ratings}\n```\n\n"
-    
+        plotly_full_ratings = f"\n\n```{{=html}}\n{control_panel_ratings}\n{plotly_inner_ratings}\n```\n\n"
+        return plotly_full_ratings
+
+    # Write ratings.qmd
+    plotly_ratings_raw = generate_trajectory_page(is_normalized=False)
     ratings_qmd = f"""---
 title: "Interactive Team Trajectories Explorer"
 subtitle: "Multi-Team Side-by-Side Comparison Suite & Time Range Filter (1950–2026)"
@@ -547,10 +546,27 @@ format:
 
 Use the **Team Checkboxes** below to add or remove national teams dynamically. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot panels with FIFA World Cup tournament markers (1950–2026).
 
-{plotly_full_ratings}
+{plotly_ratings_raw}
 """
     with open(os.path.join(website_dir, 'ratings.qmd'), 'w') as f:
         f.write(ratings_qmd)
+
+    # Write ratings_norm.qmd
+    plotly_ratings_norm = generate_trajectory_page(is_normalized=True)
+    ratings_norm_qmd = f"""---
+title: "Normalized Team Trajectories Explorer"
+subtitle: "Non-Dimensional Rating Coordinates Relative to 10th-Place World Baseline (1950–2026)"
+format:
+  html:
+    page-layout: full
+---
+
+This tab evaluates national team trajectories in **non-dimensional normalized coordinates** relative to the 10th-place World baseline ($R^e / R^e_{{10th}}$, $R^o / R^o_{{10th}}$, $R^d / R^d_{{10th}}$) on match dates.
+
+{plotly_ratings_norm}
+"""
+    with open(os.path.join(website_dir, 'ratings_norm.qmd'), 'w') as f:
+        f.write(ratings_norm_qmd)
 
     # 4. Build style_space.qmd (White Theme)
     df_avg = df_norm.groupby('team')[['norm_def', 'norm_off', 'elo']].mean().reset_index()
