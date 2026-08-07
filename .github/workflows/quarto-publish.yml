@@ -32,10 +32,10 @@ jobs:
         run: |
           python paper_scripts/build_website_views.py
 
-      - name: Render Quarto Website
+      - name: Render Quarto Website Statically
         run: |
           cd website
-          quarto render
+          quarto render --no-execute
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

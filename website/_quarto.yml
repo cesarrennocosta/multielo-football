@@ -22,7 +22,8 @@ website:
         href: https://github.com/cesarrennocosta/multielo-football
 
 execute:
-  enabled: false
+  eval: false
+  freeze: true
 
 format:
   html:
