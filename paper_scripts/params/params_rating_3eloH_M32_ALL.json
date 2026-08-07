@@ -1,0 +1,15 @@
+{
+    "rating_system": "3eloH",
+    "model_id": "M32",
+    "objective": "ALL",
+    "K_base": 29.258098,
+    "M_overall": 1.214153,
+    "H_overall": 83.252081,
+    "divisor_overall": 1063.323291,
+    "M_style": 1.168495,
+    "H_style": 77.766222,
+    "divisor_style": 1069.454901,
+    "K_scale": 0.61348,
+    "rho": -0.038613,
+    "loss_ALL": 0.427621
+}

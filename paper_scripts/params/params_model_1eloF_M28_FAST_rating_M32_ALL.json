@@ -1,0 +1,71 @@
+{
+    "rating_system": "1eloF",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloF",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 30.0,
+        "M_overall": 1.2,
+        "H_overall": 100.0,
+        "divisor_overall": 400.0,
+        "rho": -0.05,
+        "loss_ALL": 0.438295
+    },
+    "glm_model": {
+        "model_id": "M28",
+        "taxonomy_code": "B-I-L-T-C",
+        "distribution": "bivariate",
+        "home_advantage": "separate",
+        "response_type": "linear",
+        "time_trend": true,
+        "competition_weight": true,
+        "num_glm_params": 15
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.0019938464267765916,
+            0.05086707376442675,
+            0.0019256343494658767,
+            -6.105416821376471e-05,
+            0.45593524895491727
+        ],
+        "beta_away": [
+            0.0028077909733382096,
+            -0.3861993310841895,
+            -0.0016062802352097127,
+            2.366915965502364e-05,
+            0.26972185906463
+        ],
+        "rho": -0.050000174228916006,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "is_home",
+            "year_norm",
+            "year_norm2",
+            "is_comp"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "is_home",
+            "year_norm",
+            "year_norm2",
+            "is_comp"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.17183136695030246,
+        "RPS_slow": 0.17050666901625464,
+        "ESD_fast": 1.9309890109890109,
+        "Fast+ESD": 0.268380817499753,
+        "Joint_ALL": 0.4388874865160076
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.1725595959705797,
+        "CV_std": 0.0054866333795702705
+    },
+    "elapsed_seconds": 130.37
+}

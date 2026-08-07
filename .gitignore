@@ -1,6 +1,29 @@
+# Python build and cache artifacts
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 *.egg-info/
 dist/
 build/
 .eggs/
+.pytest_cache/
+
+# Ignore generated datasets, figures, and tables inside paper_scripts/
+paper_scripts/data/*
+!paper_scripts/data/.gitkeep
+
+paper_scripts/figures/*
+!paper_scripts/figures/.gitkeep
+
+paper_scripts/tables/*
+!paper_scripts/tables/.gitkeep
+
+# Ignore root data/figures outputs if any
+*.csv
+!paper_scripts/params/*.json
+
+# OS and IDE temporary files
+.DS_Store
+.vscode/
+.idea/

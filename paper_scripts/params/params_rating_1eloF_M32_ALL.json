@@ -1,0 +1,11 @@
+{
+    "rating_system": "1eloF",
+    "model_id": "M32",
+    "objective": "ALL",
+    "K_base": 30.0,
+    "M_overall": 1.2,
+    "H_overall": 100.0,
+    "divisor_overall": 400.0,
+    "rho": -0.05,
+    "loss_ALL": 0.438295
+}

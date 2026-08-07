@@ -1,0 +1,64 @@
+{
+    "rating_system": "1eloC",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloC",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 32.0,
+        "M_overall": 2.0,
+        "H_overall": 200.0,
+        "divisor_overall": 1200.0,
+        "G2": 1.1,
+        "a_margin": 4.0,
+        "b_margin": 3.5,
+        "rho": -0.05,
+        "loss_ALL": 0.435889
+    },
+    "glm_model": {
+        "model_id": "M25",
+        "taxonomy_code": "B-I-L-0-0",
+        "distribution": "bivariate",
+        "home_advantage": "separate",
+        "response_type": "linear",
+        "time_trend": false,
+        "competition_weight": false,
+        "num_glm_params": 9
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.36829466269744054,
+            0.0006260109435420633,
+            0.04327458416808511
+        ],
+        "beta_away": [
+            0.26135190952611514,
+            0.0008625306664459737,
+            -0.3820064149545545
+        ],
+        "rho": -0.05000005763538346,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "is_home"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "is_home"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.1712279936728997,
+        "RPS_slow": 0.16955045451310732,
+        "ESD_fast": 1.9236263736263737,
+        "Fast+ESD": 0.2674093123542184,
+        "Joint_ALL": 0.4369597668673257
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.1715862799192937,
+        "CV_std": 0.005048921578747885
+    },
+    "elapsed_seconds": 43.57
+}

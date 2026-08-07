@@ -1,0 +1,14 @@
+{
+    "rating_system": "1eloC",
+    "model_id": "M32",
+    "objective": "ALL",
+    "K_base": 32.0,
+    "M_overall": 2.0,
+    "H_overall": 200.0,
+    "divisor_overall": 1200.0,
+    "G2": 1.1,
+    "a_margin": 4.0,
+    "b_margin": 3.5,
+    "rho": -0.05,
+    "loss_ALL": 0.435889
+}

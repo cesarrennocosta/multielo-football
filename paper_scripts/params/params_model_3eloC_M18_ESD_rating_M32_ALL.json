@@ -1,0 +1,74 @@
+{
+    "rating_system": "3eloC",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "3eloC",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 32.05371,
+        "M_overall": 2.501047,
+        "H_overall": 218.209652,
+        "divisor_overall": 1267.582933,
+        "G2": 1.097433,
+        "a_margin": 4.32698,
+        "b_margin": 3.603202,
+        "M_style": 1.072913,
+        "H_style": 60.945526,
+        "divisor_style": 974.553479,
+        "K_scale": 0.552142,
+        "rho": -0.082093,
+        "loss_ALL": 0.427156
+    },
+    "glm_model": {
+        "model_id": "M18",
+        "taxonomy_code": "B-S-L-0-C",
+        "distribution": "bivariate",
+        "home_advantage": "shared",
+        "response_type": "linear",
+        "time_trend": false,
+        "competition_weight": true,
+        "num_glm_params": 7
+    },
+    "target_objective": "ESD",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.00014257349151144456,
+            0.0018048047951044767,
+            0.1197799020225368,
+            0.38263282417660693
+        ],
+        "beta_away": [
+            0.00022548916968126475,
+            0.0016978430103623365,
+            -0.30178207224340925,
+            0.28005103772338624
+        ],
+        "rho": -0.082093,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "is_home",
+            "is_comp"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "is_home",
+            "is_comp"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.1680045594150079,
+        "RPS_slow": 0.16660565496855875,
+        "ESD_fast": 1.8789010989010988,
+        "Fast+ESD": 0.2619496143600628,
+        "Joint_ALL": 0.4285552693286216
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 1.8821245421245423,
+        "CV_std": 0.03081794504114322
+    },
+    "elapsed_seconds": 27.33
+}

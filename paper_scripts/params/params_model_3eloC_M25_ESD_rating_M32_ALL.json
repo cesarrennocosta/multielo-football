@@ -1,0 +1,72 @@
+{
+    "rating_system": "3eloC",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "3eloC",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 32.05371,
+        "M_overall": 2.501047,
+        "H_overall": 218.209652,
+        "divisor_overall": 1267.582933,
+        "G2": 1.097433,
+        "a_margin": 4.32698,
+        "b_margin": 3.603202,
+        "M_style": 1.072913,
+        "H_style": 60.945526,
+        "divisor_style": 974.553479,
+        "K_scale": 0.552142,
+        "rho": -0.082093,
+        "loss_ALL": 0.427156
+    },
+    "glm_model": {
+        "model_id": "M25",
+        "taxonomy_code": "B-I-L-0-0",
+        "distribution": "bivariate",
+        "home_advantage": "separate",
+        "response_type": "linear",
+        "time_trend": false,
+        "competition_weight": false,
+        "num_glm_params": 9
+    },
+    "target_objective": "ESD",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.38263282417660505,
+            0.00014257349151047206,
+            0.0018048047951078725,
+            0.11977990202253745
+        ],
+        "beta_away": [
+            0.28005103772338513,
+            0.00022548916968111803,
+            0.0016978430103628428,
+            -0.3017820722434097
+        ],
+        "rho": -0.082093,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "is_home"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "is_home"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.16800455941501008,
+        "RPS_slow": 0.16660565496855997,
+        "ESD_fast": 1.8789010989010988,
+        "Fast+ESD": 0.26194961436006503,
+        "Joint_ALL": 0.42855526932862503
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 1.8821245421245423,
+        "CV_std": 0.03081794504114322
+    },
+    "elapsed_seconds": 27.43
+}

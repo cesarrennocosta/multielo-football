@@ -1,0 +1,74 @@
+{
+    "rating_system": "1eloC",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloC",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 32.0,
+        "M_overall": 2.0,
+        "H_overall": 200.0,
+        "divisor_overall": 1200.0,
+        "G2": 1.1,
+        "a_margin": 4.0,
+        "b_margin": 3.5,
+        "rho": -0.05,
+        "loss_ALL": 0.435889
+    },
+    "glm_model": {
+        "model_id": "M04",
+        "taxonomy_code": "P-S-L-T-C",
+        "distribution": "poisson",
+        "home_advantage": "shared",
+        "response_type": "linear",
+        "time_trend": true,
+        "competition_weight": true,
+        "num_glm_params": 8
+    },
+    "target_objective": "ESD",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.0007297936012377049,
+            0.05132927465066426,
+            0.0016954021369778613,
+            -6.042145510011497e-05,
+            0.4506906031121981
+        ],
+        "beta_away": [
+            0.0007769143799124271,
+            -0.3823318245092528,
+            -0.0013483414848090682,
+            2.3765194233407763e-05,
+            0.2622253249739117
+        ],
+        "rho": 0.0,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "is_home",
+            "year_norm",
+            "year_norm2",
+            "is_comp"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "is_home",
+            "year_norm",
+            "year_norm2",
+            "is_comp"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.17099891484443983,
+        "RPS_slow": 0.17138714549930859,
+        "ESD_fast": 1.9402564102564102,
+        "Fast+ESD": 0.2680117353572603,
+        "Joint_ALL": 0.4393988808565689
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 1.9641025641025642,
+        "CV_std": 0.07088200768368506
+    },
+    "elapsed_seconds": 100.34
+}

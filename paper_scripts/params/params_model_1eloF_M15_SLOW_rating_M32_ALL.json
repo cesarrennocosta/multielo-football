@@ -1,0 +1,73 @@
+{
+    "rating_system": "1eloF",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloF",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 30.0,
+        "M_overall": 1.2,
+        "H_overall": 100.0,
+        "divisor_overall": 400.0,
+        "rho": -0.05,
+        "loss_ALL": 0.438295
+    },
+    "glm_model": {
+        "model_id": "M15",
+        "taxonomy_code": "P-I-Q-T-0",
+        "distribution": "poisson",
+        "home_advantage": "separate",
+        "response_type": "quadratic",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 18
+    },
+    "target_objective": "SLOW",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.45840000947131265,
+            0.0025627117041764095,
+            -1.0186817919156212e-06,
+            0.07040355626938179,
+            0.0018956652548088443,
+            -5.8305135917290374e-05
+        ],
+        "beta_away": [
+            0.27904130956341766,
+            0.0026419593491330503,
+            -7.326819154493308e-07,
+            -0.3757791758347123,
+            -0.0018263956483983504,
+            3.357085311191495e-05
+        ],
+        "rho": 0.0,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "elo_diff_sq_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "elo_diff_sq_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.17196486629482624,
+        "RPS_slow": 0.17055695896584283,
+        "ESD_fast": 1.9383516483516483,
+        "Fast+ESD": 0.26888244871240863,
+        "Joint_ALL": 0.4394394076782515
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.2706885178737409,
+        "CV_std": 0.008941512666525778
+    },
+    "elapsed_seconds": 340.35
+}

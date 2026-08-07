@@ -1,0 +1,88 @@
+{
+    "rating_system": "3eloC",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "3eloC",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 32.05371,
+        "M_overall": 2.501047,
+        "H_overall": 218.209652,
+        "divisor_overall": 1267.582933,
+        "G2": 1.097433,
+        "a_margin": 4.32698,
+        "b_margin": 3.603202,
+        "M_style": 1.072913,
+        "H_style": 60.945526,
+        "divisor_style": 974.553479,
+        "K_scale": 0.552142,
+        "rho": -0.082093,
+        "loss_ALL": 0.427156
+    },
+    "glm_model": {
+        "model_id": "M31",
+        "taxonomy_code": "B-I-Q-T-0",
+        "distribution": "bivariate",
+        "home_advantage": "separate",
+        "response_type": "quadratic",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 19
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.3656975272664858,
+            0.00024352980783364102,
+            0.00164325750980867,
+            -6.666332175196527e-08,
+            -3.716284752396538e-07,
+            0.13383307277468975,
+            0.0036400754480900924,
+            -5.9573149991007536e-05
+        ],
+        "beta_away": [
+            0.1680858034325036,
+            0.0002932527904223885,
+            0.0015649385022932494,
+            -4.730024201129253e-08,
+            -2.1676667008760914e-07,
+            -0.29372265219525623,
+            0.0010374069547127425,
+            1.76510672814183e-05
+        ],
+        "rho": -0.08209299999757921,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "elo_diff_sq_h",
+            "off_def_diff_sq_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "elo_diff_sq_a",
+            "off_def_diff_sq_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.16730540358128262,
+        "RPS_slow": 0.16621669683165832,
+        "ESD_fast": 1.8860439560439561,
+        "Fast+ESD": 0.26160760138348044,
+        "Joint_ALL": 0.4278242982151388
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.1682893928961269,
+        "CV_std": 0.006213882065220865
+    },
+    "elapsed_seconds": 297.01
+}

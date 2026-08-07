@@ -1,0 +1,11 @@
+{
+    "rating_system": "2eloOD_pure",
+    "model_id": "M32",
+    "objective": "ALL",
+    "K_style": 11.11309,
+    "M_style": 1.162237,
+    "H_style": 42.158187,
+    "divisor_style": 777.419355,
+    "rho": -0.011497,
+    "loss_ALL": 0.437727
+}

@@ -1,0 +1,73 @@
+{
+    "rating_system": "1eloF",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloF",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 30.0,
+        "M_overall": 1.2,
+        "H_overall": 100.0,
+        "divisor_overall": 400.0,
+        "rho": -0.05,
+        "loss_ALL": 0.438295
+    },
+    "glm_model": {
+        "model_id": "M31",
+        "taxonomy_code": "B-I-Q-T-0",
+        "distribution": "bivariate",
+        "home_advantage": "separate",
+        "response_type": "quadratic",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 19
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.4584000013077476,
+            0.0025580929384448185,
+            -1.324596955614009e-06,
+            0.07040355819908502,
+            0.001895339428230029,
+            -7.441235018052713e-05
+        ],
+        "beta_away": [
+            0.27904130437124863,
+            0.002638286962550421,
+            -7.855726881792581e-07,
+            -0.37577918321746845,
+            -0.0018267266931580963,
+            1.1948888031468721e-05
+        ],
+        "rho": -0.0500000035684772,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "elo_diff_sq_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "elo_diff_sq_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.17180983044694606,
+        "RPS_slow": 0.1704399238578649,
+        "ESD_fast": 1.9422344322344323,
+        "Fast+ESD": 0.2689215520586677,
+        "Joint_ALL": 0.4393614759165326
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.17243305017757984,
+        "CV_std": 0.005606650835086899
+    },
+    "elapsed_seconds": 207.57
+}

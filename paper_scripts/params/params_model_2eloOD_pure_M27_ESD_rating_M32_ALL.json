@@ -1,0 +1,73 @@
+{
+    "rating_system": "2eloOD_pure",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "2eloOD_pure",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_style": 11.11309,
+        "M_style": 1.162237,
+        "H_style": 42.158187,
+        "divisor_style": 777.419355,
+        "rho": -0.011497,
+        "loss_ALL": 0.437727
+    },
+    "glm_model": {
+        "model_id": "M27",
+        "taxonomy_code": "B-I-L-T-0",
+        "distribution": "bivariate",
+        "home_advantage": "separate",
+        "response_type": "linear",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 13
+    },
+    "target_objective": "ESD",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.32539617444396063,
+            -0.0002775576081874817,
+            0.0027226844455699164,
+            0.14554064952064316,
+            0.004775455721850057,
+            -3.093999021326986e-05
+        ],
+        "beta_away": [
+            0.10865176507237831,
+            -0.0003237863677043205,
+            0.0028599894874570472,
+            -0.2597756122724954,
+            0.0027428708880607305,
+            -9.213957061009372e-06
+        ],
+        "rho": -0.011497,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.17059567728511849,
+        "RPS_slow": 0.16741352600906825,
+        "ESD_fast": 1.8917216117216118,
+        "Fast+ESD": 0.2651817578711991,
+        "Joint_ALL": 0.4325952838802673
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 1.880769230769231,
+        "CV_std": 0.05137250003662347
+    },
+    "elapsed_seconds": 110.13
+}

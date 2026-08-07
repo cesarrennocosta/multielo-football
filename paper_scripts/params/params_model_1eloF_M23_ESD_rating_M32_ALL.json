@@ -1,0 +1,73 @@
+{
+    "rating_system": "1eloF",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloF",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 30.0,
+        "M_overall": 1.2,
+        "H_overall": 100.0,
+        "divisor_overall": 400.0,
+        "rho": -0.05,
+        "loss_ALL": 0.438295
+    },
+    "glm_model": {
+        "model_id": "M23",
+        "taxonomy_code": "B-S-Q-T-0",
+        "distribution": "bivariate",
+        "home_advantage": "shared",
+        "response_type": "quadratic",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 11
+    },
+    "target_objective": "ESD",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.45840000947131265,
+            0.002562708518936281,
+            -9.95051754680688e-07,
+            0.07040355626938179,
+            0.0018956652548088443,
+            -5.8305135917290374e-05
+        ],
+        "beta_away": [
+            0.27904130956341766,
+            0.0026419593491330503,
+            -7.475710611573422e-07,
+            -0.3757791758347123,
+            -0.0018263956483983504,
+            3.357270499571097e-05
+        ],
+        "rho": -0.05,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "elo_diff_sq_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "elo_diff_sq_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.17190400914199153,
+        "RPS_slow": 0.17051130419876392,
+        "ESD_fast": 1.9191208791208791,
+        "Fast+ESD": 0.2678600530980355,
+        "Joint_ALL": 0.43837135729679944
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 1.9461172161172162,
+        "CV_std": 0.08136440650886778
+    },
+    "elapsed_seconds": 218.15
+}

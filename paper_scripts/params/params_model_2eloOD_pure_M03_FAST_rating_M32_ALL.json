@@ -1,0 +1,73 @@
+{
+    "rating_system": "2eloOD_pure",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "2eloOD_pure",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_style": 11.11309,
+        "M_style": 1.162237,
+        "H_style": 42.158187,
+        "divisor_style": 777.419355,
+        "rho": -0.011497,
+        "loss_ALL": 0.437727
+    },
+    "glm_model": {
+        "model_id": "M03",
+        "taxonomy_code": "P-S-L-T-0",
+        "distribution": "poisson",
+        "home_advantage": "shared",
+        "response_type": "linear",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 7
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.3253958112424029,
+            0.00019155127552108328,
+            0.0025795841439335515,
+            0.1455412706249213,
+            0.0047635434063326935,
+            -6.172367292285342e-05
+        ],
+        "beta_away": [
+            0.10865216190638552,
+            -0.0004962494411154518,
+            0.0031677165968480884,
+            -0.25977381246785286,
+            0.0027527473853802935,
+            1.3945753017538416e-05
+        ],
+        "rho": 0.0,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.16790659929851065,
+        "RPS_slow": 0.16676799565031136,
+        "ESD_fast": 1.896996336996337,
+        "Fast+ESD": 0.2627564161483275,
+        "Joint_ALL": 0.42952441179863887
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.16888115810403798,
+        "CV_std": 0.005977852926360488
+    },
+    "elapsed_seconds": 188.55
+}

@@ -1,0 +1,67 @@
+{
+    "rating_system": "2eloOD_pure",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "2eloOD_pure",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_style": 11.11309,
+        "M_style": 1.162237,
+        "H_style": 42.158187,
+        "divisor_style": 777.419355,
+        "rho": -0.011497,
+        "loss_ALL": 0.437727
+    },
+    "glm_model": {
+        "model_id": "M26",
+        "taxonomy_code": "B-I-L-0-C",
+        "distribution": "bivariate",
+        "home_advantage": "separate",
+        "response_type": "linear",
+        "time_trend": false,
+        "competition_weight": true,
+        "num_glm_params": 11
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.0001676103768349103,
+            0.002613509338812747,
+            0.14264111887648737,
+            0.3813991186519647
+        ],
+        "beta_away": [
+            -0.00045747969833295364,
+            0.0031563747399376693,
+            -0.25604942105693085,
+            0.27599366848339685
+        ],
+        "rho": -0.011499457212135257,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "is_home",
+            "is_comp"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "is_home",
+            "is_comp"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.16833845015540919,
+        "RPS_slow": 0.16680568186547157,
+        "ESD_fast": 1.8994505494505494,
+        "Fast+ESD": 0.26331097762793665,
+        "Joint_ALL": 0.43011665949340827
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.16875071144657044,
+        "CV_std": 0.004692421622276098
+    },
+    "elapsed_seconds": 61.47
+}

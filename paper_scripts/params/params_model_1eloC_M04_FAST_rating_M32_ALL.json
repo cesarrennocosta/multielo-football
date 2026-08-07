@@ -1,0 +1,74 @@
+{
+    "rating_system": "1eloC",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloC",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 32.0,
+        "M_overall": 2.0,
+        "H_overall": 200.0,
+        "divisor_overall": 1200.0,
+        "G2": 1.1,
+        "a_margin": 4.0,
+        "b_margin": 3.5,
+        "rho": -0.05,
+        "loss_ALL": 0.435889
+    },
+    "glm_model": {
+        "model_id": "M04",
+        "taxonomy_code": "P-S-L-T-C",
+        "distribution": "poisson",
+        "home_advantage": "shared",
+        "response_type": "linear",
+        "time_trend": true,
+        "competition_weight": true,
+        "num_glm_params": 8
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.0006520533353239358,
+            0.051329379456659247,
+            0.001694038333718061,
+            -6.867568881237213e-05,
+            0.45069052824679257
+        ],
+        "beta_away": [
+            0.0008756526513707309,
+            -0.38233190068397616,
+            -0.0013479785785086714,
+            7.490922243745956e-06,
+            0.26222534691540467
+        ],
+        "rho": 0.0,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "is_home",
+            "year_norm",
+            "year_norm2",
+            "is_comp"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "is_home",
+            "year_norm",
+            "year_norm2",
+            "is_comp"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.17086906026076124,
+        "RPS_slow": 0.16944739546424004,
+        "ESD_fast": 1.9608058608058607,
+        "Fast+ESD": 0.26890935330105425,
+        "Joint_ALL": 0.4383567487652943
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.17147423223180452,
+        "CV_std": 0.005752887945338157
+    },
+    "elapsed_seconds": 91.75
+}

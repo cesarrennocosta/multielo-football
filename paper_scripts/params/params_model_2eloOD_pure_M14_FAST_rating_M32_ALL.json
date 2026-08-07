@@ -1,0 +1,75 @@
+{
+    "rating_system": "2eloOD_pure",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "2eloOD_pure",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_style": 11.11309,
+        "M_style": 1.162237,
+        "H_style": 42.158187,
+        "divisor_style": 777.419355,
+        "rho": -0.011497,
+        "loss_ALL": 0.437727
+    },
+    "glm_model": {
+        "model_id": "M14",
+        "taxonomy_code": "P-I-Q-0-C",
+        "distribution": "poisson",
+        "home_advantage": "separate",
+        "response_type": "quadratic",
+        "time_trend": false,
+        "competition_weight": true,
+        "num_glm_params": 16
+    },
+    "target_objective": "FAST",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            -0.00014414046518827013,
+            0.0029422044396338887,
+            1.8200224800159188e-07,
+            -1.572147468691354e-06,
+            0.14407394652018674,
+            0.3947486179689407
+        ],
+        "beta_away": [
+            -0.00014846684100399622,
+            0.003030456886209676,
+            2.3410798453522068e-07,
+            -1.2015847515511653e-06,
+            -0.25680452091365746,
+            0.28332176249488034
+        ],
+        "rho": 0.0,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "elo_diff_sq_h",
+            "off_def_diff_sq_h",
+            "is_home",
+            "is_comp"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "elo_diff_sq_a",
+            "off_def_diff_sq_a",
+            "is_home",
+            "is_comp"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.1676903902484688,
+        "RPS_slow": 0.16632026913347775,
+        "ESD_fast": 1.9167032967032966,
+        "Fast+ESD": 0.2635255550836336,
+        "Joint_ALL": 0.42984582421711137
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.16803314244661935,
+        "CV_std": 0.004884610690786085
+    },
+    "elapsed_seconds": 184.5
+}

@@ -1,0 +1,77 @@
+{
+    "rating_system": "3eloH",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "3eloH",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 29.258098,
+        "M_overall": 1.214153,
+        "H_overall": 83.252081,
+        "divisor_overall": 1063.323291,
+        "M_style": 1.168495,
+        "H_style": 77.766222,
+        "divisor_style": 1069.454901,
+        "K_scale": 0.61348,
+        "rho": -0.038613,
+        "loss_ALL": 0.427621
+    },
+    "glm_model": {
+        "model_id": "M11",
+        "taxonomy_code": "P-I-L-T-0",
+        "distribution": "poisson",
+        "home_advantage": "separate",
+        "response_type": "linear",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 12
+    },
+    "target_objective": "ALL",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.34715774818478606,
+            0.00013953963884359708,
+            0.0018143864696114392,
+            0.1326009614354939,
+            0.00475900281572991,
+            -6.706106828092714e-05
+        ],
+        "beta_away": [
+            0.1383656213937985,
+            0.00022372312356902526,
+            0.001815825771340638,
+            -0.2912989599545237,
+            0.0027248901670977473,
+            7.108569994216067e-06
+        ],
+        "rho": 0.0,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "off_def_diff_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "off_def_diff_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.16776351760972716,
+        "RPS_slow": 0.16638735849534275,
+        "ESD_fast": 1.8897802197802198,
+        "Fast+ESD": 0.26225252859873815,
+        "Joint_ALL": 0.42863988709408085
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.2638097296068934,
+        "CV_std": 0.007324880556615329
+    },
+    "elapsed_seconds": 290.05
+}

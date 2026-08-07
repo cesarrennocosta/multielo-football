@@ -1,0 +1,18 @@
+{
+    "rating_system": "3eloC",
+    "model_id": "M32",
+    "objective": "ALL",
+    "K_base": 32.05371,
+    "M_overall": 2.501047,
+    "H_overall": 218.209652,
+    "divisor_overall": 1267.582933,
+    "G2": 1.097433,
+    "a_margin": 4.32698,
+    "b_margin": 3.603202,
+    "M_style": 1.072913,
+    "H_style": 60.945526,
+    "divisor_style": 974.553479,
+    "K_scale": 0.552142,
+    "rho": -0.082093,
+    "loss_ALL": 0.427156
+}

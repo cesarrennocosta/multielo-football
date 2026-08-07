@@ -1,0 +1,76 @@
+{
+    "rating_system": "1eloC",
+    "rating_reference_state": "M32_ALL",
+    "rating_parameters": {
+        "rating_system": "1eloC",
+        "model_id": "M32",
+        "objective": "ALL",
+        "K_base": 32.0,
+        "M_overall": 2.0,
+        "H_overall": 200.0,
+        "divisor_overall": 1200.0,
+        "G2": 1.1,
+        "a_margin": 4.0,
+        "b_margin": 3.5,
+        "rho": -0.05,
+        "loss_ALL": 0.435889
+    },
+    "glm_model": {
+        "model_id": "M23",
+        "taxonomy_code": "B-S-Q-T-0",
+        "distribution": "bivariate",
+        "home_advantage": "shared",
+        "response_type": "quadratic",
+        "time_trend": true,
+        "competition_weight": false,
+        "num_glm_params": 11
+    },
+    "target_objective": "SLOW",
+    "glm_fitted_parameters": {
+        "beta_home": [
+            0.4526059319361686,
+            0.0008038825525717957,
+            -7.56323827370038e-08,
+            0.0668266545210983,
+            0.001701484153209705,
+            -5.6692083296018194e-05
+        ],
+        "beta_away": [
+            0.2707647451505917,
+            0.0008307751944108241,
+            -7.212900495018415e-08,
+            -0.3735159549675321,
+            -0.0015297146421441863,
+            2.8341522181397313e-05
+        ],
+        "rho": -0.05000000000000294,
+        "home_features": [
+            "const",
+            "elo_diff_h",
+            "elo_diff_sq_h",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ],
+        "away_features": [
+            "const",
+            "elo_diff_a",
+            "elo_diff_sq_a",
+            "is_home",
+            "year_norm",
+            "year_norm2"
+        ]
+    },
+    "evaluated_metrics": {
+        "RPS_fast": 0.1709391421475487,
+        "RPS_slow": 0.16942888818157067,
+        "ESD_fast": 1.9114285714285715,
+        "Fast+ESD": 0.2665105707189773,
+        "Joint_ALL": 0.43593945890054797
+    },
+    "cross_validation_5fold": {
+        "CV_mean": 0.26844012539671513,
+        "CV_std": 0.009369416338469412
+    },
+    "elapsed_seconds": 263.81
+}
