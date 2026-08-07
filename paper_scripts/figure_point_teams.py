@@ -25,10 +25,36 @@ from figure_elolution_team import TOURNAMENTS, parse_date_string
 import multielo
 
 
+def get_teams_with_wc_semifinals(df_matches):
+    """
+    Identify all national teams that have reached at least one World Cup Semi-Final / Top 4.
+    """
+    wc_matches = df_matches[df_matches['tournament'].str.contains('World Cup', case=False, na=False)].copy()
+    
+    # Filter for knockout stages associated with Semi-Finals, 3rd Place, and Finals
+    sf_keywords = ['semi-final', 'semifinal', 'final', 'third place', '3rd place']
+    
+    sf_teams = set()
+    for row in wc_matches.itertuples():
+        tourn = str(row.tournament).lower()
+        dt_str = str(row.date)
+        if any(k in tourn for k in sf_keywords) or dt_str.startswith(('1930', '1950')):
+            sf_teams.add(row.home_team)
+            sf_teams.add(row.away_team)
+            
+    # Add established historical WC semifinalists
+    known_wc_semifinalists = {
+        'Brazil', 'Argentina', 'Uruguay', 'Chile',
+        'Germany', 'German DR', 'West Germany', 'Italy', 'France', 'England', 'Spain',
+        'Netherlands', 'Croatia', 'Belgium', 'Sweden', 'Portugal', 'Hungary',
+        'Czechoslovakia', 'Czech Republic', 'Austria', 'Poland', 'Soviet Union', 'Russia',
+        'Yugoslavia', 'Bulgaria', 'Turkey', 'Morocco', 'United States', 'USA', 'South Korea'
+    }
+    
+    return sf_teams.union(known_wc_semifinalists)
+
+
 def parse_remarkable_arg(arg_str):
-    """
-    Parse remarkable team string format: 'team-year' or 'team_year' (e.g., 'brazil-1982', 'netherlands-1974').
-    """
     s = str(arg_str).strip()
     if '-' in s:
         parts = s.rsplit('-', 1)
@@ -71,19 +97,24 @@ def figure_point_teams(rating='3eloC', startdate='1950', enddate='2026', remarka
     df_all_norm = pd.read_csv(norm_csv_path)
     df_all_norm['date'] = pd.to_datetime(df_all_norm['date'])
     
-    # Filter date range
+    # Load match dataset to evaluate WC semifinalists
+    raw_results_path = os.path.join(data_dir, 'results.csv')
+    df_matches = multielo.load_dataset(path=raw_results_path)
+    wc_semifinalist_teams = get_teams_with_wc_semifinals(df_matches)
+    
+    # Filter dataset to date range
     df_all_norm = df_all_norm[(df_all_norm['date'] >= dt_start) & (df_all_norm['date'] <= dt_stop)].reset_index(drop=True)
     
     if 'norm_off' not in df_all_norm.columns or 'norm_def' not in df_all_norm.columns:
         raise ValueError(f"Rating system '{canonical_sys}' does not maintain separate Offensive and Defensive style ratings.")
 
     # 1. Identify World #1 ranked team on every match date
-    # On each match date, extract the team with maximum overall rating (elo)
     idx_max = df_all_norm.groupby('date')['elo'].idxmax()
     df_no1_daily = df_all_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
     
-    # Filter out isolated regional inflation artifacts (e.g. Tahiti 1980s Pacific games)
-    df_no1_daily = df_no1_daily[df_no1_daily['team'] != 'Tahiti'].reset_index(drop=True)
+    # Filter OUT teams that have NEVER reached a World Cup Semi-Final
+    wc_sf_lower = {t.lower() for t in wc_semifinalist_teams}
+    df_no1_daily = df_no1_daily[df_no1_daily['team'].str.lower().isin(wc_sf_lower)].reset_index(drop=True)
     
     # 2. Perform 90-day (quarterly) temporal sampling for World #1 tenures
     df_no1_daily['spell_id'] = (df_no1_daily['team'] != df_no1_daily['team'].shift(1)).cumsum()
@@ -92,36 +123,37 @@ def figure_point_teams(rating='3eloC', startdate='1950', enddate='2026', remarka
     for _, spell in df_no1_daily.groupby('spell_id'):
         duration_days = (spell['date'].max() - spell['date'].min()).days
         if duration_days >= 90:
-            # Sample quarterly (every 90 days)
             q_dates = pd.date_range(spell['date'].min(), spell['date'].max(), freq='90D')
             for q_dt in q_dates:
                 idx_near = (spell['date'] - q_dt).abs().idxmin()
                 sampled_no1_rows.append(spell.loc[idx_near])
         else:
-            # Sample median date for short tenure
             mid_idx = len(spell) // 2
             sampled_no1_rows.append(spell.iloc[mid_idx])
             
     df_no1_sampled = pd.DataFrame(sampled_no1_rows).drop_duplicates(subset=['date', 'team']).reset_index(drop=True)
     
-    print(f"Extracted {len(df_no1_sampled)} sampled World #1 points across {len(df_no1_sampled['team'].unique())} distinct leaders.")
+    print(f"Extracted {len(df_no1_sampled)} sampled World #1 points across {len(df_no1_sampled['team'].unique())} qualified WC semifinalist leaders.")
 
     # 3. Setup Plot
-    fig, ax = plt.subplots(figsize=(8.5, 7.0), dpi=300)
+    fig, ax = plt.subplots(figsize=(8.5, 7.2), dpi=300)
     
     # Reference Lines
     ax.axhline(1.0, color='#999999', linestyle='--', linewidth=1.2, zorder=1)
     ax.axvline(1.0, color='#999999', linestyle='--', linewidth=1.2, zorder=1)
-    ax.plot([0.5, 1.5], [0.5, 1.5], color='#cccccc', linestyle=':', linewidth=1.0, zorder=1)
+    ax.plot([0.5, 1.6], [0.5, 1.6], color='#cccccc', linestyle=':', linewidth=1.0, zorder=1)
 
     # Plot World #1 Scatter Points (colored by team)
     teams_no1 = sorted(df_no1_sampled['team'].unique())
     cmap = plt.get_cmap('tab10', max(10, len(teams_no1)))
     color_map = {t: cmap(i) for i, t in enumerate(teams_no1)}
     
+    all_x_pts = list(df_no1_sampled['norm_def'])
+    all_y_pts = list(df_no1_sampled['norm_off'])
+    
     for t_name, group in df_no1_sampled.groupby('team'):
         ax.scatter(group['norm_def'], group['norm_off'], label=t_name, color=color_map[t_name],
-                   alpha=0.65, s=40, edgecolor='white', linewidth=0.4, zorder=3)
+                   alpha=0.65, s=42, edgecolor='white', linewidth=0.4, zorder=3)
                    
     # 4. Overlay World Cup Champions (Gold Stars) if not --nowc
     if not nowc:
@@ -132,12 +164,14 @@ def figure_point_teams(rating='3eloC', startdate='1950', enddate='2026', remarka
                 winner = t_info['winner']
                 
                 if wc_start >= dt_start and wc_start <= dt_stop:
-                    # Find winner's rating point just prior to tournament
                     sub_winner = df_all_norm[(df_all_norm['team'].str.lower() == winner.lower()) & 
                                              (df_all_norm['date'] <= wc_start)].sort_values('date')
                     if len(sub_winner) > 0:
                         champ_pt = sub_winner.iloc[-1]
                         c_def, c_off = champ_pt['norm_def'], champ_pt['norm_off']
+                        
+                        all_x_pts.append(c_def)
+                        all_y_pts.append(c_off)
                         
                         ax.scatter([c_def], [c_off], color='#ffd700', marker='*', s=240,
                                    edgecolor='#b8860b', linewidth=0.9, zorder=10)
@@ -158,7 +192,6 @@ def figure_point_teams(rating='3eloC', startdate='1950', enddate='2026', remarka
                 
                 if r_team_clean in all_teams_lower:
                     exact_name = all_teams_lower[r_team_clean]
-                    # Target date around mid-year of that remarkable season
                     rem_dt = pd.to_datetime(f"{r_year}-06-01")
                     
                     sub_rem = df_all_norm[(df_all_norm['team'] == exact_name) & 
@@ -170,6 +203,9 @@ def figure_point_teams(rating='3eloC', startdate='1950', enddate='2026', remarka
                         rem_pt = sub_rem.iloc[-1]
                         r_def, r_off = rem_pt['norm_def'], rem_pt['norm_off']
                         
+                        all_x_pts.append(r_def)
+                        all_y_pts.append(r_off)
+                        
                         ax.scatter([r_def], [r_off], color='#c0c0c0', marker='o', s=110,
                                    edgecolor='#444444', linewidth=1.0, zorder=9)
                         
@@ -178,6 +214,16 @@ def figure_point_teams(rating='3eloC', startdate='1950', enddate='2026', remarka
                         txt.set_path_effects([path_effects.withStroke(linewidth=2, foreground='white')])
             except Exception as e:
                 print(f"Warning: Failed to parse remarkable entry '{rem_item}': {e}")
+
+    # 6. Adjust Axes Scale to Maximize Inclusion of All Points
+    min_x, max_x = min(all_x_pts), max(all_x_pts)
+    min_y, max_y = min(all_y_pts), max(all_y_pts)
+    
+    pad_x = max(0.025, (max_x - min_x) * 0.05)
+    pad_y = max(0.025, (max_y - min_y) * 0.05)
+    
+    ax.set_xlim(min_x - pad_x, max_x + pad_x)
+    ax.set_ylim(min_y - pad_y, max_y + pad_y)
 
     # Titles and Axes
     ax.set_title(f"World #1 Tactical Style Positions in Normalized Style Space ({dt_start.strftime('%Y')}–{dt_stop.strftime('%Y')})", fontsize=12, fontweight='bold', pad=12)
