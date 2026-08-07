@@ -21,6 +21,9 @@ website:
       - icon: github
         href: https://github.com/cesarrennocosta/multielo-football
 
+execute:
+  enabled: false
+
 format:
   html:
     theme:
@@ -29,8 +32,6 @@ format:
     css: styles.css
     toc: true
     toc-depth: 3
-    code-fold: true
-    code-summary: "Show Python Code"
     grid:
       sidebar-width: 0px
       body-width: 1000px

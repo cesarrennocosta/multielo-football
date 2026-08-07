@@ -33,9 +33,9 @@ jobs:
           python paper_scripts/build_website_views.py
 
       - name: Render Quarto Website
-        uses: quarto-dev/quarto-actions/render@v2
-        with:
-          path: website
+        run: |
+          cd website
+          quarto render
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
