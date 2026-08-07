@@ -32,10 +32,11 @@ import seaborn as sns
 
 # Import multielo library
 import multielo
+import warnings
+warnings.filterwarnings('ignore')
 
-# Set clean white plotting style
+# Set clean seaborn plotting style
 sns.set_theme(style="whitegrid")
-plt.rcParams['font.sans-serif'] = 'Inter'
 plt.rcParams['figure.dpi'] = 120
 
 print(f"multielo version: {multielo.__file__}")
