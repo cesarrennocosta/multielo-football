@@ -212,28 +212,55 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
         c = team_colors[t]
         is_vis = (t in default_checked)
         
-        # Trace 0: Overall Elo
+        # Trace 0: Overall Elo (Solid thick line)
         fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo'], name=f"{t} (R^e)", line=dict(color=c, width=3), visible=is_vis),
+            go.Scatter(x=df_t['date'], y=df_t['elo'], name=f"{t} (R^e)", line=dict(color=c, width=3, dash='solid'), visible=is_vis),
             row=1, col=1
         )
-        # Trace 1: Offensive Elo
+        # Trace 1: Offensive Elo (Straight/Solid line)
         fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo_off'], name=f"{t} Offense (R^o)", line=dict(color=c, width=2, dash='solid'), visible=is_vis),
+            go.Scatter(x=df_t['date'], y=df_t['elo_off'], name=f"{t} Offense (R^o)", line=dict(color=c, width=2.2, dash='solid'), visible=is_vis),
             row=2, col=1
         )
-        # Trace 2: Defensive Elo
+        # Trace 2: Defensive Elo (Dashed line)
         fig_ratings.add_trace(
-            go.Scatter(x=df_t['date'], y=df_t['elo_def'], name=f"{t} Defense (R^d)", line=dict(color=c, width=2, dash='dot'), visible=is_vis),
+            go.Scatter(x=df_t['date'], y=df_t['elo_def'], name=f"{t} Defense (R^d)", line=dict(color=c, width=2.2, dash='dash'), visible=is_vis),
             row=2, col=1
+        )
+
+    # Add FIFA World Cup Tournament Markers (1950–2026)
+    world_cup_years = [
+        (1950, "WC '50"), (1954, "WC '54"), (1958, "WC '58"), (1962, "WC '62"),
+        (1966, "WC '66"), (1970, "WC '70"), (1974, "WC '74"), (1978, "WC '78"),
+        (1982, "WC '82"), (1986, "WC '86"), (1990, "WC '90"), (1994, "WC '94"),
+        (1998, "WC '98"), (2002, "WC '02"), (2006, "WC '06"), (2010, "WC '10"),
+        (2014, "WC '14"), (2018, "WC '18"), (2022, "WC '22"), (2026, "WC '26")
+    ]
+    
+    for yr, label in world_cup_years:
+        wc_date = f"{yr}-06-15"
+        # Add subtle vertical marker line on both subplots
+        fig_ratings.add_vline(
+            x=wc_date,
+            line_dash="dot",
+            line_color="rgba(148, 163, 184, 0.35)",
+            line_width=1.2
+        )
+        # Add label annotation on top row
+        fig_ratings.add_annotation(
+            x=wc_date, y=1.02, yref="y domain",
+            text=label, showarrow=False,
+            font=dict(size=9, color="#94a3b8"),
+            row=1, col=1
         )
 
     chart_div_id = "ratings-plotly-chart"
     
     fig_ratings.update_layout(
         template="plotly_dark",
-        height=720,
-        legend=dict(orientation="h", y=1.12, x=0.0),
+        height=740,
+        showlegend=False,  # Legend removed to prevent overlaying the figure
+        margin=dict(t=50, b=40, l=60, r=40),
         xaxis2=dict(
             rangeslider=dict(visible=True),
             type="date"
