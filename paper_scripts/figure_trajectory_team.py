@@ -5,8 +5,6 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.colors as mcolors
 import matplotlib.patheffects as path_effects
 
 # Configure Matplotlib vector text formatting
@@ -23,37 +21,9 @@ pkg_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if pkg_root not in sys.path:
     sys.path.insert(0, pkg_root)
 
-from run_compute_team import run_compute_team, SYSTEM_CONFIGS, SYSTEM_ALIASES, load_params_file
 import multielo
-
-
-def parse_date_string(date_str, is_end=False):
-    if not date_str:
-        return None
-    s = str(date_str).strip()
-    parts = s.split('-')
-    
-    if len(parts) == 1 and parts[0].isdigit():
-        yr = int(parts[0])
-        return pd.to_datetime(f"{yr}-12-31" if is_end else f"{yr}-01-01")
-    elif len(parts) == 2:
-        p1, p2 = parts[0], parts[1]
-        if len(p1) == 4 and p1.isdigit():
-            yr, mo = int(p1), int(p2)
-        else:
-            mo, yr = int(p1), int(p2)
-        if is_end:
-            last_day = pd.Period(f"{yr}-{mo:02d}").days_in_month
-            return pd.to_datetime(f"{yr}-{mo:02d}-{last_day:02d}")
-        else:
-            return pd.to_datetime(f"{yr}-{mo:02d}-01")
-    elif len(parts) == 3:
-        if len(parts[0]) == 4:
-            return pd.to_datetime(f"{parts[0]}-{parts[1]}-{parts[2]}")
-        else:
-            return pd.to_datetime(f"{parts[2]}-{parts[1]}-{parts[0]}")
-            
-    return pd.to_datetime(s)
+from run_compute_team import run_compute_team, SYSTEM_CONFIGS, SYSTEM_ALIASES, load_params_file
+from figure_elolution_team import TOURNAMENTS, get_confederation, parse_date_string
 
 
 def calculate_grid_layout(num_teams):
@@ -108,6 +78,10 @@ def figure_trajectory_team(teams=None, rating='3eloC', startdate='1950', enddate
     df_all_norm = pd.read_csv(norm_csv_path)
     df_all_norm['date'] = pd.to_datetime(df_all_norm['date'])
     
+    # Also load match results to check tournament appearances
+    raw_results_path = os.path.join(data_dir, 'results.csv')
+    df_matches = multielo.load_dataset(path=raw_results_path)
+    
     # Check that rating system contains style ratings (norm_off and norm_def)
     if 'norm_off' not in df_all_norm.columns or 'norm_def' not in df_all_norm.columns:
         raise ValueError(f"Rating system '{canonical_sys}' does not maintain separate Offensive and Defensive style ratings. "
@@ -130,15 +104,18 @@ def figure_trajectory_team(teams=None, rating='3eloC', startdate='1950', enddate
     n_teams = len(target_teams_exact)
     n_rows, n_cols = calculate_grid_layout(n_teams)
     
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.0 * n_cols, 3.8 * n_rows), dpi=300, squeeze=False)
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.2 * n_cols, 4.0 * n_rows), dpi=300, squeeze=False)
     
-    # Palette of team trajectory colors
     team_colors = ['#1f77b4', '#d62728', '#2ca02c', '#ff7f0e', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
     for idx, team_name in enumerate(target_teams_exact):
         r_idx = idx // n_cols
         c_idx = idx % n_cols
         ax = axes[r_idx, c_idx]
+        
+        confed = get_confederation(team_name)
+        confed_match_keys = {'UEFA': ['EURO'], 'CONMEBOL': ['COPA'], 'CAF': ['AFCON'], 'CONCACAF': ['GOLD'], 'AFC': ['ASIA']}[confed]
+        allowed_tourn_keys = ['WC'] + confed_match_keys
         
         # Extract team trajectory within date range
         df_t = df_all_norm[(df_all_norm['team'] == team_name) & 
@@ -154,21 +131,56 @@ def figure_trajectory_team(teams=None, rating='3eloC', startdate='1950', enddate
         ax.axvline(1.0, color='#999999', linestyle='--', linewidth=1.0, zorder=1)
         
         # Equal style balance line (y = x)
-        xlims = (0.75, 1.25)
-        ylims = (0.75, 1.25)
         ax.plot([0.5, 1.5], [0.5, 1.5], color='#cccccc', linestyle=':', linewidth=0.9, zorder=1)
         
         # Plot continuous trajectory path
         t_color = team_colors[idx % len(team_colors)]
         ax.plot(df_t['norm_def'], df_t['norm_off'], color=t_color, linewidth=1.8, alpha=0.85, zorder=3)
         
-        # Mark Start point (green dot) and End point (star)
-        start_def, start_off = df_t['norm_def'].iloc[0], df_t['norm_off'].iloc[0]
-        end_def, end_off = df_t['norm_def'].iloc[-1], df_t['norm_off'].iloc[-1]
+        # Extract matches for team to verify participation in tournament editions
+        df_team_matches = df_matches[(df_matches['home_team'] == team_name) | (df_matches['away_team'] == team_name)]
         
-        ax.scatter([start_def], [start_off], color='#2ca02c', s=45, zorder=5, edgecolor='black', linewidth=0.5, label='Start')
-        ax.scatter([end_def], [end_off], color='#d62728', marker='*', s=120, zorder=6, edgecolor='black', linewidth=0.5, label='End')
-        
+        # Annotate Tournament Editions (World Cups + Continental Championships)
+        for t_info in TOURNAMENTS:
+            if t_info['name'] not in allowed_tourn_keys:
+                continue
+                
+            t_start = pd.to_datetime(t_info['start'])
+            t_end = pd.to_datetime(t_info['end'])
+            
+            if t_start >= dt_start and t_end <= dt_stop:
+                # Check if team actually played in this tournament
+                t_matches = df_team_matches[(df_team_matches['date'] >= t_start) & (df_team_matches['date'] <= t_end)]
+                if len(t_matches) == 0:
+                    continue
+                    
+                # Get team's trajectory point nearest to tournament start
+                match_dt = t_matches['date'].min()
+                idx_near = (df_t['date'] - match_dt).abs().idxmin()
+                pt_row = df_t.iloc[idx_near]
+                
+                pt_def = pt_row['norm_def']
+                pt_off = pt_row['norm_off']
+                
+                is_winner = (t_info['winner'].lower() == team_name.lower())
+                
+                # Yellow / Gold for Champion, Silver for non-champion participant
+                m_color = '#ffd700' if is_winner else '#c0c0c0'
+                m_edge = '#b8860b' if is_winner else '#666666'
+                m_size = 110 if is_winner else 45
+                m_shape = '*' if is_winner else 'o'
+                
+                ax.scatter([pt_def], [pt_off], color=m_color, marker=m_shape, s=m_size, zorder=6, edgecolor=m_edge, linewidth=0.8)
+                
+                # Format two-digit year label (e.g. '08', '10', '24')
+                year_lbl = f"'{t_start.strftime('%y')}"
+                if is_winner:
+                    year_lbl += "★"
+                    
+                txt = ax.text(pt_def + 0.003, pt_off + 0.003, year_lbl, fontsize=7.5, fontweight='bold' if is_winner else 'normal',
+                              color='#900000' if is_winner else '#333333', zorder=7)
+                txt.set_path_effects([path_effects.withStroke(linewidth=1.8, foreground='white')])
+
         # Subplot Title & Annotations
         ax.set_title(f"{team_name} ({df_t['date'].iloc[0].year}–{df_t['date'].iloc[-1].year})", fontsize=11, fontweight='bold', pad=6)
         ax.set_xlabel('Defensive Score ($R^d / R^d_{10\\mathrm{th}}$)', fontsize=9, fontweight='bold', labelpad=4)
@@ -192,7 +204,7 @@ def figure_trajectory_team(teams=None, rating='3eloC', startdate='1950', enddate
         c_idx = idx % n_cols
         fig.delaxes(axes[r_idx, c_idx])
 
-    plt.suptitle(f"Historical Tactical Style Trajectories ({canonical_sys})", fontsize=13, fontweight='bold', y=0.995)
+    plt.suptitle(f"Tactical Style Trajectories ({canonical_sys})", fontsize=13, fontweight='bold', y=0.995)
     plt.tight_layout()
     
     # Save outputs
