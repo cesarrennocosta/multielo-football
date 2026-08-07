@@ -12,6 +12,17 @@ if pkg_root not in sys.path:
 
 import multielo
 
+WC_CHAMPIONS = {
+    'Brazil': [1958, 1962, 1970, 1994, 2002],
+    'Germany': [1954, 1974, 1990, 2014],
+    'Italy': [1934, 1938, 1982, 2006],
+    'Argentina': [1978, 1986, 2022],
+    'France': [1998, 2018],
+    'Uruguay': [1930, 1950],
+    'England': [1966],
+    'Spain': [2010]
+}
+
 def build_website_views():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     website_dir = os.path.join(pkg_root, 'website')
@@ -41,30 +52,11 @@ def build_website_views():
         print("Pre-computing normalized rating trajectories...")
         run_compute_team(team='all', system='3eloC', normalize=True)
 
-    # 1. Build index.qmd (Landing Page)
     df_norm = pd.read_csv(norm_csv_path)
     df_norm['date'] = pd.to_datetime(df_norm['date'])
     df_norm = df_norm[df_norm['date'] >= '1950-01-01']
-    
-    idx_max = df_norm.groupby('date')['elo'].idxmax()
-    df_no1 = df_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
-    df_no1 = df_no1[df_no1['team'] != 'Tahiti']
-    
-    fig_no1 = px.scatter(
-        df_no1,
-        x='norm_def',
-        y='norm_off',
-        color='team',
-        hover_data=['date', 'elo', 'norm_elo'],
-        labels={'norm_def': 'Defensive Score (R^d / R^d_10th)', 'norm_off': 'Offensive Score (R^o / R^o_10th)', 'team': 'World #1 Nation'},
-        title="World #1 Tactical Style Positions (1950–2026)"
-    )
-    fig_no1.add_hline(y=1.0, line_dash="dash", line_color="gray")
-    fig_no1.add_vline(x=1.0, line_dash="dash", line_color="gray")
-    fig_no1.update_layout(template="plotly_dark", height=580)
-    
-    plotly_html_no1 = f"\n\n```{{=html}}\n{fig_no1.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
-    
+
+    # 1. Build index.qmd (Landing Page - Fast loading, no heavy plot)
     index_qmd = f"""---
 title: "Multi-Dimensional Elo Ratings & Forecasting"
 subtitle: "Interactive Data Platform for International Football Strength & Tactical Style"
@@ -79,7 +71,7 @@ format:
 Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Models ($M_{{01}}$–$M_{{32}}$) for national team football forecasting (1872–2026).
 
 [View on GitHub](https://github.com/cesarrennocosta/multielo-football){{.btn .btn-primary .btn-lg role="button"}}
-[Read Methodology](models.html){{.btn .btn-outline-light .btn-lg role="button"}}
+[Explore World #1 Style Space](world_no1.html){{.btn .btn-outline-light .btn-lg role="button"}}
 :::
 
 ::: {{.row}}
@@ -160,29 +152,77 @@ print(f"P(Draw)        : {{pred['p_draw']*100:.1f}}%")
 print(f"P(England Win) : {{pred['p_win_b']*100:.1f}}%")
 print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likely_score'][1]}}")
 ```
-
----
-
-## 📊 World #1 Tactical Style Space (Interactive)
-
-{plotly_html_no1}
 """
     with open(os.path.join(website_dir, 'index.qmd'), 'w') as f:
         f.write(index_qmd)
 
-    # 2. Build ratings.qmd (Multi-Team Trajectory Explorer)
+    # 2. Build world_no1.qmd (Dedicated World #1 Tab with White Theme & World Cup Champions)
+    idx_max = df_norm.groupby('date')['elo'].idxmax()
+    df_no1 = df_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
+    df_no1 = df_no1[df_no1['team'] != 'Tahiti']
+    df_no1['year'] = df_no1['date'].dt.year
+    df_no1['is_wc_champion'] = df_no1.apply(lambda row: row['team'] in WC_CHAMPIONS and any(abs(row['year'] - y) <= 2 for y in WC_CHAMPIONS[row['team']]), axis=1)
+
+    fig_no1 = px.scatter(
+        df_no1,
+        x='norm_def',
+        y='norm_off',
+        color='team',
+        symbol='is_wc_champion',
+        symbol_map={True: 'star-diamond', False: 'circle'},
+        hover_data=['date', 'elo', 'norm_elo'],
+        labels={
+            'norm_def': 'Defensive Score (R^d / R^d_10th)',
+            'norm_off': 'Offensive Score (R^o / R^o_10th)',
+            'team': 'World #1 Nation',
+            'is_wc_champion': 'World Cup Champion Era'
+        },
+        title="World #1 Tactical Style Positions & World Cup Champion Eras (1950–2026)"
+    )
+    fig_no1.add_hline(y=1.0, line_dash="dash", line_color="#94a3b8")
+    fig_no1.add_vline(x=1.0, line_dash="dash", line_color="#94a3b8")
+    fig_no1.update_traces(marker=dict(size=10, line=dict(width=1, color='#1e293b')))
+    fig_no1.update_layout(
+        template="plotly_white",
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        height=680,
+        font=dict(color="#0f172a", family="Inter, sans-serif"),
+        xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+        yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+        legend=dict(orientation="h", y=-0.15, x=0.0)
+    )
+
+    plotly_html_no1 = f"\n\n```{{=html}}\n{fig_no1.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
+
+    world_no1_qmd = f"""---
+title: "World #1 Tactical Style Space"
+subtitle: "Evaluating Historical #1 Ranked Teams & World Cup Champion Eras (1950–2026)"
+format:
+  html:
+    page-layout: full
+---
+
+This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defensive ($R^d / R^d_{{10th}}$) rating coordinates of teams holding the **World #1 Elo Ranking** on match calendar dates. **World Cup Champion Eras** are highlighted with star-diamond markers (⭐).
+
+{plotly_html_no1}
+"""
+    with open(os.path.join(website_dir, 'world_no1.qmd'), 'w') as f:
+        f.write(world_no1_qmd)
+
+    # 3. Build ratings.qmd (Multi-Team Trajectory Explorer - White Theme)
     teams_to_compute = ['Spain', 'Brazil', 'Germany', 'Argentina', 'Italy', 'France', 'England', 'Netherlands', 'Uruguay', 'Portugal']
     team_colors = {
-        'Spain': '#ef4444',
-        'Brazil': '#eab308',
-        'Germany': '#94a3b8',
-        'Argentina': '#06b6d4',
-        'France': '#3b82f6',
+        'Spain': '#dc2626',
+        'Brazil': '#d97706',
+        'Germany': '#475569',
+        'Argentina': '#0891b2',
+        'France': '#2563eb',
         'Italy': '#0284c7',
-        'England': '#f43f5e',
-        'Netherlands': '#f97316',
-        'Uruguay': '#38bdf8',
-        'Portugal': '#10b981'
+        'England': '#e11d48',
+        'Netherlands': '#ea580c',
+        'Uruguay': '#0284c7',
+        'Portugal': '#059669'
     }
     
     from run_compute_team import run_compute_team
@@ -196,11 +236,9 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
         rows=2, cols=1,
         shared_xaxes=True,
         vertical_spacing=0.10,
-        subplot_titles=("Top Panel: Overall Rating Points (R^e)", "Bottom Panel: Tactical Style Ratings — Offensive (R^o) & Defensive (R^d)")
+        subplot_titles=("Top Panel: Overall Rating Points (R^e)", "Bottom Panel: Tactical Style Ratings — Offensive (R^o, Solid) & Defensive (R^d, Dashed)")
     )
     
-    # Add traces for all 10 teams
-    # Spain and Brazil checked by default
     default_checked = ['Spain', 'Brazil']
     
     for i, t in enumerate(teams_to_compute):
@@ -212,7 +250,7 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
         c = team_colors[t]
         is_vis = (t in default_checked)
         
-        # Trace 0: Overall Elo (Solid thick line)
+        # Trace 0: Overall Elo (Solid line)
         fig_ratings.add_trace(
             go.Scatter(x=df_t['date'], y=df_t['elo'], name=f"{t} (R^e)", line=dict(color=c, width=3, dash='solid'), visible=is_vis),
             row=1, col=1
@@ -239,68 +277,71 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     
     for yr, label in world_cup_years:
         wc_date = f"{yr}-06-15"
-        # Add subtle vertical marker line on both subplots
         fig_ratings.add_vline(
             x=wc_date,
             line_dash="dot",
-            line_color="rgba(148, 163, 184, 0.35)",
+            line_color="rgba(148, 163, 184, 0.45)",
             line_width=1.2
         )
-        # Add label annotation on top row
         fig_ratings.add_annotation(
             x=wc_date, y=1.02, yref="y domain",
             text=label, showarrow=False,
-            font=dict(size=9, color="#94a3b8"),
+            font=dict(size=9, color="#64748b"),
             row=1, col=1
         )
 
     chart_div_id = "ratings-plotly-chart"
     
     fig_ratings.update_layout(
-        template="plotly_dark",
+        template="plotly_white",
+        paper_bgcolor="white",
+        plot_bgcolor="white",
         height=740,
-        showlegend=False,  # Legend removed to prevent overlaying the figure
+        showlegend=False,
         margin=dict(t=50, b=40, l=60, r=40),
+        font=dict(color="#0f172a", family="Inter, sans-serif"),
+        xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+        yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
         xaxis2=dict(
+            gridcolor="#e2e8f0", zerolinecolor="#cbd5e1",
             rangeslider=dict(visible=True),
             type="date"
-        )
+        ),
+        yaxis2=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
     )
     
-    # Generate Plotly HTML string
     plotly_inner_html = fig_ratings.to_html(full_html=False, include_plotlyjs='cdn', div_id=chart_div_id)
     
-    # Build Checkbox Controls HTML + JS
     team_checkboxes_html = ""
     for i, t in enumerate(teams_to_compute):
         c = team_colors[t]
         is_chk = "checked" if t in default_checked else ""
         team_checkboxes_html += f"""
-        <label style="color: {c}; font-weight: 600; cursor: pointer; background: #0f172a; padding: 6px 12px; border-radius: 6px; border: 1px solid #334155;">
+        <label style="color: {c}; font-weight: 600; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
           <input type="checkbox" id="chk-team-{i}" {is_chk} onchange="updateRatingsChart()"> {t}
         </label>"""
 
     control_panel_html = f"""
-<div class="team-selector-box" style="background: #1e293b; padding: 18px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155;">
-  <div style="font-weight: 600; color: #f8fafc; margin-bottom: 10px; font-size: 1.05rem;">
+<div class="team-selector-box" style="background: #f1f5f9; padding: 18px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #cbd5e1;">
+  <div style="font-weight: 600; color: #0f172a; margin-bottom: 10px; font-size: 1.05rem;">
     ⚽ Select Teams to Compare:
   </div>
   <div class="team-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
     {team_checkboxes_html}
   </div>
-  <hr style="border-color: #334155; margin: 12px 0;">
-  <div style="font-weight: 600; color: #f8fafc; margin-bottom: 10px; font-size: 1.05rem;">
+  <hr style="border-color: #cbd5e1; margin: 12px 0;">
+  <div style="font-weight: 600; color: #0f172a; margin-bottom: 10px; font-size: 1.05rem;">
     📊 Subplot Component Controls:
   </div>
   <div class="metric-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 18px;">
-    <label style="color: #f8fafc; font-weight: 600; cursor: pointer;">
+    <label style="color: #0f172a; font-weight: 600; cursor: pointer;">
       <input type="checkbox" id="chk-elo" checked onchange="updateRatingsChart()"> Top Panel: Overall Rating ($R^e$)
     </label>
-    <label style="color: #f59e0b; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-off" checked onchange="updateRatingsChart()"> Bottom Panel: Offensive Rating ($R^o$)
+    <label style="color: #d97706; font-weight: 600; cursor: pointer;">
+      <input type="checkbox" id="chk-off" checked onchange="updateRatingsChart()"> Bottom Panel: Offensive Rating ($R^o$, Solid)
     </label>
-    <label style="color: #3b82f6; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-def" checked onchange="updateRatingsChart()"> Bottom Panel: Defensive Rating ($R^d$)
+    <label style="color: #2563eb; font-weight: 600; cursor: pointer;">
+      <input type="checkbox" id="chk-def" checked onchange="updateRatingsChart()"> Bottom Panel: Defensive Rating ($R^d$, Dashed)
     </label>
   </div>
 </div>
@@ -339,14 +380,14 @@ format:
     page-layout: full
 ---
 
-Use the **Team Checkboxes** below to add or remove national teams dynamically. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot panels to prevent visual overlay.
+Use the **Team Checkboxes** below to add or remove national teams dynamically. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot panels with FIFA World Cup tournament markers (1950–2026).
 
 {plotly_full_block}
 """
     with open(os.path.join(website_dir, 'ratings.qmd'), 'w') as f:
         f.write(ratings_qmd)
 
-    # 3. Build style_space.qmd
+    # 4. Build style_space.qmd (White Theme)
     df_avg = df_norm.groupby('team')[['norm_def', 'norm_off', 'elo']].mean().reset_index()
     df_avg = df_avg[df_avg['elo'] > 1400].sort_values('elo', ascending=False).head(30)
     
@@ -361,10 +402,18 @@ Use the **Team Checkboxes** below to add or remove national teams dynamically. O
         labels={'norm_def': 'Defensive Score (R^d / R^d_10th)', 'norm_off': 'Offensive Score (R^o / R^o_10th)'},
         title="Multi-Decade Average Style Profiles for Top 30 National Teams (1950–2026)"
     )
-    fig_style.add_hline(y=1.0, line_dash="dash", line_color="gray")
-    fig_style.add_vline(x=1.0, line_dash="dash", line_color="gray")
+    fig_style.add_hline(y=1.0, line_dash="dash", line_color="#94a3b8")
+    fig_style.add_vline(x=1.0, line_dash="dash", line_color="#94a3b8")
     fig_style.update_traces(textposition='top center')
-    fig_style.update_layout(template="plotly_dark", height=620)
+    fig_style.update_layout(
+        template="plotly_white",
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        height=640,
+        font=dict(color="#0f172a", family="Inter, sans-serif"),
+        xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+        yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
+    )
     
     plotly_html_style = f"\n\n```{{=html}}\n{fig_style.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
     
@@ -381,7 +430,7 @@ format:
     with open(os.path.join(website_dir, 'style_space.qmd'), 'w') as f:
         f.write(style_space_qmd)
 
-    # 4. Build models.qmd
+    # 5. Build models.qmd
     models_rows = []
     for code, specs in multielo.GLM_TAXONOMY.items():
         models_rows.append(f"| **{code}** | {specs['dist']} | {specs['coupling']} | {specs['response']} | {'Yes' if specs['decay'] else 'No'} | {'Yes' if specs['competition'] else 'No'} |")

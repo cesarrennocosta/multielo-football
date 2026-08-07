@@ -13,9 +13,11 @@ website:
         href: index.qmd
       - text: "Team Trajectories"
         href: ratings.qmd
-      - text: "Tactical Style Space"
+      - text: "World #1 Style"
+        href: world_no1.qmd
+      - text: "Style Space"
         href: style_space.qmd
-      - text: "Model Hierarchy (M01-M32)"
+      - text: "Model Hierarchy"
         href: models.qmd
     right:
       - icon: github
