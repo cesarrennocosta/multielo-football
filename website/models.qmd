@@ -8,21 +8,37 @@ format:
 
 We systematically evaluate a 5-dimensional binary feature grid of 32 GLM specifications ($M_{01}$ through $M_{32}$):
 
-```{python}
-import pandas as pd
-import multielo
-
-models_data = []
-for code, specs in multielo.GLM_TAXONOMY.items():
-    models_data.append({
-        'Model Code': code,
-        'Distribution': specs['dist'],
-        'Coupling': specs['coupling'],
-        'Rating Response': specs['response'],
-        'Temporal Decay (T)': specs['decay'],
-        'Competition Weight (C)': specs['competition']
-    })
-
-df_models = pd.DataFrame(models_data)
-df_models
-```
+| Model Code | Distribution | Parameter Coupling | Rating Response | Temporal Decay (T) | Competition Weight (C) |
+| :--- | :--- | :--- | :--- | :---: | :---: |
+| **M01** | Poisson | Shared | Linear | No | No |
+| **M02** | Poisson | Shared | Linear | No | Yes |
+| **M03** | Poisson | Shared | Linear | Yes | No |
+| **M04** | Poisson | Shared | Linear | Yes | Yes |
+| **M05** | Poisson | Shared | Quadratic | No | No |
+| **M06** | Poisson | Shared | Quadratic | No | Yes |
+| **M07** | Poisson | Shared | Quadratic | Yes | No |
+| **M08** | Poisson | Shared | Quadratic | Yes | Yes |
+| **M09** | Poisson | Independent | Linear | No | No |
+| **M10** | Poisson | Independent | Linear | No | Yes |
+| **M11** | Poisson | Independent | Linear | Yes | No |
+| **M12** | Poisson | Independent | Linear | Yes | Yes |
+| **M13** | Poisson | Independent | Quadratic | No | No |
+| **M14** | Poisson | Independent | Quadratic | No | Yes |
+| **M15** | Poisson | Independent | Quadratic | Yes | No |
+| **M16** | Poisson | Independent | Quadratic | Yes | Yes |
+| **M17** | DixonColes | Shared | Linear | No | No |
+| **M18** | DixonColes | Shared | Linear | No | Yes |
+| **M19** | DixonColes | Shared | Linear | Yes | No |
+| **M20** | DixonColes | Shared | Linear | Yes | Yes |
+| **M21** | DixonColes | Shared | Quadratic | No | No |
+| **M22** | DixonColes | Shared | Quadratic | No | Yes |
+| **M23** | DixonColes | Shared | Quadratic | Yes | No |
+| **M24** | DixonColes | Shared | Quadratic | Yes | Yes |
+| **M25** | DixonColes | Independent | Linear | No | No |
+| **M26** | DixonColes | Independent | Linear | No | Yes |
+| **M27** | DixonColes | Independent | Linear | Yes | No |
+| **M28** | DixonColes | Independent | Linear | Yes | Yes |
+| **M29** | DixonColes | Independent | Quadratic | No | No |
+| **M30** | DixonColes | Independent | Quadratic | No | Yes |
+| **M31** | DixonColes | Independent | Quadratic | Yes | No |
+| **M32** | DixonColes | Independent | Quadratic | Yes | Yes |
