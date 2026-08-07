@@ -30,20 +30,18 @@ def run_download_dataset():
     except Exception as e:
         print(f"kagglehub notice: {e}")
         
-    # Method B: Fallback to local source dataset
+    # Method C: Direct HTTPS download from public GitHub source
     if not downloaded:
-        parent_dir = os.path.dirname(os.path.dirname(script_dir))
-        candidates = [
-            os.path.join(parent_dir, 'datset', 'results.csv'),
-            os.path.join(parent_dir, 'repository', 'multiElo', 'data', 'results.csv'),
-            os.path.join(parent_dir, 'world_cup_features_dataset.csv')
-        ]
-        for c in candidates:
-            if os.path.exists(c):
-                shutil.copy(c, target_csv)
+        try:
+            import urllib.request
+            url = "https://raw.githubusercontent.com/martj42/international_results/master/results.csv"
+            print(f"Downloading directly from {url}...")
+            urllib.request.urlretrieve(url, target_csv)
+            if os.path.exists(target_csv) and os.path.getsize(target_csv) > 1000:
                 downloaded = True
-                print(f"Copied local reference dataset from {c} to {target_csv}")
-                break
+                print(f"Successfully downloaded via direct HTTPS to: {target_csv}")
+        except Exception as e:
+            print(f"Direct download notice: {e}")
 
     if not downloaded or not os.path.exists(target_csv):
         raise FileNotFoundError("Failed to download or locate dataset. Please place 'results.csv' inside paper_scripts/data/.")

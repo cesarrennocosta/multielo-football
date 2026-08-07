@@ -22,10 +22,15 @@ def build_website_views():
     
     print("=== Pre-building Website Views and Interactive Visualizations ===")
     
-    # Ensure ratings_3eloC_all_norm.csv and ratings_3eloC_spain.csv exist
+    results_csv_path = os.path.join(data_dir, 'results.csv')
     norm_csv_path = os.path.join(data_dir, 'ratings_3eloC_all_norm.csv')
     spain_csv_path = os.path.join(data_dir, 'ratings_3eloC_spain.csv')
     
+    if not os.path.exists(results_csv_path):
+        from run_download_dataset import run_download_dataset
+        print("Downloading match dataset...")
+        run_download_dataset()
+
     if not os.path.exists(norm_csv_path) or not os.path.exists(spain_csv_path):
         from run_compute_team import run_compute_team
         print("Pre-computing rating trajectories...")
