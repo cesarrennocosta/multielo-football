@@ -1,6 +1,8 @@
 import os
 import sys
+import json
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -12,15 +14,43 @@ if pkg_root not in sys.path:
 
 import multielo
 
-WC_CHAMPIONS = {
-    'Brazil': [1958, 1962, 1970, 1994, 2002],
-    'Germany': [1954, 1974, 1990, 2014],
-    'Italy': [1934, 1938, 1982, 2006],
-    'Argentina': [1978, 1986, 2022],
-    'France': [1998, 2018],
-    'Uruguay': [1930, 1950],
-    'England': [1966],
-    'Spain': [2010]
+# Exact World Cup Victory Final Dates & Champions (1950-2026)
+WC_VICTORIES = [
+    ('Uruguay', '1950-07-16', "Uruguay '50"),
+    ('Germany', '1954-07-04', "Germany '54"),
+    ('Brazil', '1958-06-29', "Brazil '58"),
+    ('Brazil', '1962-06-17', "Brazil '62"),
+    ('England', '1966-07-30', "England '66"),
+    ('Brazil', '1970-06-21', "Brazil '70"),
+    ('Germany', '1974-07-07', "Germany '74"),
+    ('Argentina', '1978-06-25', "Argentina '78"),
+    ('Italy', '1982-07-11', "Italy '82"),
+    ('Argentina', '1986-06-29', "Argentina '86"),
+    ('Germany', '1990-07-08', "Germany '90"),
+    ('Brazil', '1994-07-17', "Brazil '94"),
+    ('France', '1998-07-12', "France '98"),
+    ('Brazil', '2002-06-30', "Brazil '02"),
+    ('Italy', '2006-07-09', "Italy '06"),
+    ('Spain', '2010-07-11', "Spain '10"),
+    ('Germany', '2014-07-13', "Germany '14"),
+    ('France', '2018-07-15', "France '18"),
+    ('Argentina', '2022-12-18', "Argentina '22")
+]
+
+TEAM_COLORS = {
+    'Spain': '#dc2626',
+    'Brazil': '#eab308',
+    'Germany': '#475569',
+    'Argentina': '#0891b2',
+    'France': '#2563eb',
+    'Italy': '#0284c7',
+    'England': '#e11d48',
+    'Netherlands': '#ea580c',
+    'Uruguay': '#0284c7',
+    'Portugal': '#059669',
+    'Hungary': '#059669',
+    'Netherlands': '#ea580c',
+    'Belgium': '#b91c1c'
 }
 
 def build_website_views():
@@ -56,7 +86,7 @@ def build_website_views():
     df_norm['date'] = pd.to_datetime(df_norm['date'])
     df_norm = df_norm[df_norm['date'] >= '1950-01-01']
 
-    # 1. Build index.qmd (Landing Page - Fast loading, no heavy plot)
+    # 1. Build index.qmd (Landing Page)
     index_qmd = f"""---
 title: "Multi-Dimensional Elo Ratings & Forecasting"
 subtitle: "Interactive Data Platform for International Football Strength & Tactical Style"
@@ -156,74 +186,167 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     with open(os.path.join(website_dir, 'index.qmd'), 'w') as f:
         f.write(index_qmd)
 
-    # 2. Build world_no1.qmd (Dedicated World #1 Tab with White Theme & World Cup Champions)
+    # 2. Build world_no1.qmd (World #1 Style Space - White Theme, Golden Stars for WC Victories, Faded Gray Off-State)
     idx_max = df_norm.groupby('date')['elo'].idxmax()
     df_no1 = df_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
     df_no1 = df_no1[df_no1['team'] != 'Tahiti']
-    df_no1['year'] = df_no1['date'].dt.year
-    df_no1['is_wc_champion'] = df_no1.apply(lambda row: row['team'] in WC_CHAMPIONS and any(abs(row['year'] - y) <= 2 for y in WC_CHAMPIONS[row['team']]), axis=1)
+    
+    unique_teams = sorted(df_no1['team'].unique())
+    
+    fig_no1 = go.Figure()
+    
+    # Track traces per team for JS toggling
+    team_trace_map = {}
+    
+    for i, t in enumerate(unique_teams):
+        df_t = df_no1[df_no1['team'] == t]
+        c = TEAM_COLORS.get(t, '#64748b')
+        
+        # Team scatter points
+        fig_no1.add_trace(go.Scatter(
+            x=df_t['norm_def'],
+            y=df_t['norm_off'],
+            mode='markers',
+            name=t,
+            marker=dict(size=9, color=c, opacity=0.85, line=dict(width=0.8, color='#1e293b')),
+            customdata=np.stack((df_t['date'].dt.strftime('%Y-%m-%d'), df_t['elo'].round(1), df_t['norm_elo'].round(3)), axis=-1),
+            hovertemplate="<b>" + t + "</b><br>Date: %{customdata[0]}<br>Defensive Score: %{x:.3f}<br>Offensive Score: %{y:.3f}<br>Elo Rating: %{customdata[1]}<extra></extra>"
+        ))
+        team_trace_map[t] = i
 
-    fig_no1 = px.scatter(
-        df_no1,
-        x='norm_def',
-        y='norm_off',
-        color='team',
-        symbol='is_wc_champion',
-        symbol_map={True: 'star-diamond', False: 'circle'},
-        hover_data=['date', 'elo', 'norm_elo'],
-        labels={
-            'norm_def': 'Defensive Score (R^d / R^d_10th)',
-            'norm_off': 'Offensive Score (R^o / R^o_10th)',
-            'team': 'World #1 Nation',
-            'is_wc_champion': 'World Cup Champion Era'
-        },
-        title="World #1 Tactical Style Positions & World Cup Champion Eras (1950–2026)"
-    )
-    fig_no1.add_hline(y=1.0, line_dash="dash", line_color="#94a3b8")
-    fig_no1.add_vline(x=1.0, line_dash="dash", line_color="#94a3b8")
-    fig_no1.update_traces(marker=dict(size=10, line=dict(width=1, color='#1e293b')))
+    # Identify World Cup Victory exact dates in df_norm
+    wc_stars_x = []
+    wc_stars_y = []
+    wc_stars_text = []
+    wc_stars_hover = []
+    
+    for tm, dt_str, label in WC_VICTORIES:
+        dt_val = pd.to_datetime(dt_str)
+        # Find closest match date for team
+        df_tm = df_norm[(df_norm['team'] == tm) & (df_norm['date'] >= dt_val - pd.Timedelta(days=14)) & (df_norm['date'] <= dt_val + pd.Timedelta(days=14))]
+        if not df_tm.empty:
+            row_wc = df_tm.iloc[0]
+            wc_stars_x.append(row_wc['norm_def'])
+            wc_stars_y.append(row_wc['norm_off'])
+            wc_stars_text.append(label)
+            wc_stars_hover.append(f"⭐ <b>{label}</b><br>Date: {row_wc['date'].strftime('%Y-%m-%d')}<br>Defensive Score: {row_wc['norm_def']:.3f}<br>Offensive Score: {row_wc['norm_off']:.3f}")
+
+    # Trace for World Cup Golden Stars (Always Top Layer)
+    star_trace_idx = len(unique_teams)
+    fig_no1.add_trace(go.Scatter(
+        x=wc_stars_x,
+        y=wc_stars_y,
+        mode='markers+text',
+        name="World Cup Winners (⭐)",
+        text=wc_stars_text,
+        textposition="top right",
+        textfont=dict(size=11, color="#b45309", family="Inter, sans-serif"),
+        marker=dict(symbol="star", size=17, color="#f59e0b", line=dict(width=1.5, color="#78350f")),
+        hoverinfo="text",
+        hovertext=wc_stars_hover
+    ))
+
+    fig_no1.add_hline(y=1.0, line_dash="dash", line_color="#cbd5e1")
+    fig_no1.add_vline(x=1.0, line_dash="dash", line_color="#cbd5e1")
+
     fig_no1.update_layout(
         template="plotly_white",
         paper_bgcolor="white",
         plot_bgcolor="white",
-        height=680,
+        height=720,
+        showlegend=False,
         font=dict(color="#0f172a", family="Inter, sans-serif"),
-        xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-        yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-        legend=dict(orientation="h", y=-0.15, x=0.0)
+        xaxis=dict(title="Defensive Score (R^d / R^d_10th)", gridcolor="#f1f5f9", zerolinecolor="#cbd5e1"),
+        yaxis=dict(title="Offensive Score (R^o / R^o_10th)", gridcolor="#f1f5f9", zerolinecolor="#cbd5e1")
     )
 
-    plotly_html_no1 = f"\n\n```{{=html}}\n{fig_no1.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
+    no1_div_id = "world-no1-chart"
+    plotly_inner_no1 = fig_no1.to_html(full_html=False, include_plotlyjs='cdn', div_id=no1_div_id)
+
+    # Build Team Checkboxes (Light gray faded when off)
+    no1_team_checkboxes = ""
+    for i, t in enumerate(unique_teams):
+        c = TEAM_COLORS.get(t, '#475569')
+        no1_team_checkboxes += f"""
+        <label style="color: {c}; font-weight: 600; cursor: pointer; background: #f8fafc; padding: 5px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.9rem;">
+          <input type="checkbox" id="chk-no1-{i}" checked onchange="updateNo1Chart()"> {t}
+        </label>"""
+
+    control_panel_no1 = f"""
+<div class="team-selector-box" style="background: #f8fafc; padding: 16px; border-radius: 10px; margin-bottom: 18px; border: 1px solid #cbd5e1;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+    <div style="font-weight: 700; color: #0f172a; font-size: 1.05rem;">
+      ⚽ Filter World #1 Nations (Off = Light Gray Cloud):
+    </div>
+    <label style="color: #b45309; font-weight: 700; cursor: pointer; background: #fef3c7; padding: 6px 14px; border-radius: 20px; border: 1px solid #fde68a;">
+      <input type="checkbox" id="chk-wc-stars" checked onchange="updateNo1Chart()"> ⭐ Highlight World Cup Champions
+    </label>
+  </div>
+  <div class="team-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 8px;">
+    {no1_team_checkboxes}
+  </div>
+</div>
+
+<script type="text/javascript">
+var defaultTeamColors = {json.dumps([TEAM_COLORS.get(t, '#64748b') for t in unique_teams])};
+
+function updateNo1Chart() {{
+    var gd = document.getElementById('{no1_div_id}');
+    if (!gd) return;
+    
+    var numTeams = {len(unique_teams)};
+    var colorUpdates = [];
+    var opacityUpdates = [];
+    
+    for (var i = 0; i < numTeams; i++) {{
+        var chk = document.getElementById('chk-no1-' + i);
+        if (chk && chk.checked) {{
+            colorUpdates.push(defaultTeamColors[i]);
+            opacityUpdates.push(0.85);
+        }} else {{
+            // Light transparent gray when off
+            colorUpdates.push('rgba(203, 213, 225, 0.25)');
+            opacityUpdates.push(0.2);
+        }}
+    }}
+    
+    // Update team trace colors & opacities
+    for (var i = 0; i < numTeams; i++) {{
+        Plotly.restyle(gd, {{
+            'marker.color': colorUpdates[i],
+            'marker.opacity': opacityUpdates[i]
+        }}, [i]);
+    }}
+    
+    // Toggle World Cup Star Markers
+    var chkStars = document.getElementById('chk-wc-stars');
+    var showStars = chkStars ? chkStars.checked : true;
+    Plotly.restyle(gd, {{visible: showStars}}, [{star_trace_idx}]);
+}}
+</script>
+"""
+
+    plotly_full_no1 = f"\n\n```{{=html}}\n{control_panel_no1}\n{plotly_inner_no1}\n```\n\n"
 
     world_no1_qmd = f"""---
 title: "World #1 Tactical Style Space"
-subtitle: "Evaluating Historical #1 Ranked Teams & World Cup Champion Eras (1950–2026)"
+subtitle: "Evaluating Historical #1 Ranked Teams & World Cup Champions (1950–2026)"
 format:
   html:
     page-layout: full
 ---
 
-This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defensive ($R^d / R^d_{{10th}}$) rating coordinates of teams holding the **World #1 Elo Ranking** on match calendar dates. **World Cup Champion Eras** are highlighted with star-diamond markers (⭐).
+This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defensive ($R^d / R^d_{{10th}}$) coordinates of teams holding the **World #1 Elo Ranking**. 
 
-{plotly_html_no1}
+Unchecking a team fades its points into a **light transparent gray cloud** so you can view team positions relative to the entire historical distribution. Exact **World Cup Victories** are marked with Golden Stars (⭐) and text labels.
+
+{plotly_full_no1}
 """
     with open(os.path.join(website_dir, 'world_no1.qmd'), 'w') as f:
         f.write(world_no1_qmd)
 
-    # 3. Build ratings.qmd (Multi-Team Trajectory Explorer - White Theme)
+    # 3. Build ratings.qmd (Multi-Team Trajectory Explorer - White Theme, Faded Gray Off-State, Straight Offense / Dashed Defense)
     teams_to_compute = ['Spain', 'Brazil', 'Germany', 'Argentina', 'Italy', 'France', 'England', 'Netherlands', 'Uruguay', 'Portugal']
-    team_colors = {
-        'Spain': '#dc2626',
-        'Brazil': '#d97706',
-        'Germany': '#475569',
-        'Argentina': '#0891b2',
-        'France': '#2563eb',
-        'Italy': '#0284c7',
-        'England': '#e11d48',
-        'Netherlands': '#ea580c',
-        'Uruguay': '#0284c7',
-        'Portugal': '#059669'
-    }
     
     from run_compute_team import run_compute_team
     for t in teams_to_compute:
@@ -247,7 +370,7 @@ This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defen
         df_t['date'] = pd.to_datetime(df_t['date'])
         df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date')
         
-        c = team_colors[t]
+        c = TEAM_COLORS.get(t, '#334155')
         is_vis = (t in default_checked)
         
         # Trace 0: Overall Elo (Solid line)
@@ -290,7 +413,7 @@ This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defen
             row=1, col=1
         )
 
-    chart_div_id = "ratings-plotly-chart"
+    ratings_div_id = "ratings-plotly-chart"
     
     fig_ratings.update_layout(
         template="plotly_white",
@@ -310,18 +433,18 @@ This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defen
         yaxis2=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
     )
     
-    plotly_inner_html = fig_ratings.to_html(full_html=False, include_plotlyjs='cdn', div_id=chart_div_id)
+    plotly_inner_ratings = fig_ratings.to_html(full_html=False, include_plotlyjs='cdn', div_id=ratings_div_id)
     
     team_checkboxes_html = ""
     for i, t in enumerate(teams_to_compute):
-        c = team_colors[t]
+        c = TEAM_COLORS.get(t, '#334155')
         is_chk = "checked" if t in default_checked else ""
         team_checkboxes_html += f"""
         <label style="color: {c}; font-weight: 600; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
           <input type="checkbox" id="chk-team-{i}" {is_chk} onchange="updateRatingsChart()"> {t}
         </label>"""
 
-    control_panel_html = f"""
+    control_panel_ratings = f"""
 <div class="team-selector-box" style="background: #f1f5f9; padding: 18px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #cbd5e1;">
   <div style="font-weight: 600; color: #0f172a; margin-bottom: 10px; font-size: 1.05rem;">
     ⚽ Select Teams to Compare:
@@ -348,7 +471,7 @@ This visualization plots the relative offensive ($R^o / R^o_{{10th}}$) and defen
 
 <script type="text/javascript">
 function updateRatingsChart() {{
-    var gd = document.getElementById('{chart_div_id}');
+    var gd = document.getElementById('{ratings_div_id}');
     if (!gd) return;
     
     var showElo = document.getElementById('chk-elo').checked;
@@ -370,7 +493,7 @@ function updateRatingsChart() {{
 </script>
 """
 
-    plotly_full_block = f"\n\n```{{=html}}\n{control_panel_html}\n{plotly_inner_html}\n```\n\n"
+    plotly_full_ratings = f"\n\n```{{=html}}\n{control_panel_ratings}\n{plotly_inner_ratings}\n```\n\n"
     
     ratings_qmd = f"""---
 title: "Interactive Team Trajectories Explorer"
@@ -382,7 +505,7 @@ format:
 
 Use the **Team Checkboxes** below to add or remove national teams dynamically. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot panels with FIFA World Cup tournament markers (1950–2026).
 
-{plotly_full_block}
+{plotly_full_ratings}
 """
     with open(os.path.join(website_dir, 'ratings.qmd'), 'w') as f:
         f.write(ratings_qmd)
@@ -411,8 +534,8 @@ Use the **Team Checkboxes** below to add or remove national teams dynamically. O
         plot_bgcolor="white",
         height=640,
         font=dict(color="#0f172a", family="Inter, sans-serif"),
-        xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-        yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
+        xaxis=dict(gridcolor="#f1f5f9", zerolinecolor="#cbd5e1"),
+        yaxis=dict(gridcolor="#f1f5f9", zerolinecolor="#cbd5e1")
     )
     
     plotly_html_style = f"\n\n```{{=html}}\n{fig_style.to_html(full_html=False, include_plotlyjs='cdn')}\n```\n\n"
