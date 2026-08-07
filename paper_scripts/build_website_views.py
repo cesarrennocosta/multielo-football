@@ -346,7 +346,24 @@ function updateNo1Chart() {{
     // Toggle World Cup Star Markers
     var chkStars = document.getElementById('chk-wc-stars');
     var showStars = chkStars ? chkStars.checked : true;
-    Plotly.restyle(gd, {{visible: showStars}}, [{star_trace_idx}]);
+    
+    if (showStars) {{
+        Plotly.restyle(gd, {{
+            'marker.color': '#f59e0b',
+            'marker.line.color': '#78350f',
+            'textfont.color': '#b45309',
+            'marker.size': 17,
+            'opacity': 1.0
+        }}, [{star_trace_idx}]);
+    }} else {{
+        Plotly.restyle(gd, {{
+            'marker.color': 'rgba(226, 232, 240, 0.25)',
+            'marker.line.color': 'rgba(148, 163, 184, 0.3)',
+            'textfont.color': 'rgba(148, 163, 184, 0.3)',
+            'marker.size': 12,
+            'opacity': 0.35
+        }}, [{star_trace_idx}]);
+    }}
 }}
 </script>
 """
