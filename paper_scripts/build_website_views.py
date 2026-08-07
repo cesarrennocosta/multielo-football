@@ -397,16 +397,18 @@ Unchecking a team fades its points into a **soft clear transparent gray backgrou
                     run_compute_team(team=t, system='3eloC', normalize=True)
             else:
                 t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
-                
+                if not os.path.exists(t_csv):
+                    print(f"Pre-computing {t} raw trajectory...")
+                    run_compute_team(team=t, system='3eloC', normalize=False)
             df_t = pd.read_csv(t_csv)
             df_t['date'] = pd.to_datetime(df_t['date'])
-            df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date')
+            df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date').reset_index(drop=True)
             
-            # Downsample: Keep match dates or sample bi-weekly to make rendering ultra-light
+            # Balanced Downsampling: Keep ALL actual match dates + 1 anchor point every 7 days during idle periods
             if 'played_match_today' in df_t.columns:
-                df_t = df_t[(df_t['played_match_today'] == True) | (df_t.index % 7 == 0)]
+                df_t = df_t[(df_t['played_match_today'] == True) | (df_t['date'].dt.day % 7 == 0)].reset_index(drop=True)
             else:
-                df_t = df_t.iloc[::5]
+                df_t = df_t[df_t['date'].dt.day % 7 == 0].reset_index(drop=True)
                 
             c = TEAM_COLORS.get(t, '#334155')
             is_vis = (t in default_checked)
