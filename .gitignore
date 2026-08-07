@@ -12,16 +12,14 @@ build/
 # Ignore generated datasets, figures, and tables inside paper_scripts/
 paper_scripts/data/*
 !paper_scripts/data/.gitkeep
+!paper_scripts/data/results.csv
+!paper_scripts/data/ratings_3eloC_spain.csv
 
 paper_scripts/figures/*
 !paper_scripts/figures/.gitkeep
 
 paper_scripts/tables/*
 !paper_scripts/tables/.gitkeep
-
-# Ignore root data/figures outputs if any
-*.csv
-!paper_scripts/params/*.json
 
 # OS and IDE temporary files
 .DS_Store

@@ -23,18 +23,22 @@ def build_website_views():
     print("=== Pre-building Website Views and Interactive Visualizations ===")
     
     results_csv_path = os.path.join(data_dir, 'results.csv')
-    norm_csv_path = os.path.join(data_dir, 'ratings_3eloC_all_norm.csv')
     spain_csv_path = os.path.join(data_dir, 'ratings_3eloC_spain.csv')
+    norm_csv_path = os.path.join(data_dir, 'ratings_3eloC_all_norm.csv')
     
     if not os.path.exists(results_csv_path):
         from run_download_dataset import run_download_dataset
         print("Downloading match dataset...")
         run_download_dataset()
 
-    if not os.path.exists(norm_csv_path) or not os.path.exists(spain_csv_path):
+    if not os.path.exists(spain_csv_path):
         from run_compute_team import run_compute_team
-        print("Pre-computing rating trajectories...")
+        print("Pre-computing Spain rating trajectory...")
         run_compute_team(team='spain', system='3eloC', normalize=False)
+
+    if not os.path.exists(norm_csv_path):
+        from run_compute_team import run_compute_team
+        print("Pre-computing normalized rating trajectories...")
         run_compute_team(team='all', system='3eloC', normalize=True)
 
     # 1. Build index.qmd (Landing Page)
