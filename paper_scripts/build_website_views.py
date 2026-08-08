@@ -95,27 +95,35 @@ def build_website_views():
     closest_mom_dt = df_mom_dates['date'].max()
     df_mom = df_norm[df_norm['date'] == closest_mom_dt].copy()
 
-    df_latest['rank'] = df_latest['elo'].rank(ascending=False, method='min').astype(int)
-    df_mom['rank_mom'] = df_mom['elo'].rank(ascending=False, method='min').astype(int)
+    df_latest['rank_elo'] = df_latest['elo'].rank(ascending=False, method='min').astype(int)
+    df_latest['rank_off'] = df_latest['elo_off'].rank(ascending=False, method='min').astype(int)
+    df_latest['rank_def'] = df_latest['elo_def'].rank(ascending=False, method='min').astype(int)
+
+    df_mom['rank_elo_mom'] = df_mom['elo'].rank(ascending=False, method='min').astype(int)
+    df_mom['rank_off_mom'] = df_mom['elo_off'].rank(ascending=False, method='min').astype(int)
+    df_mom['rank_def_mom'] = df_mom['elo_def'].rank(ascending=False, method='min').astype(int)
 
     df_merged = pd.merge(
-        df_latest[['team', 'elo', 'elo_off', 'elo_def', 'rank']],
-        df_mom[['team', 'elo', 'elo_off', 'elo_def', 'rank_mom']],
+        df_latest[['team', 'elo', 'elo_off', 'elo_def', 'rank_elo', 'rank_off', 'rank_def']],
+        df_mom[['team', 'elo', 'elo_off', 'elo_def', 'rank_elo_mom', 'rank_off_mom', 'rank_def_mom']],
         on='team',
         suffixes=('', '_mom')
     )
 
-    df_merged['rank_change'] = df_merged['rank_mom'] - df_merged['rank']
+    df_merged['rank_change_elo'] = df_merged['rank_elo_mom'] - df_merged['rank_elo']
+    df_merged['rank_change_off'] = df_merged['rank_off_mom'] - df_merged['rank_off']
+    df_merged['rank_change_def'] = df_merged['rank_def_mom'] - df_merged['rank_def']
+
     df_merged['elo_change'] = df_merged['elo'] - df_merged['elo_mom']
     df_merged['off_change'] = df_merged['elo_off'] - df_merged['elo_off_mom']
     df_merged['def_change'] = df_merged['elo_def'] - df_merged['elo_def_mom']
 
-    df_merged = df_merged.sort_values('rank').reset_index(drop=True)
+    df_merged = df_merged.sort_values('rank_elo').reset_index(drop=True)
 
     # 1. Build index.qmd (Landing Page with 3 Top-10 Leaderboard Columns & Last Update metadata)
-    top10_overall = df_merged.sort_values('rank').head(10)
-    top10_offense = df_merged.sort_values('elo_off', ascending=False).head(10).reset_index(drop=True)
-    top10_defense = df_merged.sort_values('elo_def', ascending=False).head(10).reset_index(drop=True)
+    top10_overall = df_merged.sort_values('rank_elo').head(10)
+    top10_offense = df_merged.sort_values('rank_off').head(10).reset_index(drop=True)
+    top10_defense = df_merged.sort_values('rank_def').head(10).reset_index(drop=True)
 
     def format_rank_change(val):
         if val > 0:
@@ -136,39 +144,41 @@ def build_website_views():
     # Build Top 10 Overall Table Rows
     rows_overall = ""
     for idx, r in top10_overall.iterrows():
-        medal = "🥇 " if r['rank'] == 1 else ("🥈 " if r['rank'] == 2 else ("🥉 " if r['rank'] == 3 else f"{r['rank']}. "))
+        medal = "🥇 " if r['rank_elo'] == 1 else ("🥈 " if r['rank_elo'] == 2 else ("🥉 " if r['rank_elo'] == 3 else f"{r['rank_elo']}. "))
         rows_overall += f"""
         <tr>
           <td><strong>{medal}{r['team']}</strong></td>
           <td style="text-align: right;"><strong>{r['elo']:.1f}</strong> {format_pts_change(r['elo_change'])}</td>
-          <td style="text-align: center;">{format_rank_change(r['rank_change'])}</td>
+          <td style="text-align: center;">{format_rank_change(r['rank_change_elo'])}</td>
         </tr>"""
 
     # Build Top 10 Offensive Table Rows
     rows_offense = ""
     for idx, r in top10_offense.iterrows():
-        rank_no = idx + 1
+        rank_no = r['rank_off']
         medal = "🥇 " if rank_no == 1 else ("🥈 " if rank_no == 2 else ("🥉 " if rank_no == 3 else f"{rank_no}. "))
         rows_offense += f"""
         <tr>
           <td><strong>{medal}{r['team']}</strong></td>
           <td style="text-align: right;"><strong>{r['elo_off']:.1f}</strong> {format_pts_change(r['off_change'])}</td>
+          <td style="text-align: center;">{format_rank_change(r['rank_change_off'])}</td>
         </tr>"""
 
     # Build Top 10 Defensive Table Rows
     rows_defense = ""
     for idx, r in top10_defense.iterrows():
-        rank_no = idx + 1
+        rank_no = r['rank_def']
         medal = "🥇 " if rank_no == 1 else ("🥈 " if rank_no == 2 else ("🥉 " if rank_no == 3 else f"{rank_no}. "))
         rows_defense += f"""
         <tr>
           <td><strong>{medal}{r['team']}</strong></td>
           <td style="text-align: right;"><strong>{r['elo_def']:.1f}</strong> {format_pts_change(r['def_change'])}</td>
+          <td style="text-align: center;">{format_rank_change(r['rank_change_def'])}</td>
         </tr>"""
 
     leaderboards_html = f"""
-<div style="background: #f8fafc; padding: 8px 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px; font-weight: 600; color: #475569; display: inline-block;">
-  📅 <strong>Data Last Updated:</strong> {latest_match_date} &nbsp;|&nbsp; ⚽ <strong>Total Match Records:</strong> {total_matches_count:,}
+<div style="background: #f8fafc; padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 24px; font-weight: 600; color: #475569; display: inline-block;">
+  📅 <strong>Data Last Updated:</strong> {latest_match_date} &nbsp;|&nbsp; ⚽ <strong>Total Match Records:</strong> {total_matches_count:,} &nbsp;|&nbsp; 📊 <strong>Data Source:</strong> <a href="https://www.kaggle.com/datasets/martj42/international-results-p1" target="_blank" style="color: #2563eb; text-decoration: none;">Kaggle International Football Results (1872–2026)</a>
 </div>
 
 ::: {{.row}}
@@ -202,6 +212,7 @@ def build_website_views():
       <tr style="color: #64748b;">
         <th>Team</th>
         <th style="text-align: right;">Offense Pts</th>
+        <th style="text-align: center;">MoM</th>
       </tr>
     </thead>
     <tbody>
@@ -221,6 +232,7 @@ def build_website_views():
       <tr style="color: #64748b;">
         <th>Team</th>
         <th style="text-align: right;">Defense Pts</th>
+        <th style="text-align: center;">MoM</th>
       </tr>
     </thead>
     <tbody>
