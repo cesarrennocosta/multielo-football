@@ -13,7 +13,27 @@ def create_demo_notebook():
     nb = nbf.v4.new_notebook()
     
     # Notebook Title & Intro
-    nb.cells.append(nbf.v4.new_markdown_cell("""# ⚽ MultiElo Football: Match Monte Carlo & World Cup Group Stage Simulation
+    nb.cells.append(nbf.v4.new_markdown_cell("""# ⚽ MultiElo Football: Python Library & Simulation Guide
+
+Welcome to the official `multielo-football` Python library documentation and interactive demonstration.
+
+## 📦 Installation
+
+You can install the `multielo-football` package via PyPI or directly from the GitHub repository:
+
+### Option 1: Install via PyPI (Recommended)
+```bash
+pip install multielo-football
+```
+
+### Option 2: Install directly from GitHub
+```bash
+pip install git+https://github.com/cesarrennocosta/multielo-football.git
+```
+
+---
+
+## 🚀 Overview
 
 This notebook demonstrates how to use the `multielo-football` library to:
 1. Load multi-dimensional team ratings ($R^e, R^o, R^d$) and compute Poisson match expectations ($\lambda_A, \lambda_B$).

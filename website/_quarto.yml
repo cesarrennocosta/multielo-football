@@ -21,7 +21,7 @@ website:
         href: world_no1.qmd
       - text: "Style Space"
         href: style_space.qmd
-      - text: "Simulation Demo"
+      - text: "Python Library"
         href: demo_simulation.ipynb
       - text: "Methods"
         href: models.qmd

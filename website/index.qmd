@@ -245,3 +245,34 @@ print(f"P(Draw)        : {pred['p_draw']*100:.1f}%")
 print(f"P(England Win) : {pred['p_win_b']*100:.1f}%")
 print(f"Most Likely Score: {pred['most_likely_score'][0]} - {pred['most_likely_score'][1]}")
 ```
+
+---
+
+## 👨‍💻 Authors & Development
+
+The `MultiElo Football` package, multi-dimensional rating architectures, and Poisson forecasting models were created and developed by:
+
+<div style="background: #f8fafc; padding: 16px 22px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 12px; margin-bottom: 24px;">
+  <p style="font-size: 1.1rem; margin-bottom: 6px; color: #0f172a;">
+    👨‍🔬 <strong>César Rênno-Costa</strong> &amp; <strong>László</strong>
+  </p>
+  <p style="color: #64748b; margin-bottom: 0;">
+    For contributions, issue reporting, or research inquiries, visit the official repository on <a href="https://github.com/cesarrennocosta/multielo-football" target="_blank" style="color: #2563eb; font-weight: 600;">GitHub</a>.
+  </p>
+</div>
+
+---
+
+## 📜 Scientific Citation
+
+If you use `multielo-football` or the 3-Elo rating datasets in scientific research, academic papers, or publications, please cite the framework using the following BibTeX entry:
+
+```bibtex
+@article{rennocosta2026multielo,
+  title={MultiElo Football: Multi-Dimensional Rating Architectures and Bivariate Poisson GLMs for International Football Forecasting},
+  author={R{\^e}nno-Costa, C{'e}sar and L{'a}szl{'o}},
+  journal={GitHub Repository},
+  year={2026},
+  url={https://github.com/cesarrennocosta/multielo-football}
+}
+```
