@@ -289,52 +289,127 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     with open(os.path.join(website_dir, 'index.qmd'), 'w') as f:
         f.write(index_qmd)
 
-    # 2. Build rankings.qmd (Global National Team Rankings & MoM Changes)
+    # 2. Build rankings.qmd (Global National Team Rankings & MoM Changes for Overall, Offense, and Defense)
+    df_latest['rank_elo'] = df_latest['elo'].rank(ascending=False, method='min').astype(int)
+    df_latest['rank_off'] = df_latest['elo_off'].rank(ascending=False, method='min').astype(int)
+    df_latest['rank_def'] = df_latest['elo_def'].rank(ascending=False, method='min').astype(int)
+
+    df_mom['rank_elo_mom'] = df_mom['elo'].rank(ascending=False, method='min').astype(int)
+    df_mom['rank_off_mom'] = df_mom['elo_off'].rank(ascending=False, method='min').astype(int)
+    df_mom['rank_def_mom'] = df_mom['elo_def'].rank(ascending=False, method='min').astype(int)
+
+    df_merged = pd.merge(
+        df_latest[['team', 'elo', 'elo_off', 'elo_def', 'rank_elo', 'rank_off', 'rank_def']],
+        df_mom[['team', 'elo', 'elo_off', 'elo_def', 'rank_elo_mom', 'rank_off_mom', 'rank_def_mom']],
+        on='team',
+        suffixes=('', '_mom')
+    )
+
+    df_merged['rank_change_elo'] = df_merged['rank_elo_mom'] - df_merged['rank_elo']
+    df_merged['rank_change_off'] = df_merged['rank_off_mom'] - df_merged['rank_off']
+    df_merged['rank_change_def'] = df_merged['rank_def_mom'] - df_merged['rank_def']
+
+    df_merged['elo_change'] = df_merged['elo'] - df_merged['elo_mom']
+    df_merged['off_change'] = df_merged['elo_off'] - df_merged['elo_off_mom']
+    df_merged['def_change'] = df_merged['elo_def'] - df_merged['elo_def_mom']
+
+    df_merged = df_merged.sort_values('rank_elo').reset_index(drop=True)
+
     full_rankings_rows = ""
     for idx, r in df_merged.iterrows():
-        medal = "🥇 " if r['rank'] == 1 else ("🥈 " if r['rank'] == 2 else ("🥉 " if r['rank'] == 3 else f"{r['rank']}"))
+        medal = "🥇 " if r['rank_elo'] == 1 else ("🥈 " if r['rank_elo'] == 2 else ("🥉 " if r['rank_elo'] == 3 else f"{r['rank_elo']}"))
         full_rankings_rows += f"""
         <tr>
           <td><strong>{medal}</strong></td>
           <td><strong>{r['team']}</strong></td>
-          <td style="text-align: right;"><strong>{r['elo']:.1f}</strong></td>
-          <td style="text-align: center;">{format_rank_change(r['rank_change'])}</td>
-          <td style="text-align: right;">{format_pts_change(r['elo_change'])}</td>
-          <td style="text-align: right;">{r['elo_off']:.1f} {format_pts_change(r['off_change'])}</td>
-          <td style="text-align: right;">{r['elo_def']:.1f} {format_pts_change(r['def_change'])}</td>
+          <td style="text-align: right;" data-sort="{r['elo']:.2f}"><strong>{r['elo']:.1f}</strong> {format_pts_change(r['elo_change'])}</td>
+          <td style="text-align: center;" data-sort="{r['rank_change_elo']}">{format_rank_change(r['rank_change_elo'])}</td>
+          <td style="text-align: right;" data-sort="{r['elo_off']:.2f}"><strong>{r['elo_off']:.1f}</strong> {format_pts_change(r['off_change'])}</td>
+          <td style="text-align: center;" data-sort="{r['rank_change_off']}">{format_rank_change(r['rank_change_off'])}</td>
+          <td style="text-align: right;" data-sort="{r['elo_def']:.2f}"><strong>{r['elo_def']:.1f}</strong> {format_pts_change(r['def_change'])}</td>
+          <td style="text-align: center;" data-sort="{r['rank_change_def']}">{format_rank_change(r['rank_change_def'])}</td>
         </tr>"""
 
     rankings_qmd = f"""---
 title: "Global National Team Rankings & MoM Dynamics"
-subtitle: "Comprehensive Overall ($R^e$), Offensive ($R^o$), and Defensive ($R^d$) Ratings with Month-over-Month Changes"
+subtitle: "Interactive Sorting by Overall ($R^e$), Offensive ($R^o$), or Defensive ($R^d$) Ratings with Rank Movements"
 format:
   html:
     page-layout: full
 ---
 
-This leaderboard ranks all active national teams evaluated under the top-performing **3-Elo Complete ($M_{{32}}$)** model architecture. Month-over-Month ($\Delta_{{MoM}}$) changes evaluate rank movements ($\Delta\\text{{Rank}}$) and rating point shifts ($\Delta R$) over the last 30 calendar days.
+This leaderboard ranks all active national teams evaluated under the top-performing **3-Elo Complete ($M_{{32}}$)** model architecture. Click the buttons below or click any table header to reorder teams by Overall, Offensive, or Defensive strength!
 
 ```{{=html}}
-<div style="background: #f8fafc; padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-weight: 600; color: #475569; display: inline-block;">
-  📅 <strong>Data Last Updated:</strong> {latest_match_date} &nbsp;|&nbsp; ⚽ <strong>Total Match Records Analyzed:</strong> {total_matches_count:,}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+  <div style="background: #f8fafc; padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #475569;">
+    📅 <strong>Data Last Updated:</strong> {latest_match_date} &nbsp;|&nbsp; ⚽ <strong>Total Match Records:</strong> {total_matches_count:,}
+  </div>
+  
+  <div style="display: flex; gap: 10px;">
+    <button onclick="sortTableByCol(2)" class="btn btn-sm btn-primary" style="font-weight: 600;">🏆 Sort by Overall ($R^e$)</button>
+    <button onclick="sortTableByCol(4)" class="btn btn-sm btn-warning" style="font-weight: 600; color: #78350f;">⚔️ Sort by Offense ($R^o$)</button>
+    <button onclick="sortTableByCol(6)" class="btn btn-sm btn-success" style="font-weight: 600;">🛡️ Sort by Defense ($R^d$)</button>
+  </div>
 </div>
 
-<table class="table table-striped table-hover" style="font-size: 0.95rem;">
+<table id="rankingsTable" class="table table-striped table-hover" style="font-size: 0.95rem;">
   <thead>
-    <tr style="background: #f1f5f9; color: #0f172a;">
-      <th style="width: 70px;">Rank</th>
-      <th>National Team</th>
-      <th style="text-align: right;">Overall Elo ($R^e$)</th>
-      <th style="text-align: center;">ΔRank (MoM)</th>
-      <th style="text-align: right;">ΔR^e (MoM)</th>
-      <th style="text-align: right;">Offensive Elo ($R^o$)</th>
-      <th style="text-align: right;">Defensive Elo ($R^d$)</th>
+    <tr style="background: #f1f5f9; color: #0f172a; cursor: pointer;">
+      <th style="width: 70px;" onclick="sortTableByCol(0)">Rank</th>
+      <th onclick="sortTableByCol(1)">National Team ⇕</th>
+      <th style="text-align: right;" onclick="sortTableByCol(2)">Overall Elo ($R^e$) ⇕</th>
+      <th style="text-align: center;" onclick="sortTableByCol(3)">$\Delta\text{{Rank}}_{{MoM}}$ ⇕</th>
+      <th style="text-align: right;" onclick="sortTableByCol(4)">Offensive Elo ($R^o$) ⇕</th>
+      <th style="text-align: center;" onclick="sortTableByCol(5)">$\Delta\text{{Rank}}_{{Off}}$ ⇕</th>
+      <th style="text-align: right;" onclick="sortTableByCol(6)">Defensive Elo ($R^d$) ⇕</th>
+      <th style="text-align: center;" onclick="sortTableByCol(7)">$\Delta\text{{Rank}}_{{Def}}$ ⇕</th>
     </tr>
   </thead>
   <tbody>
     {full_rankings_rows}
   </tbody>
 </table>
+
+<script type="text/javascript">
+var currentSortCol = -1;
+var sortAscending = false;
+
+function sortTableByCol(colIdx) {{
+    var table = document.getElementById("rankingsTable");
+    if (!table) return;
+    var tbody = table.getElementsByTagName("tbody")[0];
+    var rows = Array.from(tbody.getElementsByTagName("tr"));
+    
+    if (currentSortCol === colIdx) {{
+        sortAscending = !sortAscending;
+    }} else {{
+        currentSortCol = colIdx;
+        sortAscending = (colIdx === 1); // Alphabetical asc for team name, numeric desc for ratings
+    }}
+    
+    rows.sort(function(a, b) {{
+        var cellA = a.getElementsByTagName("td")[colIdx];
+        var cellB = b.getElementsByTagName("td")[colIdx];
+        
+        var valA = cellA.getAttribute("data-sort") || cellA.innerText.trim();
+        var valB = cellB.getAttribute("data-sort") || cellB.innerText.trim();
+        
+        var numA = parseFloat(valA);
+        var numB = parseFloat(valB);
+        
+        if (!isNaN(numA) && !isNaN(numB)) {{
+            return sortAscending ? numA - numB : numB - numA;
+        }} else {{
+            return sortAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }}
+    }});
+    
+    for (var i = 0; i < rows.length; i++) {{
+        tbody.appendChild(rows[i]);
+    }}
+}}
+</script>
 ```
 """
     with open(os.path.join(website_dir, 'rankings.qmd'), 'w') as f:
