@@ -3444,6 +3444,9 @@ function sortTableByCol(colIdx) {
     });
     
     for (var i = 0; i < rows.length; i++) {
+        var rankCell = rows[i].getElementsByTagName("td")[0];
+        var medal = (i === 0) ? "🥇 " : ((i === 1) ? "🥈 " : ((i === 2) ? "🥉 " : (i + 1).toString()));
+        rankCell.innerHTML = "<strong>" + medal + "</strong>";
         tbody.appendChild(rows[i]);
     }
 }

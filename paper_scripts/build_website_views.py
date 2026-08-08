@@ -449,6 +449,9 @@ function sortTableByCol(colIdx) {{
     }});
     
     for (var i = 0; i < rows.length; i++) {{
+        var rankCell = rows[i].getElementsByTagName("td")[0];
+        var medal = (i === 0) ? "🥇 " : ((i === 1) ? "🥈 " : ((i === 2) ? "🥉 " : (i + 1).toString()));
+        rankCell.innerHTML = "<strong>" + medal + "</strong>";
         tbody.appendChild(rows[i]);
     }}
 }}
@@ -645,206 +648,214 @@ Unchecking a team fades its points into a **soft clear transparent gray backgrou
     with open(os.path.join(website_dir, 'world_no1.qmd'), 'w') as f:
         f.write(world_no1_qmd)
 
-    # 4. Build ratings.qmd & ratings_norm.qmd
+    # 4. Build single unified ratings.qmd (Raw & Normalized Trajectories with Mode Toggle)
     teams_to_compute = ['Spain', 'Brazil', 'Germany', 'Argentina', 'Italy', 'France', 'England', 'Netherlands', 'Uruguay', 'Portugal']
     
     from run_compute_team import run_compute_team
     for t in teams_to_compute:
-        t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
-        if not os.path.exists(t_csv):
-            print(f"Pre-computing {t} rating trajectory...")
+        t_raw = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
+        t_norm = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}_norm.csv')
+        if not os.path.exists(t_raw):
+            print(f"Pre-computing {t} raw trajectory...")
             run_compute_team(team=t, system='3eloC', normalize=False)
+        if not os.path.exists(t_norm):
+            print(f"Pre-computing {t} normalized trajectory...")
+            run_compute_team(team=t, system='3eloC', normalize=True)
 
-    def generate_trajectory_page(is_normalized=False):
-        fig_ratings = make_subplots(
-            rows=2, cols=1,
-            shared_xaxes=True,
-            vertical_spacing=0.10,
-            subplot_titles=("Top Panel: Overall Rating Points (R^e)" if not is_normalized else "Top Panel: Normalized Overall Rating (R^e / R^e_10th)",
-                            "Bottom Panel: Tactical Style Ratings — Offensive (R^o, Solid) & Defensive (R^d, Dashed)" if not is_normalized else "Bottom Panel: Normalized Tactical Style Ratios — Offensive (R^o / R^o_10th) & Defensive (R^d / R^d_10th)")
-        )
+    fig_unified = make_subplots(
+        rows=2, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.10,
+        subplot_titles=("Top Panel: Overall Rating (R^e)",
+                        "Bottom Panel: Tactical Style Ratings — Offensive (R^o, Solid) & Defensive (R^d, Dashed)")
+    )
+    
+    default_checked = ['Spain', 'Brazil']
+    
+    for i, t in enumerate(teams_to_compute):
+        t_raw = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
+        t_norm = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}_norm.csv')
         
-        default_checked = ['Spain', 'Brazil']
-        
-        for i, t in enumerate(teams_to_compute):
-            if is_normalized:
-                t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}_norm.csv')
-                if not os.path.exists(t_csv):
-                    print(f"Pre-computing {t} normalized trajectory...")
-                    run_compute_team(team=t, system='3eloC', normalize=True)
-            else:
-                t_csv = os.path.join(data_dir, f'ratings_3eloC_{t.lower()}.csv')
-                if not os.path.exists(t_csv):
-                    print(f"Pre-computing {t} raw trajectory...")
-                    run_compute_team(team=t, system='3eloC', normalize=False)
-                    
-            df_t = pd.read_csv(t_csv)
-            df_t['date'] = pd.to_datetime(df_t['date'])
-            df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date').reset_index(drop=True)
-            
-            # Balanced Downsampling: Keep ALL actual match dates + 1 anchor point every 7 days during idle periods
-            if 'played_match_today' in df_t.columns:
-                df_t = df_t[(df_t['played_match_today'] == True) | (df_t['date'].dt.day % 7 == 0)].reset_index(drop=True)
-            else:
-                df_t = df_t[df_t['date'].dt.day % 7 == 0].reset_index(drop=True)
-                
-            c = TEAM_COLORS.get(t, '#334155')
-            is_vis = (t in default_checked)
-            
-            y_elo = df_t['norm_elo'] if (is_normalized and 'norm_elo' in df_t.columns) else df_t['elo']
-            y_off = df_t['norm_off'] if (is_normalized and 'norm_off' in df_t.columns) else df_t['elo_off']
-            y_def = df_t['norm_def'] if (is_normalized and 'norm_def' in df_t.columns) else df_t['elo_def']
-            
-            fig_ratings.add_trace(
-                go.Scatter(x=df_t['date'], y=y_elo, name=f"{t} (R^e)", line=dict(color=c, width=3, dash='solid'), visible=is_vis),
-                row=1, col=1
-            )
-            fig_ratings.add_trace(
-                go.Scatter(x=df_t['date'], y=y_off, name=f"{t} Offense (R^o)", line=dict(color=c, width=2.2, dash='solid'), visible=is_vis),
-                row=2, col=1
-            )
-            fig_ratings.add_trace(
-                go.Scatter(x=df_t['date'], y=y_def, name=f"{t} Defense (R^d)", line=dict(color=c, width=2.2, dash='dash'), visible=is_vis),
-                row=2, col=1
-            )
+        df_raw = pd.read_csv(t_raw)
+        df_raw['date'] = pd.to_datetime(df_raw['date'])
+        df_raw = df_raw[df_raw['date'] >= '1950-01-01'].sort_values('date').reset_index(drop=True)
+        if 'played_match_today' in df_raw.columns:
+            df_raw = df_raw[(df_raw['played_match_today'] == True) | (df_raw['date'].dt.day % 7 == 0)].reset_index(drop=True)
+        else:
+            df_raw = df_raw[df_raw['date'].dt.day % 7 == 0].reset_index(drop=True)
 
-        world_cup_years = [
-            (1950, "WC '50"), (1954, "WC '54"), (1958, "WC '58"), (1962, "WC '62"),
-            (1966, "WC '66"), (1970, "WC '70"), (1974, "WC '74"), (1978, "WC '78"),
-            (1982, "WC '82"), (1986, "WC '86"), (1990, "WC '90"), (1994, "WC '94"),
-            (1998, "WC '98"), (2002, "WC '02"), (2006, "WC '06"), (2010, "WC '10"),
-            (2014, "WC '14"), (2018, "WC '18"), (2022, "WC '22"), (2026, "WC '26")
-        ]
-        
-        for yr, label in world_cup_years:
-            wc_date = f"{yr}-06-15"
-            fig_ratings.add_vline(
-                x=wc_date,
-                line_dash="dot",
-                line_color="rgba(148, 163, 184, 0.45)",
-                line_width=1.2
-            )
-            fig_ratings.add_annotation(
-                x=wc_date, y=1.02, yref="y domain",
-                text=label, showarrow=False,
-                font=dict(size=9, color="#64748b"),
-                row=1, col=1
-            )
+        df_norm_t = pd.read_csv(t_norm)
+        df_norm_t['date'] = pd.to_datetime(df_norm_t['date'])
+        df_norm_t = df_norm_t[df_norm_t['date'] >= '1950-01-01'].sort_values('date').reset_index(drop=True)
+        if 'played_match_today' in df_norm_t.columns:
+            df_norm_t = df_norm_t[(df_norm_t['played_match_today'] == True) | (df_norm_t['date'].dt.day % 7 == 0)].reset_index(drop=True)
+        else:
+            df_norm_t = df_norm_t[df_norm_t['date'].dt.day % 7 == 0].reset_index(drop=True)
 
-        ratings_div_id = "ratings-norm-chart" if is_normalized else "ratings-plotly-chart"
+        c = TEAM_COLORS.get(t, '#334155')
+        is_vis = (t in default_checked)
         
-        fig_ratings.update_layout(
-            template="plotly_white",
-            paper_bgcolor="white",
-            plot_bgcolor="white",
-            height=740,
-            showlegend=False,
-            margin=dict(t=50, b=40, l=60, r=40),
-            font=dict(color="#0f172a", family="Inter, sans-serif"),
-            xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-            yaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
-            xaxis2=dict(
-                gridcolor="#e2e8f0", zerolinecolor="#cbd5e1",
-                rangeslider=dict(visible=True),
-                type="date"
-            ),
-            yaxis2=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
-        )
+        # Raw Traces (Indices 6*i + 0, 6*i + 1, 6*i + 2)
+        fig_unified.add_trace(go.Scatter(x=df_raw['date'], y=df_raw['elo'], name=f"{t} (R^e)", line=dict(color=c, width=3, dash='solid'), visible=is_vis), row=1, col=1)
+        fig_unified.add_trace(go.Scatter(x=df_raw['date'], y=df_raw['elo_off'], name=f"{t} Offense (R^o)", line=dict(color=c, width=2.2, dash='solid'), visible=is_vis), row=2, col=1)
+        fig_unified.add_trace(go.Scatter(x=df_raw['date'], y=df_raw['elo_def'], name=f"{t} Defense (R^d)", line=dict(color=c, width=2.2, dash='dash'), visible=is_vis), row=2, col=1)
         
-        plotly_inner_ratings = fig_ratings.to_html(full_html=False, include_plotlyjs='cdn', div_id=ratings_div_id)
-        
-        team_checkboxes_html = ""
-        for i, t in enumerate(teams_to_compute):
-            c = TEAM_COLORS.get(t, '#334155')
-            is_chk = "checked" if t in default_checked else ""
-            team_checkboxes_html += f"""
-            <label style="color: {c}; font-weight: 600; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
-              <input type="checkbox" id="chk-team-{i}{'-norm' if is_normalized else ''}" {is_chk} onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> {t}
-            </label>"""
+        # Norm Traces (Indices 6*i + 3, 6*i + 4, 6*i + 5) - initial visible = False
+        fig_unified.add_trace(go.Scatter(x=df_norm_t['date'], y=df_norm_t['norm_elo'], name=f"{t} Norm (R^e/R^e_10th)", line=dict(color=c, width=3, dash='solid'), visible=False), row=1, col=1)
+        fig_unified.add_trace(go.Scatter(x=df_norm_t['date'], y=df_norm_t['norm_off'], name=f"{t} Norm Offense", line=dict(color=c, width=2.2, dash='solid'), visible=False), row=2, col=1)
+        fig_unified.add_trace(go.Scatter(x=df_norm_t['date'], y=df_norm_t['norm_def'], name=f"{t} Norm Defense", line=dict(color=c, width=2.2, dash='dash'), visible=False), row=2, col=1)
 
-        control_panel_ratings = f"""
+    world_cup_years = [
+        (1950, "WC '50"), (1954, "WC '54"), (1958, "WC '58"), (1962, "WC '62"),
+        (1966, "WC '66"), (1970, "WC '70"), (1974, "WC '74"), (1978, "WC '78"),
+        (1982, "WC '82"), (1986, "WC '86"), (1990, "WC '90"), (1994, "WC '94"),
+        (1998, "WC '98"), (2002, "WC '02"), (2006, "WC '06"), (2010, "WC '10"),
+        (2014, "WC '14"), (2018, "WC '18"), (2022, "WC '22"), (2026, "WC '26")
+    ]
+    
+    for yr, label in world_cup_years:
+        wc_date = f"{yr}-06-15"
+        fig_unified.add_vline(x=wc_date, line_dash="dot", line_color="rgba(148, 163, 184, 0.45)", line_width=1.2)
+        fig_unified.add_annotation(x=wc_date, y=1.02, yref="y domain", text=label, showarrow=False, font=dict(size=9, color="#64748b"), row=1, col=1)
+
+    ratings_div_id = "ratings-unified-chart"
+    
+    fig_unified.update_layout(
+        template="plotly_white",
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        height=740,
+        showlegend=False,
+        margin=dict(t=50, b=40, l=60, r=40),
+        font=dict(color="#0f172a", family="Inter, sans-serif"),
+        xaxis=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+        yaxis=dict(title="Overall Rating Points (R^e)", gridcolor="#e2e8f0", zerolinecolor="#cbd5e1"),
+        xaxis2=dict(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1", rangeslider=dict(visible=True), type="date"),
+        yaxis2=dict(title="Tactical Style Rating Points (R^o, R^d)", gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
+    )
+    
+    plotly_inner_unified = fig_unified.to_html(full_html=False, include_plotlyjs='cdn', div_id=ratings_div_id)
+    
+    team_checkboxes_html = ""
+    for i, t in enumerate(teams_to_compute):
+        c = TEAM_COLORS.get(t, '#334155')
+        is_chk = "checked" if t in default_checked else ""
+        team_checkboxes_html += f"""
+        <label style="color: {c}; font-weight: 600; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
+          <input type="checkbox" id="chk-team-{i}" {is_chk} onchange="updateUnifiedRatingsChart()"> {t}
+        </label>"""
+
+    control_panel_unified = f"""
 <div class="team-selector-box" style="background: #f1f5f9; padding: 18px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #cbd5e1;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+    <div style="font-weight: 700; color: #0f172a; font-size: 1.05rem;">
+      📈 Trajectory Scale Mode:
+    </div>
+    <div style="display: flex; gap: 16px; background: #ffffff; padding: 6px 16px; border-radius: 20px; border: 1px solid #cbd5e1;">
+      <label style="color: #0f172a; font-weight: 700; cursor: pointer; margin-bottom: 0;">
+        <input type="radio" name="scaleMode" id="rad-mode-raw" checked onchange="updateUnifiedRatingsChart()"> 📊 Raw Rating Points ($R^e, R^o, R^d$)
+      </label>
+      <label style="color: #2563eb; font-weight: 700; cursor: pointer; margin-bottom: 0;">
+        <input type="radio" name="scaleMode" id="rad-mode-norm" onchange="updateUnifiedRatingsChart()"> 📏 Normalized Ratios ($R / R_{{10th}}$)
+      </label>
+    </div>
+  </div>
+  
+  <hr style="border-color: #cbd5e1; margin: 12px 0;">
+  
   <div style="font-weight: 600; color: #0f172a; margin-bottom: 10px; font-size: 1.05rem;">
     ⚽ Select Teams to Compare:
   </div>
   <div class="team-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
     {team_checkboxes_html}
   </div>
+  
   <hr style="border-color: #cbd5e1; margin: 12px 0;">
+  
   <div style="font-weight: 600; color: #0f172a; margin-bottom: 10px; font-size: 1.05rem;">
     📊 Subplot Component Controls:
   </div>
   <div class="metric-checkbox-grid" style="display: flex; flex-wrap: wrap; gap: 18px;">
     <label style="color: #0f172a; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-elo{'-norm' if is_normalized else ''}" checked onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> Top Panel: {'Normalized Rating ($R^e / R^e_{{10th}}$)' if is_normalized else 'Overall Rating ($R^e$)'}
+      <input type="checkbox" id="chk-elo" checked onchange="updateUnifiedRatingsChart()"> Top Panel: Overall Rating ($R^e$)
     </label>
     <label style="color: #d97706; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-off{'-norm' if is_normalized else ''}" checked onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> Bottom Panel: {'Normalized Offense ($R^o / R^o_{{10th}}$, Solid)' if is_normalized else 'Offensive Rating ($R^o$, Solid)'}
+      <input type="checkbox" id="chk-off" checked onchange="updateUnifiedRatingsChart()"> Bottom Panel: Offensive Rating ($R^o$, Solid)
     </label>
     <label style="color: #2563eb; font-weight: 600; cursor: pointer;">
-      <input type="checkbox" id="chk-def{'-norm' if is_normalized else ''}" checked onchange="updateRatingsChart{'_norm' if is_normalized else ''}()"> Bottom Panel: {'Normalized Defense ($R^d / R^d_{{10th}}$, Dashed)' if is_normalized else 'Defensive Rating ($R^d$, Dashed)'}
+      <input type="checkbox" id="chk-def" checked onchange="updateUnifiedRatingsChart()"> Bottom Panel: Defensive Rating ($R^d$, Dashed)
     </label>
   </div>
 </div>
 
 <script type="text/javascript">
-function updateRatingsChart{'_norm' if is_normalized else ''}() {{
+function updateUnifiedRatingsChart() {{
     var gd = document.getElementById('{ratings_div_id}');
     if (!gd) return;
     
-    var showElo = document.getElementById('chk-elo{'-norm' if is_normalized else ''}').checked;
-    var showOff = document.getElementById('chk-off{'-norm' if is_normalized else ''}').checked;
-    var showDef = document.getElementById('chk-def{'-norm' if is_normalized else ''}').checked;
+    var isRaw = document.getElementById('rad-mode-raw').checked;
+    var showElo = document.getElementById('chk-elo').checked;
+    var showOff = document.getElementById('chk-off').checked;
+    var showDef = document.getElementById('chk-def').checked;
     
     var visArray = [];
     var numTeams = {len(teams_to_compute)};
     
     for (var i = 0; i < numTeams; i++) {{
-        var teamChk = document.getElementById('chk-team-' + i + '{'-norm' if is_normalized else ''}').checked;
-        visArray.push(teamChk && showElo);
-        visArray.push(teamChk && showOff);
-        visArray.push(teamChk && showDef);
+        var teamChk = document.getElementById('chk-team-' + i).checked;
+        if (isRaw) {{
+            visArray.push(teamChk && showElo);
+            visArray.push(teamChk && showOff);
+            visArray.push(teamChk && showDef);
+            visArray.push(false);
+            visArray.push(false);
+            visArray.push(false);
+        }} else {{
+            visArray.push(false);
+            visArray.push(false);
+            visArray.push(false);
+            visArray.push(teamChk && showElo);
+            visArray.push(teamChk && showOff);
+            visArray.push(teamChk && showDef);
+        }}
     }}
     
     Plotly.restyle(gd, {{visible: visArray}});
+    
+    var title1 = isRaw ? 'Top Panel: Overall Rating Points (R^e)' : 'Top Panel: Normalized Overall Ratio (R^e / R^e_10th)';
+    var title2 = isRaw ? 'Bottom Panel: Tactical Style Ratings — Offensive (R^o, Solid) & Defensive (R^d, Dashed)' : 'Bottom Panel: Normalized Tactical Ratios — Offensive (R^o / R^o_10th) & Defensive (R^d / R^d_10th)';
+    
+    Plotly.relayout(gd, {{
+        'annotations[0].text': title1,
+        'annotations[1].text': title2
+    }});
 }}
 </script>
 """
 
-        plotly_full_ratings = f"\n\n```{{=html}}\n{control_panel_ratings}\n{plotly_inner_ratings}\n```\n\n"
-        return plotly_full_ratings
-
-    plotly_ratings_raw = generate_trajectory_page(is_normalized=False)
+    plotly_full_unified = f"\n\n```{{=html}}\n{control_panel_unified}\n{plotly_inner_unified}\n```\n\n"
+    
     ratings_qmd = f"""---
-title: "Interactive Team Trajectories Explorer"
-subtitle: "Multi-Team Side-by-Side Comparison Suite & Time Range Filter (1950–2026)"
+title: "Interactive Team Trajectories Suite"
+subtitle: "Multi-Team Comparison Suite with Raw Points & Normalized Scale Mode Toggle (1950–2026)"
 format:
   html:
     page-layout: full
 ---
 
-Use the **Team Checkboxes** below to add or remove national teams dynamically. Overall Elo ($R^e$) and Tactical Style ($R^o, R^d$) are displayed on decoupled subplot panels with FIFA World Cup tournament markers (1950–2026).
+Use the **Trajectory Scale Mode** toggle below to switch seamlessly between **Raw Rating Points ($R^e, R^o, R^d$)** and **Normalized Ratios ($R / R_{{10th}}$)** relative to the 10th-place World baseline on match dates. 
 
-{plotly_ratings_raw}
+Use the **Team Checkboxes** to add or remove national teams dynamically across decoupled subplot panels with FIFA World Cup tournament markers (1950–2026).
+
+{plotly_full_unified}
 """
     with open(os.path.join(website_dir, 'ratings.qmd'), 'w') as f:
         f.write(ratings_qmd)
-
-    plotly_ratings_norm = generate_trajectory_page(is_normalized=True)
-    ratings_norm_qmd = f"""---
-title: "Normalized Team Trajectories Explorer"
-subtitle: "Non-Dimensional Rating Coordinates Relative to 10th-Place World Baseline (1950–2026)"
-format:
-  html:
-    page-layout: full
----
-
-This tab evaluates national team trajectories in **non-dimensional normalized coordinates** relative to the 10th-place World baseline ($R^e / R^e_{{10th}}$, $R^o / R^o_{{10th}}$, $R^d / R^d_{{10th}}$) on match dates.
-
-{plotly_ratings_norm}
-"""
-    with open(os.path.join(website_dir, 'ratings_norm.qmd'), 'w') as f:
-        f.write(ratings_norm_qmd)
+        
+    # Remove old ratings_norm.qmd if exists
+    norm_qmd_path = os.path.join(website_dir, 'ratings_norm.qmd')
+    if os.path.exists(norm_qmd_path):
+        os.remove(norm_qmd_path)
 
     # 5. Build style_space.qmd
     df_avg = df_norm.groupby('team')[['norm_def', 'norm_off', 'elo']].mean().reset_index()
