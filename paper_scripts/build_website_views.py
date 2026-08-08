@@ -927,34 +927,58 @@ The **3-Elo Complete** system decomposes national team strength into three dynam
 3. **Defensive Rating ($R^d$)**: Defensive resistance.
 
 ### Mathematical Rating Update Equations
-Following match $k$ between Home Team $i$ and Away Team $j$ with match goal outcome $(g_i, g_j)$:
+Following match $k$ between Home Team $H$ and Away Team $A$ with match goal outcome $(g_H, g_A)$:
 
-#### Overall Rating Update ($R^e$):
-$$R^e_{{i, k+1}} = R^e_{{i, k}} + K_{{\\text{{base}}}} \\cdot W_c \\cdot \\gamma(m) \\cdot (S_i - E_i)$$
-$$R^e_{{j, k+1}} = R^e_{{j, k}} + K_{{\\text{{base}}}} \\cdot W_c \\cdot \\gamma(m) \\cdot (S_j - E_j)$$
+#### 1. Overall Rating Update ($R^e$):
+Expected win probability $E_H$ is computed via logistic sigmoid:
+$$E_H = \\frac{{1}}{{1 + 10^{{-\\frac{{(R^e_H + H_{{\\text{{overall}}}} - R^e_A)}}{{D_{{\\text{{overall}}}}}}}}}}$$
 
-where expected win probability $E_i$ is computed via logistic sigmoid:
-$$E_i = \\frac{{1}}{{1 + 10^{{-\\frac{{(R^e_{{i}} - R^e_{{j}}) + H_{{\\text{{overall}}}}}}{{D_{{\\text{{overall}}}}}}}}}}$$
+Goal difference margin scaling multiplier $G(\\Delta g)$ (where $\\Delta g = |g_H - g_A|$):
+$$G(\\Delta g) = \\begin{{cases}} 
+1.0 & \\text{{if }} \\Delta g \\le 1 \\\\ 
+G_2 & \\text{{if }} \\Delta g = 2 \\\\ 
+\\frac{{a_{{\\text{{margin}}}} + \\Delta g}}{{b_{{\\text{{margin}}}}}} & \\text{{if }} \\Delta g \\ge 3 
+\\end{{cases}}$$
 
-#### Tactical Style Updates (Offensive $R^o$ and Defensive $R^d$):
-$$R^o_{{i, k+1}} = R^o_{{i, k}} + K_{{\\text{{scale}}}} \\cdot K_{{\\text{{base}}}} \\cdot W_c \\cdot \\gamma(m) \\cdot (S^o_i - E^o_i)$$
-$$R^d_{{i, k+1}} = R^d_{{i, k}} + K_{{\\text{{scale}}}} \\cdot K_{{\\text{{base}}}} \\cdot W_c \\cdot \\gamma(m) \\cdot (S^d_i - E^d_i)$$
+Effective overall $K$-factor scaling:
+$$K_{{\\text{{eff}}}} = K_{{\\text{{base}}}} \\cdot \\left(M_{{\\text{{overall}}}}\\right)^{{I_{{\\text{{comp}}}}}} \\cdot G(\\Delta g)$$
 
-#### Goal Difference Margin Scaling Factor $\\gamma(m)$:
-$$\\gamma(m) = M_{{\\text{{overall}}}} \\cdot \\ln(1 + |g_i - g_j|) \\cdot \\left(\\frac{{a_{{\\text{{margin}}}}}}{{a_{{\\text{{margin}}}} + |g_i - g_j|}}\\right)$$
+Overall rating update:
+$$R^e_{{H, k+1}} = R^e_{{H, k}} + K_{{\\text{{eff}}}} \\cdot (S_H - E_H)$$
+$$R^e_{{A, k+1}} = R^e_{{A, k}} + K_{{\\text{{eff}}}} \\cdot (S_A - E_A)$$
 
-#### Tuned 3-Elo Complete Parameter Estimates:
+#### 2. Tactical Style Updates (Offensive $R^o$ & Defensive $R^d$):
+Expected goal intensities ($\\lambda_H, \\lambda_A$):
+$$\\lambda_H = \\mu_{{\\text{{base}}}} \\cdot 10^{{\\frac{{(R^o_H - R^d_A + H_{{\\text{{style}}}})}}{{D_{{\\text{{style}}}}}}}}$$
+$$\\lambda_A = \\mu_{{\\text{{base}}}} \\cdot 10^{{\\frac{{(R^o_A - R^d_H - H_{{\\text{{style}}}})}}{{D_{{\\text{{style}}}}}}}}$$
 
-| Parameter | Description | Value |
+Effective style $K$-factor:
+$$K_{{\\text{{style}}}} = K_{{\\text{{base}}}} \\cdot K_{{\\text{{scale}}}} \\cdot \\left(M_{{\\text{{style}}}}\\right)^{{I_{{\\text{{comp}}}}}}$$
+
+Tactical style updates:
+$$R^o_{{H, k+1}} = R^o_{{H, k}} + K_{{\\text{{style}}}} \\cdot (g_H - \\lambda_H)$$
+$$R^d_{{A, k+1}} = R^d_{{A, k}} + K_{{\\text{{style}}}} \\cdot (\\lambda_H - g_H)$$
+$$R^o_{{A, k+1}} = R^o_{{A, k}} + K_{{\\text{{style}}}} \\cdot (g_A - \\lambda_A)$$
+$$R^d_{{H, k+1}} = R^d_{{H, k}} + K_{{\\text{{style}}}} \\cdot (\\lambda_A - g_A)$$
+
+---
+
+### Complete 12-Parameter Specification (`3-Elo Complete`):
+
+| Parameter | Description | Exact Tuned Value |
 | :--- | :--- | :---: |
-| $K_{{\\text{{base}}}}$ | Base rating volatility factor | `32.0537` |
-| $H_{{\\text{{overall}}}}$ | Home venue advantage constant | `218.2097` |
-| $D_{{\\text{{overall}}}}$ | Logistic scale divisor | `1267.5829` |
-| $M_{{\\text{{overall}}}}$ | Goal difference margin multiplier | `2.5010` |
-| $a_{{\\text{{margin}}}}$ | Margin saturation parameter | `4.3270` |
-| $b_{{\\text{{margin}}}}$ | Secondary margin parameter | `3.6032` |
-| $M_{{\\text{{style}}}}$ | Tactical style update factor | `1.0729` |
-| $K_{{\\text{{scale}}}}$ | Style-to-overall $K$-ratio | `0.5521` |
+| $K_{{\\text{{base}}}}$ | Base rating volatility factor | `32.05371` |
+| $M_{{\\text{{overall}}}}$ | Competition weighting multiplier for competitive matches | `2.501047` |
+| $H_{{\\text{{overall}}}}$ | Overall Home venue advantage constant | `218.209652` |
+| $D_{{\\text{{overall}}}}$ | Overall logistic scale divisor | `1267.582933` |
+| $G_2$ | Goal difference margin multiplier for 2-goal victories | `1.097433` |
+| $a_{{\\text{{margin}}}}$ | Margin saturation numerator constant ($\\Delta g \\ge 3$) | `4.326980` |
+| $b_{{\\text{{margin}}}}$ | Margin saturation denominator constant ($\\Delta g \\ge 3$) | `3.603202` |
+| $M_{{\\text{{style}}}}$ | Tactical style competition weighting multiplier | `1.072913` |
+| $H_{{\\text{{style}}}}$ | Tactical style Home venue advantage constant | `60.945526` |
+| $D_{{\\text{{style}}}}$ | Tactical style scale divisor | `974.553479` |
+| $K_{{\\text{{scale}}}}$ | Style-to-overall $K$-factor ratio multiplier | `0.552142` |
+| $\\mu_{{\\text{{base}}}}$ | Baseline expected goal rate for Poisson intensity updates | `1.350000` |
 
 ---
 

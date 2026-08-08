@@ -346,6 +346,7 @@ window.Quarto = {
   <li><a href="#the-3-elo-complete-rating-architecture-3eloc" id="toc-the-3-elo-complete-rating-architecture-3eloc" class="nav-link active" data-scroll-target="#the-3-elo-complete-rating-architecture-3eloc">1. The 3-Elo Complete Rating Architecture (<code>3eloC</code>)</a>
   <ul class="collapse">
   <li><a href="#mathematical-rating-update-equations" id="toc-mathematical-rating-update-equations" class="nav-link" data-scroll-target="#mathematical-rating-update-equations">Mathematical Rating Update Equations</a></li>
+  <li><a href="#complete-12-parameter-specification-3-elo-complete" id="toc-complete-12-parameter-specification-3-elo-complete" class="nav-link" data-scroll-target="#complete-12-parameter-specification-3-elo-complete">Complete 12-Parameter Specification (<code>3-Elo Complete</code>):</a></li>
   </ul></li>
   <li><a href="#model-m_32-bivariate-poisson-glm-framework-b-i-q-t-c" id="toc-model-m_32-bivariate-poisson-glm-framework-b-i-q-t-c" class="nav-link" data-scroll-target="#model-m_32-bivariate-poisson-glm-framework-b-i-q-t-c">2. Model <span class="math inline">\(M_{32}\)</span> Bivariate Poisson GLM Framework (<code>B-I-Q-T-C</code>)</a>
   <ul class="collapse">
@@ -390,75 +391,105 @@ window.Quarto = {
 <p>The <strong>3-Elo Complete</strong> system decomposes national team strength into three dynamic state variables evaluated chronologically across all match dates: 1. <strong>Overall Rating (<span class="math inline">\(R^e\)</span>)</strong>: Aggregate winning capacity. 2. <strong>Offensive Rating (<span class="math inline">\(R^o\)</span>)</strong>: Goal-scoring potency. 3. <strong>Defensive Rating (<span class="math inline">\(R^d\)</span>)</strong>: Defensive resistance.</p>
 <section id="mathematical-rating-update-equations" class="level3">
 <h3 class="anchored" data-anchor-id="mathematical-rating-update-equations">Mathematical Rating Update Equations</h3>
-<p>Following match <span class="math inline">\(k\)</span> between Home Team <span class="math inline">\(i\)</span> and Away Team <span class="math inline">\(j\)</span> with match goal outcome <span class="math inline">\((g_i, g_j)\)</span>:</p>
+<p>Following match <span class="math inline">\(k\)</span> between Home Team <span class="math inline">\(H\)</span> and Away Team <span class="math inline">\(A\)</span> with match goal outcome <span class="math inline">\((g_H, g_A)\)</span>:</p>
 <section id="overall-rating-update-re" class="level4">
-<h4 class="anchored" data-anchor-id="overall-rating-update-re">Overall Rating Update (<span class="math inline">\(R^e\)</span>):</h4>
-<p><span class="math display">\[R^e_{i, k+1} = R^e_{i, k} + K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S_i - E_i)\]</span> <span class="math display">\[R^e_{j, k+1} = R^e_{j, k} + K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S_j - E_j)\]</span></p>
-<p>where expected win probability <span class="math inline">\(E_i\)</span> is computed via logistic sigmoid: <span class="math display">\[E_i = \frac{1}{1 + 10^{-\frac{(R^e_{i} - R^e_{j}) + H_{\text{overall}}}{D_{\text{overall}}}}}\]</span></p>
+<h4 class="anchored" data-anchor-id="overall-rating-update-re">1. Overall Rating Update (<span class="math inline">\(R^e\)</span>):</h4>
+<p>Expected win probability <span class="math inline">\(E_H\)</span> is computed via logistic sigmoid: <span class="math display">\[E_H = \frac{1}{1 + 10^{-\frac{(R^e_H + H_{\text{overall}} - R^e_A)}{D_{\text{overall}}}}}\]</span></p>
+<p>Goal difference margin scaling multiplier <span class="math inline">\(G(\Delta g)\)</span> (where <span class="math inline">\(\Delta g = |g_H - g_A|\)</span>): <span class="math display">\[G(\Delta g) = \begin{cases}
+1.0 &amp; \text{if } \Delta g \le 1 \\
+G_2 &amp; \text{if } \Delta g = 2 \\
+\frac{a_{\text{margin}} + \Delta g}{b_{\text{margin}}} &amp; \text{if } \Delta g \ge 3
+\end{cases}\]</span></p>
+<p>Effective overall <span class="math inline">\(K\)</span>-factor scaling: <span class="math display">\[K_{\text{eff}} = K_{\text{base}} \cdot \left(M_{\text{overall}}\right)^{I_{\text{comp}}} \cdot G(\Delta g)\]</span></p>
+<p>Overall rating update: <span class="math display">\[R^e_{H, k+1} = R^e_{H, k} + K_{\text{eff}} \cdot (S_H - E_H)\]</span> <span class="math display">\[R^e_{A, k+1} = R^e_{A, k} + K_{\text{eff}} \cdot (S_A - E_A)\]</span></p>
 </section>
-<section id="tactical-style-updates-offensive-ro-and-defensive-rd" class="level4">
-<h4 class="anchored" data-anchor-id="tactical-style-updates-offensive-ro-and-defensive-rd">Tactical Style Updates (Offensive <span class="math inline">\(R^o\)</span> and Defensive <span class="math inline">\(R^d\)</span>):</h4>
-<p><span class="math display">\[R^o_{i, k+1} = R^o_{i, k} + K_{\text{scale}} \cdot K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S^o_i - E^o_i)\]</span> <span class="math display">\[R^d_{i, k+1} = R^d_{i, k} + K_{\text{scale}} \cdot K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S^d_i - E^d_i)\]</span></p>
+<section id="tactical-style-updates-offensive-ro-defensive-rd" class="level4">
+<h4 class="anchored" data-anchor-id="tactical-style-updates-offensive-ro-defensive-rd">2. Tactical Style Updates (Offensive <span class="math inline">\(R^o\)</span> &amp; Defensive <span class="math inline">\(R^d\)</span>):</h4>
+<p>Expected goal intensities (<span class="math inline">\(\lambda_H, \lambda_A\)</span>): <span class="math display">\[\lambda_H = \mu_{\text{base}} \cdot 10^{\frac{(R^o_H - R^d_A + H_{\text{style}})}{D_{\text{style}}}}\]</span> <span class="math display">\[\lambda_A = \mu_{\text{base}} \cdot 10^{\frac{(R^o_A - R^d_H - H_{\text{style}})}{D_{\text{style}}}}\]</span></p>
+<p>Effective style <span class="math inline">\(K\)</span>-factor: <span class="math display">\[K_{\text{style}} = K_{\text{base}} \cdot K_{\text{scale}} \cdot \left(M_{\text{style}}\right)^{I_{\text{comp}}}\]</span></p>
+<p>Tactical style updates: <span class="math display">\[R^o_{H, k+1} = R^o_{H, k} + K_{\text{style}} \cdot (g_H - \lambda_H)\]</span> <span class="math display">\[R^d_{A, k+1} = R^d_{A, k} + K_{\text{style}} \cdot (\lambda_H - g_H)\]</span> <span class="math display">\[R^o_{A, k+1} = R^o_{A, k} + K_{\text{style}} \cdot (g_A - \lambda_A)\]</span> <span class="math display">\[R^d_{H, k+1} = R^d_{H, k} + K_{\text{style}} \cdot (\lambda_A - g_A)\]</span></p>
+<hr>
 </section>
-<section id="goal-difference-margin-scaling-factor-gammam" class="level4">
-<h4 class="anchored" data-anchor-id="goal-difference-margin-scaling-factor-gammam">Goal Difference Margin Scaling Factor <span class="math inline">\(\gamma(m)\)</span>:</h4>
-<p><span class="math display">\[\gamma(m) = M_{\text{overall}} \cdot \ln(1 + |g_i - g_j|) \cdot \left(\frac{a_{\text{margin}}}{a_{\text{margin}} + |g_i - g_j|}\right)\]</span></p>
 </section>
-<section id="tuned-3-elo-complete-parameter-estimates" class="level4">
-<h4 class="anchored" data-anchor-id="tuned-3-elo-complete-parameter-estimates">Tuned 3-Elo Complete Parameter Estimates:</h4>
+<section id="complete-12-parameter-specification-3-elo-complete" class="level3">
+<h3 class="anchored" data-anchor-id="complete-12-parameter-specification-3-elo-complete">Complete 12-Parameter Specification (<code>3-Elo Complete</code>):</h3>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 38%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Parameter</th>
 <th style="text-align: left;">Description</th>
-<th style="text-align: center;">Value</th>
+<th style="text-align: center;">Exact Tuned Value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(K_{\text{base}}\)</span></td>
 <td style="text-align: left;">Base rating volatility factor</td>
-<td style="text-align: center;"><code>32.0537</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><span class="math inline">\(H_{\text{overall}}\)</span></td>
-<td style="text-align: left;">Home venue advantage constant</td>
-<td style="text-align: center;"><code>218.2097</code></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><span class="math inline">\(D_{\text{overall}}\)</span></td>
-<td style="text-align: left;">Logistic scale divisor</td>
-<td style="text-align: center;"><code>1267.5829</code></td>
+<td style="text-align: center;"><code>32.05371</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(M_{\text{overall}}\)</span></td>
-<td style="text-align: left;">Goal difference margin multiplier</td>
-<td style="text-align: center;"><code>2.5010</code></td>
+<td style="text-align: left;">Competition weighting multiplier for competitive matches</td>
+<td style="text-align: center;"><code>2.501047</code></td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(H_{\text{overall}}\)</span></td>
+<td style="text-align: left;">Overall Home venue advantage constant</td>
+<td style="text-align: center;"><code>218.209652</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(D_{\text{overall}}\)</span></td>
+<td style="text-align: left;">Overall logistic scale divisor</td>
+<td style="text-align: center;"><code>1267.582933</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(G_2\)</span></td>
+<td style="text-align: left;">Goal difference margin multiplier for 2-goal victories</td>
+<td style="text-align: center;"><code>1.097433</code></td>
+</tr>
+<tr class="even">
 <td style="text-align: left;"><span class="math inline">\(a_{\text{margin}}\)</span></td>
-<td style="text-align: left;">Margin saturation parameter</td>
-<td style="text-align: center;"><code>4.3270</code></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><span class="math inline">\(b_{\text{margin}}\)</span></td>
-<td style="text-align: left;">Secondary margin parameter</td>
-<td style="text-align: center;"><code>3.6032</code></td>
+<td style="text-align: left;">Margin saturation numerator constant (<span class="math inline">\(\Delta g \ge 3\)</span>)</td>
+<td style="text-align: center;"><code>4.326980</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><span class="math inline">\(M_{\text{style}}\)</span></td>
-<td style="text-align: left;">Tactical style update factor</td>
-<td style="text-align: center;"><code>1.0729</code></td>
+<td style="text-align: left;"><span class="math inline">\(b_{\text{margin}}\)</span></td>
+<td style="text-align: left;">Margin saturation denominator constant (<span class="math inline">\(\Delta g \ge 3\)</span>)</td>
+<td style="text-align: center;"><code>3.603202</code></td>
 </tr>
 <tr class="even">
+<td style="text-align: left;"><span class="math inline">\(M_{\text{style}}\)</span></td>
+<td style="text-align: left;">Tactical style competition weighting multiplier</td>
+<td style="text-align: center;"><code>1.072913</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(H_{\text{style}}\)</span></td>
+<td style="text-align: left;">Tactical style Home venue advantage constant</td>
+<td style="text-align: center;"><code>60.945526</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(D_{\text{style}}\)</span></td>
+<td style="text-align: left;">Tactical style scale divisor</td>
+<td style="text-align: center;"><code>974.553479</code></td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(K_{\text{scale}}\)</span></td>
-<td style="text-align: left;">Style-to-overall <span class="math inline">\(K\)</span>-ratio</td>
-<td style="text-align: center;"><code>0.5521</code></td>
+<td style="text-align: left;">Style-to-overall <span class="math inline">\(K\)</span>-factor ratio multiplier</td>
+<td style="text-align: center;"><code>0.552142</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\mu_{\text{base}}\)</span></td>
+<td style="text-align: left;">Baseline expected goal rate for Poisson intensity updates</td>
+<td style="text-align: center;"><code>1.350000</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
-</section>
 </section>
 </section>
 <section id="model-m_32-bivariate-poisson-glm-framework-b-i-q-t-c" class="level2">
