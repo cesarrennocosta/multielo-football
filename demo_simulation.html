@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>⚽ MultiElo Football: Match Monte Carlo &amp; World Cup Group Stage Simulation – MultiElo Football</title>
+<title>⚽ MultiElo Football: Python Library &amp; Simulation Guide – MultiElo Football</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -355,7 +355,7 @@ window.Quarto = {
   </li>  
   <li class="nav-item">
     <a class="nav-link active" href="./demo_simulation.html" aria-current="page"> 
-<span class="menu-text">Simulation Demo</span></a>
+<span class="menu-text">Python Library</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./models.html"> 
@@ -385,7 +385,13 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" id="toc-part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" class="nav-link active" data-scroll-target="#part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap">Part 1: Two-Team Match Prediction &amp; 1,000 Monte Carlo Score Heatmap</a></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">📦 Installation</a>
+  <ul class="collapse">
+  <li><a href="#option-1-install-via-pypi-recommended" id="toc-option-1-install-via-pypi-recommended" class="nav-link" data-scroll-target="#option-1-install-via-pypi-recommended">Option 1: Install via PyPI (Recommended)</a></li>
+  <li><a href="#option-2-install-directly-from-github" id="toc-option-2-install-directly-from-github" class="nav-link" data-scroll-target="#option-2-install-directly-from-github">Option 2: Install directly from GitHub</a></li>
+  </ul></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">🚀 Overview</a></li>
+  <li><a href="#part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" id="toc-part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" class="nav-link" data-scroll-target="#part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap">Part 1: Two-Team Match Prediction &amp; 1,000 Monte Carlo Score Heatmap</a></li>
   <li><a href="#part-2-4-team-fifa-world-cup-group-stage-simulation" id="toc-part-2-4-team-fifa-world-cup-group-stage-simulation" class="nav-link" data-scroll-target="#part-2-4-team-fifa-world-cup-group-stage-simulation">Part 2: 4-Team FIFA World Cup Group Stage Simulation</a>
   <ul class="collapse">
   <li><a href="#monte-carlo-group-stage-tournaments-finishing-position-heatmap" id="toc-monte-carlo-group-stage-tournaments-finishing-position-heatmap" class="nav-link" data-scroll-target="#monte-carlo-group-stage-tournaments-finishing-position-heatmap">1,000 Monte Carlo Group Stage Tournaments &amp; Finishing Position Heatmap</a></li>
@@ -399,7 +405,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">⚽ MultiElo Football: Match Monte Carlo &amp; World Cup Group Stage Simulation</h1>
+<h1 class="title">⚽ MultiElo Football: Python Library &amp; Simulation Guide</h1>
 </div>
 
 
@@ -416,47 +422,64 @@ window.Quarto = {
 </header>
 
 
+<p>Welcome to the official <code>multielo-football</code> Python library documentation and interactive demonstration.</p>
+<section id="installation" class="level2">
+<h2 class="anchored" data-anchor-id="installation">📦 Installation</h2>
+<p>You can install the <code>multielo-football</code> package via PyPI or directly from the GitHub repository:</p>
+<section id="option-1-install-via-pypi-recommended" class="level3">
+<h3 class="anchored" data-anchor-id="option-1-install-via-pypi-recommended">Option 1: Install via PyPI (Recommended)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install multielo-football</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="option-2-install-directly-from-github" class="level3">
+<h3 class="anchored" data-anchor-id="option-2-install-directly-from-github">Option 2: Install directly from GitHub</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install git+https://github.com/cesarrennocosta/multielo-football.git</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">🚀 Overview</h2>
 <p>This notebook demonstrates how to use the <code>multielo-football</code> library to: 1. Load multi-dimensional team ratings (<span class="math inline">\(R^e, R^o, R^d\)</span>) and compute Poisson match expectations (<span class="math inline">\(\lambda_A, \lambda_B\)</span>). 2. Perform <strong>1,000 Monte Carlo match simulations</strong> between two top national teams and plot a 2D scoreline probability heatmap. 3. Simulate a 4-team <strong>FIFA World Cup Group Stage round-robin</strong> under official FIFA tiebreaker rules (Points <span class="math inline">\(\rightarrow\)</span> Goal Difference <span class="math inline">\(\rightarrow\)</span> Goals For <span class="math inline">\(\rightarrow\)</span> Head-to-Head). 4. Run <strong>1,000 Monte Carlo group stage tournaments</strong> to calculate empirical probabilities for each team finishing in 1st, 2nd, 3rd, and 4th place, visualized as a heatmap.</p>
-<div id="aa821077" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T22:04:42.161617Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T22:04:42.161405Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T22:04:43.271465Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T22:04:43.271212Z&quot;}}" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Import multielo library</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> multielo</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Set clean seaborn plotting style</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">120</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"multielo version: </span><span class="sc">{</span>multielo<span class="sc">.</span><span class="va">__file__</span><span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="5295966a" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-08T10:50:45.446043Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-08T10:50:45.445847Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-08T10:50:47.009659Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-08T10:50:47.009378Z&quot;}}" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Import multielo library</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> multielo</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Set clean seaborn plotting style</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'figure.dpi'</span>] <span class="op">=</span> <span class="dv">120</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"multielo version: </span><span class="sc">{</span>multielo<span class="sc">.</span><span class="va">__file__</span><span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>multielo version: /Users/rennocosta/matchdataset/multielo_package/multielo/__init__.py</code></pre>
 </div>
 </div>
+</section>
 <section id="part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap" class="level2">
 <h2 class="anchored" data-anchor-id="part-1-two-team-match-prediction-1000-monte-carlo-score-heatmap">Part 1: Two-Team Match Prediction &amp; 1,000 Monte Carlo Score Heatmap</h2>
 <p>We evaluate a neutral-venue match between <strong>Spain</strong> and <strong>England</strong> using model specification <strong><span class="math inline">\(M_{32}\)</span></strong> (3-Elo Complete Bivariate Poisson GLM).</p>
-<div id="555e9ead" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T22:04:43.272555Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T22:04:43.272450Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T22:04:43.275010Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T22:04:43.274830Z&quot;}}" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Define Multi-Dimensional Ratings (Overall Elo, Offensive, Defensive)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>spain_ratings <span class="op">=</span> {<span class="st">'elo'</span>: <span class="fl">2279.0</span>, <span class="st">'off'</span>: <span class="fl">2276.6</span>, <span class="st">'def'</span>: <span class="fl">2412.4</span>}</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>england_ratings <span class="op">=</span> {<span class="st">'elo'</span>: <span class="fl">2117.7</span>, <span class="st">'off'</span>: <span class="fl">2341.5</span>, <span class="st">'def'</span>: <span class="fl">2226.9</span>}</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Predict match expectations under M32 Poisson GLM model</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> multielo.predict(spain_ratings, england_ratings, model_specs<span class="op">=</span><span class="st">'M32'</span>, is_neutral<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Analytical Model Prediction ==="</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Spain Win Probability   : </span><span class="sc">{</span>pred[<span class="st">'p_win_a'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Draw Probability        : </span><span class="sc">{</span>pred[<span class="st">'p_draw'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"England Win Probability : </span><span class="sc">{</span>pred[<span class="st">'p_win_b'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Goals (Spain)  : </span><span class="sc">{</span>pred[<span class="st">'expected_goals_a'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Goals (England): </span><span class="sc">{</span>pred[<span class="st">'expected_goals_b'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analytical Most Likely Score: </span><span class="sc">{</span>pred[<span class="st">'most_likely_score'</span>][<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>pred[<span class="st">'most_likely_score'</span>][<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6634dc87" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-08T10:50:47.010817Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-08T10:50:47.010704Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-08T10:50:47.013566Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-08T10:50:47.013358Z&quot;}}" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Define Multi-Dimensional Ratings (Overall Elo, Offensive, Defensive)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>spain_ratings <span class="op">=</span> {<span class="st">'elo'</span>: <span class="fl">2279.0</span>, <span class="st">'off'</span>: <span class="fl">2276.6</span>, <span class="st">'def'</span>: <span class="fl">2412.4</span>}</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>england_ratings <span class="op">=</span> {<span class="st">'elo'</span>: <span class="fl">2117.7</span>, <span class="st">'off'</span>: <span class="fl">2341.5</span>, <span class="st">'def'</span>: <span class="fl">2226.9</span>}</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Predict match expectations under M32 Poisson GLM model</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> multielo.predict(spain_ratings, england_ratings, model_specs<span class="op">=</span><span class="st">'M32'</span>, is_neutral<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Analytical Model Prediction ==="</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Spain Win Probability   : </span><span class="sc">{</span>pred[<span class="st">'p_win_a'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Draw Probability        : </span><span class="sc">{</span>pred[<span class="st">'p_draw'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"England Win Probability : </span><span class="sc">{</span>pred[<span class="st">'p_win_b'</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Goals (Spain)  : </span><span class="sc">{</span>pred[<span class="st">'expected_goals_a'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Goals (England): </span><span class="sc">{</span>pred[<span class="st">'expected_goals_b'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analytical Most Likely Score: </span><span class="sc">{</span>pred[<span class="st">'most_likely_score'</span>][<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>pred[<span class="st">'most_likely_score'</span>][<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Analytical Model Prediction ===
 Spain Win Probability   : 45.2%
@@ -467,49 +490,49 @@ Expected Goals (England): 1.142
 Analytical Most Likely Score: 1 - 1</code></pre>
 </div>
 </div>
-<div id="7f5000ab" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T22:04:43.275925Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T22:04:43.275865Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T22:04:43.391906Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T22:04:43.391644Z&quot;}}" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Perform 1,000 Monte Carlo Match Simulations</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>N_SIMS <span class="op">=</span> <span class="dv">1000</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>lambda_spain <span class="op">=</span> pred[<span class="st">'expected_goals_a'</span>]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>lambda_england <span class="op">=</span> pred[<span class="st">'expected_goals_b'</span>]</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>sim_goals_spain <span class="op">=</span> np.random.poisson(lambda_spain, N_SIMS)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>sim_goals_england <span class="op">=</span> np.random.poisson(lambda_england, N_SIMS)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Construct 2D Score Frequency Matrix (0 to 5+ goals)</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>max_goals <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>score_matrix <span class="op">=</span> np.zeros((max_goals <span class="op">+</span> <span class="dv">1</span>, max_goals <span class="op">+</span> <span class="dv">1</span>))</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> g_s, g_e <span class="kw">in</span> <span class="bu">zip</span>(sim_goals_spain, sim_goals_england):</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    r_s <span class="op">=</span> <span class="bu">min</span>(g_s, max_goals)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    r_e <span class="op">=</span> <span class="bu">min</span>(g_e, max_goals)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    score_matrix[r_s, r_e] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>score_matrix_pct <span class="op">=</span> (score_matrix <span class="op">/</span> N_SIMS) <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Plot Score Probability Heatmap</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">6</span>))</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> [<span class="bu">str</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_goals)] <span class="op">+</span> [<span class="ss">f'</span><span class="sc">{</span>max_goals<span class="sc">}</span><span class="ss">+'</span>]</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.heatmap(</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    score_matrix_pct,</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    annot<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    fmt<span class="op">=</span><span class="st">".1f"</span>,</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"YlGnBu"</span>,</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Empirical Probability (%)'</span>},</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    xticklabels<span class="op">=</span>labels,</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    yticklabels<span class="op">=</span>labels,</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    linewidths<span class="op">=</span><span class="fl">0.5</span></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Monte Carlo Scoreline Probabilities (%)</span><span class="ch">\n</span><span class="st">Spain vs England (1,000 Simulations)"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"England Goals"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Spain Goals"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>plt.gca().invert_yaxis()</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="fc5cf447" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-08T10:50:47.014576Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-08T10:50:47.014499Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-08T10:50:47.139171Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-08T10:50:47.138920Z&quot;}}" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Perform 1,000 Monte Carlo Match Simulations</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>N_SIMS <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>lambda_spain <span class="op">=</span> pred[<span class="st">'expected_goals_a'</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>lambda_england <span class="op">=</span> pred[<span class="st">'expected_goals_b'</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>sim_goals_spain <span class="op">=</span> np.random.poisson(lambda_spain, N_SIMS)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>sim_goals_england <span class="op">=</span> np.random.poisson(lambda_england, N_SIMS)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Construct 2D Score Frequency Matrix (0 to 5+ goals)</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>max_goals <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>score_matrix <span class="op">=</span> np.zeros((max_goals <span class="op">+</span> <span class="dv">1</span>, max_goals <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> g_s, g_e <span class="kw">in</span> <span class="bu">zip</span>(sim_goals_spain, sim_goals_england):</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    r_s <span class="op">=</span> <span class="bu">min</span>(g_s, max_goals)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    r_e <span class="op">=</span> <span class="bu">min</span>(g_e, max_goals)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    score_matrix[r_s, r_e] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>score_matrix_pct <span class="op">=</span> (score_matrix <span class="op">/</span> N_SIMS) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Plot Score Probability Heatmap</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">6</span>))</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> [<span class="bu">str</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_goals)] <span class="op">+</span> [<span class="ss">f'</span><span class="sc">{</span>max_goals<span class="sc">}</span><span class="ss">+'</span>]</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.heatmap(</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    score_matrix_pct,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    annot<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    fmt<span class="op">=</span><span class="st">".1f"</span>,</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"YlGnBu"</span>,</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Empirical Probability (%)'</span>},</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    xticklabels<span class="op">=</span>labels,</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    yticklabels<span class="op">=</span>labels,</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    linewidths<span class="op">=</span><span class="fl">0.5</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Monte Carlo Scoreline Probabilities (%)</span><span class="ch">\n</span><span class="st">Spain vs England (1,000 Simulations)"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"England Goals"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Spain Goals"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>plt.gca().invert_yaxis()</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -523,85 +546,85 @@ Analytical Most Likely Score: 1 - 1</code></pre>
 <h2 class="anchored" data-anchor-id="part-2-4-team-fifa-world-cup-group-stage-simulation">Part 2: 4-Team FIFA World Cup Group Stage Simulation</h2>
 <p>We evaluate a 4-team World Cup “Group of Death”: - 🇪🇸 <strong>Spain</strong> - 🇧🇷 <strong>Brazil</strong> - 🇩🇪 <strong>Germany</strong> - 🇯🇵 <strong>Japan</strong></p>
 <p>We implement official <strong>FIFA World Cup Tiebreaker Rules</strong>: 1. Points (<span class="math inline">\(3\)</span> for win, <span class="math inline">\(1\)</span> for draw, <span class="math inline">\(0\)</span> for loss) 2. Goal Difference (<span class="math inline">\(GD = GF - GA\)</span>) 3. Goals For (<span class="math inline">\(GF\)</span>) 4. Head-to-head match result / Random coin toss</p>
-<div id="8d914e60" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T22:04:43.393019Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T22:04:43.392921Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T22:04:43.397810Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T22:04:43.397582Z&quot;}}" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Group Teams and Multi-Dimensional Ratings</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>group_teams <span class="op">=</span> {</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Spain'</span>: {<span class="st">'elo'</span>: <span class="fl">2279.0</span>, <span class="st">'off'</span>: <span class="fl">2276.6</span>, <span class="st">'def'</span>: <span class="fl">2412.4</span>},</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Brazil'</span>: {<span class="st">'elo'</span>: <span class="fl">2250.0</span>, <span class="st">'off'</span>: <span class="fl">2310.0</span>, <span class="st">'def'</span>: <span class="fl">2350.0</span>},</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Germany'</span>: {<span class="st">'elo'</span>: <span class="fl">2180.0</span>, <span class="st">'off'</span>: <span class="fl">2240.0</span>, <span class="st">'def'</span>: <span class="fl">2260.0</span>},</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Japan'</span>: {<span class="st">'elo'</span>: <span class="fl">1980.0</span>, <span class="st">'off'</span>: <span class="fl">2020.0</span>, <span class="st">'def'</span>: <span class="fl">2010.0</span>}</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_match(team_a, team_b):</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> multielo.predict(group_teams[team_a], group_teams[team_b], model_specs<span class="op">=</span><span class="st">'M32'</span>, is_neutral<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    g_a <span class="op">=</span> np.random.poisson(pred[<span class="st">'expected_goals_a'</span>])</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    g_b <span class="op">=</span> np.random.poisson(pred[<span class="st">'expected_goals_b'</span>])</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g_a, g_b</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_group_stage():</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    teams <span class="op">=</span> <span class="bu">list</span>(group_teams.keys())</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    stats <span class="op">=</span> {t: {<span class="st">'pld'</span>: <span class="dv">0</span>, <span class="st">'w'</span>: <span class="dv">0</span>, <span class="st">'d'</span>: <span class="dv">0</span>, <span class="st">'l'</span>: <span class="dv">0</span>, <span class="st">'gf'</span>: <span class="dv">0</span>, <span class="st">'ga'</span>: <span class="dv">0</span>, <span class="st">'gd'</span>: <span class="dv">0</span>, <span class="st">'pts'</span>: <span class="dv">0</span>} <span class="cf">for</span> t <span class="kw">in</span> teams}</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    matches <span class="op">=</span> [</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Brazil'</span>), (<span class="st">'Germany'</span>, <span class="st">'Japan'</span>),</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Germany'</span>), (<span class="st">'Brazil'</span>, <span class="st">'Japan'</span>),</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Japan'</span>), (<span class="st">'Brazil'</span>, <span class="st">'Germany'</span>)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    match_results <span class="op">=</span> []</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t_a, t_b <span class="kw">in</span> matches:</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>        g_a, g_b <span class="op">=</span> simulate_match(t_a, t_b)</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        match_results.append((t_a, g_a, g_b, t_b))</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'pld'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'pld'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'gf'</span>] <span class="op">+=</span> g_a<span class="op">;</span> stats[t_a][<span class="st">'ga'</span>] <span class="op">+=</span> g_b</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        stats[t_b][<span class="st">'gf'</span>] <span class="op">+=</span> g_b<span class="op">;</span> stats[t_b][<span class="st">'ga'</span>] <span class="op">+=</span> g_a</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'gd'</span>] <span class="op">+=</span> (g_a <span class="op">-</span> g_b)<span class="op">;</span> stats[t_b][<span class="st">'gd'</span>] <span class="op">+=</span> (g_b <span class="op">-</span> g_a)</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> g_a <span class="op">&gt;</span> g_b:</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>            stats[t_a][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span> stats[t_a][<span class="st">'w'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'l'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> g_b <span class="op">&gt;</span> g_a:</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>            stats[t_b][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span> stats[t_b][<span class="st">'w'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_a][<span class="st">'l'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>            stats[t_a][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_a][<span class="st">'d'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'d'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply FIFA World Cup Tiebreaker Sorting: Pts -&gt; GD -&gt; GF -&gt; Random Tiebreaker</span></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    sorted_teams <span class="op">=</span> <span class="bu">sorted</span>(teams, key<span class="op">=</span><span class="kw">lambda</span> t: (</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'pts'</span>],</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'gd'</span>],</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'gf'</span>],</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        np.random.rand()</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    ), reverse<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sorted_teams, stats, match_results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="991aa955" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-08T10:50:47.140241Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-08T10:50:47.140158Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-08T10:50:47.144895Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-08T10:50:47.144698Z&quot;}}" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Group Teams and Multi-Dimensional Ratings</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>group_teams <span class="op">=</span> {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Spain'</span>: {<span class="st">'elo'</span>: <span class="fl">2279.0</span>, <span class="st">'off'</span>: <span class="fl">2276.6</span>, <span class="st">'def'</span>: <span class="fl">2412.4</span>},</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Brazil'</span>: {<span class="st">'elo'</span>: <span class="fl">2250.0</span>, <span class="st">'off'</span>: <span class="fl">2310.0</span>, <span class="st">'def'</span>: <span class="fl">2350.0</span>},</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Germany'</span>: {<span class="st">'elo'</span>: <span class="fl">2180.0</span>, <span class="st">'off'</span>: <span class="fl">2240.0</span>, <span class="st">'def'</span>: <span class="fl">2260.0</span>},</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Japan'</span>: {<span class="st">'elo'</span>: <span class="fl">1980.0</span>, <span class="st">'off'</span>: <span class="fl">2020.0</span>, <span class="st">'def'</span>: <span class="fl">2010.0</span>}</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_match(team_a, team_b):</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> multielo.predict(group_teams[team_a], group_teams[team_b], model_specs<span class="op">=</span><span class="st">'M32'</span>, is_neutral<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    g_a <span class="op">=</span> np.random.poisson(pred[<span class="st">'expected_goals_a'</span>])</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    g_b <span class="op">=</span> np.random.poisson(pred[<span class="st">'expected_goals_b'</span>])</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g_a, g_b</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_group_stage():</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    teams <span class="op">=</span> <span class="bu">list</span>(group_teams.keys())</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    stats <span class="op">=</span> {t: {<span class="st">'pld'</span>: <span class="dv">0</span>, <span class="st">'w'</span>: <span class="dv">0</span>, <span class="st">'d'</span>: <span class="dv">0</span>, <span class="st">'l'</span>: <span class="dv">0</span>, <span class="st">'gf'</span>: <span class="dv">0</span>, <span class="st">'ga'</span>: <span class="dv">0</span>, <span class="st">'gd'</span>: <span class="dv">0</span>, <span class="st">'pts'</span>: <span class="dv">0</span>} <span class="cf">for</span> t <span class="kw">in</span> teams}</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    matches <span class="op">=</span> [</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Brazil'</span>), (<span class="st">'Germany'</span>, <span class="st">'Japan'</span>),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Germany'</span>), (<span class="st">'Brazil'</span>, <span class="st">'Japan'</span>),</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'Spain'</span>, <span class="st">'Japan'</span>), (<span class="st">'Brazil'</span>, <span class="st">'Germany'</span>)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    match_results <span class="op">=</span> []</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t_a, t_b <span class="kw">in</span> matches:</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        g_a, g_b <span class="op">=</span> simulate_match(t_a, t_b)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        match_results.append((t_a, g_a, g_b, t_b))</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'pld'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'pld'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'gf'</span>] <span class="op">+=</span> g_a<span class="op">;</span> stats[t_a][<span class="st">'ga'</span>] <span class="op">+=</span> g_b</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>        stats[t_b][<span class="st">'gf'</span>] <span class="op">+=</span> g_b<span class="op">;</span> stats[t_b][<span class="st">'ga'</span>] <span class="op">+=</span> g_a</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        stats[t_a][<span class="st">'gd'</span>] <span class="op">+=</span> (g_a <span class="op">-</span> g_b)<span class="op">;</span> stats[t_b][<span class="st">'gd'</span>] <span class="op">+=</span> (g_b <span class="op">-</span> g_a)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> g_a <span class="op">&gt;</span> g_b:</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>            stats[t_a][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span> stats[t_a][<span class="st">'w'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'l'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> g_b <span class="op">&gt;</span> g_a:</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>            stats[t_b][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span> stats[t_b][<span class="st">'w'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_a][<span class="st">'l'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>            stats[t_a][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'pts'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_a][<span class="st">'d'</span>] <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span> stats[t_b][<span class="st">'d'</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply FIFA World Cup Tiebreaker Sorting: Pts -&gt; GD -&gt; GF -&gt; Random Tiebreaker</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    sorted_teams <span class="op">=</span> <span class="bu">sorted</span>(teams, key<span class="op">=</span><span class="kw">lambda</span> t: (</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'pts'</span>],</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'gd'</span>],</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>        stats[t][<span class="st">'gf'</span>],</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>        np.random.rand()</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>    ), reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sorted_teams, stats, match_results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="156a3815" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T22:04:43.398755Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T22:04:43.398681Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T22:04:43.405687Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T22:04:43.405476Z&quot;}}" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run a Single Group Stage Simulation</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">101</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>standings, stats, match_results <span class="op">=</span> run_group_stage()</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Single Tournament Group Stage Match Results ==="</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t_a, g_a, g_b, t_b <span class="kw">in</span> match_results:</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>t_a<span class="sc">:10s}</span><span class="ss"> </span><span class="sc">{</span>g_a<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>g_b<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>t_b<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Final Group Classification (FIFA WC Tiebreakers) ==="</span>)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>df_standings <span class="op">=</span> pd.DataFrame([</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Rank'</span>: pos <span class="op">+</span> <span class="dv">1</span>,</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Team'</span>: team,</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Pld'</span>: stats[team][<span class="st">'pld'</span>],</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">'W'</span>: stats[team][<span class="st">'w'</span>],</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">'D'</span>: stats[team][<span class="st">'d'</span>],</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">'L'</span>: stats[team][<span class="st">'l'</span>],</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GF'</span>: stats[team][<span class="st">'gf'</span>],</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GA'</span>: stats[team][<span class="st">'ga'</span>],</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GD'</span>: <span class="ss">f"</span><span class="sc">{</span>stats[team][<span class="st">'gd'</span>]<span class="sc">:+d}</span><span class="ss">"</span>,</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Pts'</span>: stats[team][<span class="st">'pts'</span>]</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pos, team <span class="kw">in</span> <span class="bu">enumerate</span>(standings)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>df_standings</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="de2d5604" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-08T10:50:47.145819Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-08T10:50:47.145749Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-08T10:50:47.153687Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-08T10:50:47.153486Z&quot;}}" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run a Single Group Stage Simulation</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">101</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>standings, stats, match_results <span class="op">=</span> run_group_stage()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Single Tournament Group Stage Match Results ==="</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t_a, g_a, g_b, t_b <span class="kw">in</span> match_results:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>t_a<span class="sc">:10s}</span><span class="ss"> </span><span class="sc">{</span>g_a<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>g_b<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>t_b<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Final Group Classification (FIFA WC Tiebreakers) ==="</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>df_standings <span class="op">=</span> pd.DataFrame([</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Rank'</span>: pos <span class="op">+</span> <span class="dv">1</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Team'</span>: team,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Pld'</span>: stats[team][<span class="st">'pld'</span>],</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">'W'</span>: stats[team][<span class="st">'w'</span>],</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">'D'</span>: stats[team][<span class="st">'d'</span>],</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">'L'</span>: stats[team][<span class="st">'l'</span>],</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GF'</span>: stats[team][<span class="st">'gf'</span>],</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GA'</span>: stats[team][<span class="st">'ga'</span>],</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'GD'</span>: <span class="ss">f"</span><span class="sc">{</span>stats[team][<span class="st">'gd'</span>]<span class="sc">:+d}</span><span class="ss">"</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">'Pts'</span>: stats[team][<span class="st">'pts'</span>]</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pos, team <span class="kw">in</span> <span class="bu">enumerate</span>(standings)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>df_standings</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Single Tournament Group Stage Match Results ===
 Spain      1 - 0 Brazil
@@ -695,28 +718,28 @@ Brazil     0 - 2 Germany
 <section id="monte-carlo-group-stage-tournaments-finishing-position-heatmap" class="level3">
 <h3 class="anchored" data-anchor-id="monte-carlo-group-stage-tournaments-finishing-position-heatmap">1,000 Monte Carlo Group Stage Tournaments &amp; Finishing Position Heatmap</h3>
 <p>Now we simulate the group stage <strong>1,000 times</strong> to compute the empirical probability distribution of each team finishing in <strong>1st, 2nd, 3rd, and 4th place</strong>.</p>
-<div id="f0d058b3" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T22:04:43.406562Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T22:04:43.406495Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T22:04:43.864227Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T22:04:43.863956Z&quot;}}" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run 1,000 Full Group Stage Tournament Simulations</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>N_GROUPS <span class="op">=</span> <span class="dv">1000</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>rank_counts <span class="op">=</span> {t: [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>] <span class="cf">for</span> t <span class="kw">in</span> group_teams.keys()}</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_GROUPS):</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    st, _, _ <span class="op">=</span> run_group_stage()</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pos, team <span class="kw">in</span> <span class="bu">enumerate</span>(st):</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        rank_counts[team][pos] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate percentages (%)</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>df_rank_pct <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    rank_counts,</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">'1st Place (Winner)'</span>, <span class="st">'2nd Place (Runner-up)'</span>, <span class="st">'3rd Place'</span>, <span class="st">'4th Place'</span>]</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>).T</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>df_rank_pct <span class="op">=</span> (df_rank_pct <span class="op">/</span> N_GROUPS) <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Empirical Finishing Position Probabilities (%) ==="</span>)</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>display(df_rank_pct.<span class="bu">round</span>(<span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="75998765" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-08T10:50:47.154599Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-08T10:50:47.154537Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-08T10:50:47.617737Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-08T10:50:47.617371Z&quot;}}" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run 1,000 Full Group Stage Tournament Simulations</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>N_GROUPS <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>rank_counts <span class="op">=</span> {t: [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>] <span class="cf">for</span> t <span class="kw">in</span> group_teams.keys()}</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(N_GROUPS):</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    st, _, _ <span class="op">=</span> run_group_stage()</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pos, team <span class="kw">in</span> <span class="bu">enumerate</span>(st):</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        rank_counts[team][pos] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate percentages (%)</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>df_rank_pct <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    rank_counts,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">'1st Place (Winner)'</span>, <span class="st">'2nd Place (Runner-up)'</span>, <span class="st">'3rd Place'</span>, <span class="st">'4th Place'</span>]</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>).T</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>df_rank_pct <span class="op">=</span> (df_rank_pct <span class="op">/</span> N_GROUPS) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Empirical Finishing Position Probabilities (%) ==="</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>display(df_rank_pct.<span class="bu">round</span>(<span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Empirical Finishing Position Probabilities (%) ===</code></pre>
 </div>
@@ -769,25 +792,25 @@ Brazil     0 - 2 Germany
 </div>
 </div>
 </div>
-<div id="8be230ff" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-07T22:04:43.865271Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-07T22:04:43.865198Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-07T22:04:43.943673Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-07T22:04:43.943373Z&quot;}}" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Group Stage Finishing Probabilities Heatmap</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.heatmap(</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    df_rank_pct,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    annot<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    fmt<span class="op">=</span><span class="st">".1f"</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"OrRd"</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Finishing Probability (%)'</span>},</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    linewidths<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    annot_kws<span class="op">=</span>{<span class="st">"size"</span>: <span class="dv">11</span>, <span class="st">"weight"</span>: <span class="st">"bold"</span>}</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"FIFA World Cup Group Stage Finishing Probabilities (%)</span><span class="ch">\n</span><span class="st">(1,000 Monte Carlo Tournament Simulations)"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Finishing Position"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"National Team"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4363711d" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-08T10:50:47.618849Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-08T10:50:47.618775Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-08T10:50:47.703844Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-08T10:50:47.703542Z&quot;}}" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Group Stage Finishing Probabilities Heatmap</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.heatmap(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    df_rank_pct,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    annot<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    fmt<span class="op">=</span><span class="st">".1f"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"OrRd"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Finishing Probability (%)'</span>},</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    linewidths<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    annot_kws<span class="op">=</span>{<span class="st">"size"</span>: <span class="dv">11</span>, <span class="st">"weight"</span>: <span class="st">"bold"</span>}</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"FIFA World Cup Group Stage Finishing Probabilities (%)</span><span class="ch">\n</span><span class="st">(1,000 Monte Carlo Tournament Simulations)"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Finishing Position"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"National Team"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">'semibold'</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
