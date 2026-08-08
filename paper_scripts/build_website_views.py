@@ -80,9 +80,158 @@ def build_website_views():
 
     df_norm = pd.read_csv(norm_csv_path)
     df_norm['date'] = pd.to_datetime(df_norm['date'])
-    df_norm = df_norm[df_norm['date'] >= '1950-01-01']
+    
+    # Calculate dataset metadata
+    df_results = pd.read_csv(results_csv_path, low_memory=False)
+    latest_match_date = pd.to_datetime(df_results['date']).max().strftime('%B %d, %Y')
+    total_matches_count = len(df_results)
 
-    # 1. Build index.qmd (Landing Page)
+    # Calculate MoM Rating & Rank changes
+    latest_dt = df_norm['date'].max()
+    mom_dt = latest_dt - pd.Timedelta(days=30)
+
+    df_latest = df_norm[df_norm['date'] == latest_dt].copy()
+    df_mom_dates = df_norm[df_norm['date'] <= mom_dt]
+    closest_mom_dt = df_mom_dates['date'].max()
+    df_mom = df_norm[df_norm['date'] == closest_mom_dt].copy()
+
+    df_latest['rank'] = df_latest['elo'].rank(ascending=False, method='min').astype(int)
+    df_mom['rank_mom'] = df_mom['elo'].rank(ascending=False, method='min').astype(int)
+
+    df_merged = pd.merge(
+        df_latest[['team', 'elo', 'elo_off', 'elo_def', 'rank']],
+        df_mom[['team', 'elo', 'elo_off', 'elo_def', 'rank_mom']],
+        on='team',
+        suffixes=('', '_mom')
+    )
+
+    df_merged['rank_change'] = df_merged['rank_mom'] - df_merged['rank']
+    df_merged['elo_change'] = df_merged['elo'] - df_merged['elo_mom']
+    df_merged['off_change'] = df_merged['elo_off'] - df_merged['elo_off_mom']
+    df_merged['def_change'] = df_merged['elo_def'] - df_merged['elo_def_mom']
+
+    df_merged = df_merged.sort_values('rank').reset_index(drop=True)
+
+    # 1. Build index.qmd (Landing Page with 3 Top-10 Leaderboard Columns & Last Update metadata)
+    top10_overall = df_merged.sort_values('rank').head(10)
+    top10_offense = df_merged.sort_values('elo_off', ascending=False).head(10).reset_index(drop=True)
+    top10_defense = df_merged.sort_values('elo_def', ascending=False).head(10).reset_index(drop=True)
+
+    def format_rank_change(val):
+        if val > 0:
+            return f'<span style="color: #16a34a; font-weight: 600;">▲ {val}</span>'
+        elif val < 0:
+            return f'<span style="color: #dc2626; font-weight: 600;">▼ {abs(val)}</span>'
+        else:
+            return '<span style="color: #94a3b8;">-</span>'
+
+    def format_pts_change(val):
+        if val > 0:
+            return f'<span style="color: #16a34a; font-size: 0.85rem;">(+{val:.1f})</span>'
+        elif val < 0:
+            return f'<span style="color: #dc2626; font-size: 0.85rem;">({val:.1f})</span>'
+        else:
+            return '<span style="color: #94a3b8; font-size: 0.85rem;">(0.0)</span>'
+
+    # Build Top 10 Overall Table Rows
+    rows_overall = ""
+    for idx, r in top10_overall.iterrows():
+        medal = "🥇 " if r['rank'] == 1 else ("🥈 " if r['rank'] == 2 else ("🥉 " if r['rank'] == 3 else f"{r['rank']}. "))
+        rows_overall += f"""
+        <tr>
+          <td><strong>{medal}{r['team']}</strong></td>
+          <td style="text-align: right;"><strong>{r['elo']:.1f}</strong> {format_pts_change(r['elo_change'])}</td>
+          <td style="text-align: center;">{format_rank_change(r['rank_change'])}</td>
+        </tr>"""
+
+    # Build Top 10 Offensive Table Rows
+    rows_offense = ""
+    for idx, r in top10_offense.iterrows():
+        rank_no = idx + 1
+        medal = "🥇 " if rank_no == 1 else ("🥈 " if rank_no == 2 else ("🥉 " if rank_no == 3 else f"{rank_no}. "))
+        rows_offense += f"""
+        <tr>
+          <td><strong>{medal}{r['team']}</strong></td>
+          <td style="text-align: right;"><strong>{r['elo_off']:.1f}</strong> {format_pts_change(r['off_change'])}</td>
+        </tr>"""
+
+    # Build Top 10 Defensive Table Rows
+    rows_defense = ""
+    for idx, r in top10_defense.iterrows():
+        rank_no = idx + 1
+        medal = "🥇 " if rank_no == 1 else ("🥈 " if rank_no == 2 else ("🥉 " if rank_no == 3 else f"{rank_no}. "))
+        rows_defense += f"""
+        <tr>
+          <td><strong>{medal}{r['team']}</strong></td>
+          <td style="text-align: right;"><strong>{r['elo_def']:.1f}</strong> {format_pts_change(r['def_change'])}</td>
+        </tr>"""
+
+    leaderboards_html = f"""
+<div style="background: #f8fafc; padding: 8px 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px; font-weight: 600; color: #475569; display: inline-block;">
+  📅 <strong>Data Last Updated:</strong> {latest_match_date} &nbsp;|&nbsp; ⚽ <strong>Total Match Records:</strong> {total_matches_count:,}
+</div>
+
+::: {{.row}}
+::: {{.col-md-4}}
+<div class="card-metric" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 18px;">
+  <h4 style="color: #2563eb; font-weight: 700; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 12px;">
+    🏆 Top 10 Overall Elo ($R^e$)
+  </h4>
+  <table class="table table-sm table-hover" style="font-size: 0.92rem; margin-bottom: 0;">
+    <thead>
+      <tr style="color: #64748b;">
+        <th>Team</th>
+        <th style="text-align: right;">Elo Pts</th>
+        <th style="text-align: center;">MoM</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows_overall}
+    </tbody>
+  </table>
+</div>
+:::
+
+::: {{.col-md-4}}
+<div class="card-metric" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 18px;">
+  <h4 style="color: #d97706; font-weight: 700; border-bottom: 2px solid #d97706; padding-bottom: 8px; margin-bottom: 12px;">
+    ⚔️ Top 10 Offensive ($R^o$)
+  </h4>
+  <table class="table table-sm table-hover" style="font-size: 0.92rem; margin-bottom: 0;">
+    <thead>
+      <tr style="color: #64748b;">
+        <th>Team</th>
+        <th style="text-align: right;">Offense Pts</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows_offense}
+    </tbody>
+  </table>
+</div>
+:::
+
+::: {{.col-md-4}}
+<div class="card-metric" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 18px;">
+  <h4 style="color: #059669; font-weight: 700; border-bottom: 2px solid #059669; padding-bottom: 8px; margin-bottom: 12px;">
+    🛡️ Top 10 Defensive ($R^d$)
+  </h4>
+  <table class="table table-sm table-hover" style="font-size: 0.92rem; margin-bottom: 0;">
+    <thead>
+      <tr style="color: #64748b;">
+        <th>Team</th>
+        <th style="text-align: right;">Defense Pts</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows_defense}
+    </tbody>
+  </table>
+</div>
+:::
+:::
+"""
+
     index_qmd = f"""---
 title: "Multi-Dimensional Elo Ratings & Forecasting"
 subtitle: "Interactive Data Platform for International Football Strength & Tactical Style"
@@ -96,55 +245,11 @@ format:
 
 Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Models ($M_{{01}}$–$M_{{32}}$) for national team football forecasting (1872–2026).
 
-[View on GitHub](https://github.com/cesarrennocosta/multielo-football){{.btn .btn-primary .btn-lg role="button"}}
+[View Global Rankings](rankings.html){{.btn .btn-primary .btn-lg role="button"}}
 [Explore World #1 Style Space](world_no1.html){{.btn .btn-outline-light .btn-lg role="button"}}
 :::
 
-::: {{.row}}
-::: {{.col-md-3}}
-::: {{.card-metric}}
-::: {{.metric-value}}
-49,518
-:::
-::: {{.metric-label}}
-Match Records Analyzed
-:::
-:::
-:::
-
-::: {{.col-md-3}}
-::: {{.card-metric}}
-::: {{.metric-value}}
-32 GLMs
-:::
-::: {{.metric-label}}
-Model Architecture Grid
-:::
-:::
-:::
-
-::: {{.col-md-3}}
-::: {{.card-metric}}
-::: {{.metric-value}}
-3-Elo Complete
-:::
-::: {{.metric-label}}
-Top Performing Architecture
-:::
-:::
-:::
-
-::: {{.col-md-3}}
-::: {{.card-metric}}
-::: {{.metric-value}}
--4.5%
-:::
-::: {{.metric-label}}
-Loss Reduction vs Benchmark
-:::
-:::
-:::
-:::
+{leaderboards_html}
 
 ---
 
@@ -182,7 +287,57 @@ print(f"Most Likely Score: {{pred['most_likely_score'][0]}} - {{pred['most_likel
     with open(os.path.join(website_dir, 'index.qmd'), 'w') as f:
         f.write(index_qmd)
 
-    # 2. Build world_no1.qmd (World #1 Style Space)
+    # 2. Build rankings.qmd (Global National Team Rankings & MoM Changes)
+    full_rankings_rows = ""
+    for idx, r in df_merged.iterrows():
+        medal = "🥇 " if r['rank'] == 1 else ("🥈 " if r['rank'] == 2 else ("🥉 " if r['rank'] == 3 else f"{r['rank']}"))
+        full_rankings_rows += f"""
+        <tr>
+          <td><strong>{medal}</strong></td>
+          <td><strong>{r['team']}</strong></td>
+          <td style="text-align: right;"><strong>{r['elo']:.1f}</strong></td>
+          <td style="text-align: center;">{format_rank_change(r['rank_change'])}</td>
+          <td style="text-align: right;">{format_pts_change(r['elo_change'])}</td>
+          <td style="text-align: right;">{r['elo_off']:.1f} {format_pts_change(r['off_change'])}</td>
+          <td style="text-align: right;">{r['elo_def']:.1f} {format_pts_change(r['def_change'])}</td>
+        </tr>"""
+
+    rankings_qmd = f"""---
+title: "Global National Team Rankings & MoM Dynamics"
+subtitle: "Comprehensive Overall ($R^e$), Offensive ($R^o$), and Defensive ($R^d$) Ratings with Month-over-Month Changes"
+format:
+  html:
+    page-layout: full
+---
+
+::: {{.callout-info}}
+📅 **Data Last Updated:** {latest_match_date} &nbsp;|&nbsp; ⚽ **Total Match Records:** {total_matches_count:,}
+:::
+
+This leaderboard ranks all active national teams evaluated under the top-performing **3-Elo Complete ($M_{{32}}$)** model architecture. Month-over-Month ($\Delta_{{MoM}}$) changes evaluate rank movements ($\Delta\\text{{Rank}}$) and rating point shifts ($\Delta R$) over the last 30 calendar days.
+
+<table class="table table-striped table-hover" style="font-size: 0.95rem;">
+  <thead>
+    <tr style="background: #f1f5f9; color: #0f172a;">
+      <th style="width: 70px;">Rank</th>
+      <th>National Team</th>
+      <th style="text-align: right;">Overall Elo ($R^e$)</th>
+      <th style="text-align: center;">$\Delta\text{{Rank}}_{{MoM}}$</th>
+      <th style="text-align: right;">$\Delta R^e_{{MoM}}$</th>
+      <th style="text-align: right;">Offensive Elo ($R^o$)</th>
+      <th style="text-align: right;">Defensive Elo ($R^d$)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {full_rankings_rows}
+  </tbody>
+</table>
+"""
+    with open(os.path.join(website_dir, 'rankings.qmd'), 'w') as f:
+        f.write(rankings_qmd)
+
+    # 3. Build world_no1.qmd
+    df_norm = df_norm[df_norm['date'] >= '1950-01-01']
     idx_max = df_norm.groupby('date')['elo'].idxmax()
     df_no1 = df_norm.loc[idx_max].sort_values('date').reset_index(drop=True)
     df_no1 = df_no1[df_no1['team'] != 'Tahiti']
@@ -368,7 +523,7 @@ Unchecking a team fades its points into a **soft clear transparent gray backgrou
     with open(os.path.join(website_dir, 'world_no1.qmd'), 'w') as f:
         f.write(world_no1_qmd)
 
-    # 3. Build ratings.qmd (Lightweight Downsampled Team Trajectories - Raw Elo Points)
+    # 4. Build ratings.qmd & ratings_norm.qmd
     teams_to_compute = ['Spain', 'Brazil', 'Germany', 'Argentina', 'Italy', 'France', 'England', 'Netherlands', 'Uruguay', 'Portugal']
     
     from run_compute_team import run_compute_team
@@ -400,6 +555,7 @@ Unchecking a team fades its points into a **soft clear transparent gray backgrou
                 if not os.path.exists(t_csv):
                     print(f"Pre-computing {t} raw trajectory...")
                     run_compute_team(team=t, system='3eloC', normalize=False)
+                    
             df_t = pd.read_csv(t_csv)
             df_t['date'] = pd.to_datetime(df_t['date'])
             df_t = df_t[df_t['date'] >= '1950-01-01'].sort_values('date').reset_index(drop=True)
@@ -536,7 +692,6 @@ function updateRatingsChart{'_norm' if is_normalized else ''}() {{
         plotly_full_ratings = f"\n\n```{{=html}}\n{control_panel_ratings}\n{plotly_inner_ratings}\n```\n\n"
         return plotly_full_ratings
 
-    # Write ratings.qmd
     plotly_ratings_raw = generate_trajectory_page(is_normalized=False)
     ratings_qmd = f"""---
 title: "Interactive Team Trajectories Explorer"
@@ -553,7 +708,6 @@ Use the **Team Checkboxes** below to add or remove national teams dynamically. O
     with open(os.path.join(website_dir, 'ratings.qmd'), 'w') as f:
         f.write(ratings_qmd)
 
-    # Write ratings_norm.qmd
     plotly_ratings_norm = generate_trajectory_page(is_normalized=True)
     ratings_norm_qmd = f"""---
 title: "Normalized Team Trajectories Explorer"
@@ -570,7 +724,7 @@ This tab evaluates national team trajectories in **non-dimensional normalized co
     with open(os.path.join(website_dir, 'ratings_norm.qmd'), 'w') as f:
         f.write(ratings_norm_qmd)
 
-    # 4. Build style_space.qmd (White Theme)
+    # 5. Build style_space.qmd
     df_avg = df_norm.groupby('team')[['norm_def', 'norm_off', 'elo']].mean().reset_index()
     df_avg = df_avg[df_avg['elo'] > 1400].sort_values('elo', ascending=False).head(30)
     
@@ -613,7 +767,7 @@ format:
     with open(os.path.join(website_dir, 'style_space.qmd'), 'w') as f:
         f.write(style_space_qmd)
 
-    # 5. Build models.qmd
+    # 6. Build models.qmd
     models_rows = []
     for code, specs in multielo.GLM_TAXONOMY.items():
         models_rows.append(f"| **{code}** | {specs['dist']} | {specs['coupling']} | {specs['response']} | {'Yes' if specs['decay'] else 'No'} | {'Yes' if specs['competition'] else 'No'} |")
@@ -637,7 +791,7 @@ We systematically evaluate a 5-dimensional binary feature grid of 32 GLM specifi
     with open(os.path.join(website_dir, 'models.qmd'), 'w') as f:
         f.write(models_qmd)
         
-    # 6. Copy Jupyter Notebook demo to website folder
+    # 7. Copy Jupyter Notebook demo
     import shutil
     demo_nb_src = os.path.join(pkg_root, 'examples', 'demo_group_simulation.ipynb')
     demo_nb_dst = os.path.join(website_dir, 'demo_simulation.ipynb')

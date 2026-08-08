@@ -11,6 +11,8 @@ website:
     left:
       - text: "Home"
         href: index.qmd
+      - text: "Global Rankings"
+        href: rankings.qmd
       - text: "Team Trajectories"
         href: ratings.qmd
       - text: "Normalized Trajectories"
