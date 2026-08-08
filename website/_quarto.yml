@@ -23,7 +23,7 @@ website:
         href: style_space.qmd
       - text: "Simulation Demo"
         href: demo_simulation.ipynb
-      - text: "Model Hierarchy"
+      - text: "Methods"
         href: models.qmd
     right:
       - icon: github

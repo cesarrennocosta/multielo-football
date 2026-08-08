@@ -1,10 +1,102 @@
 ---
-title: "Poisson GLM Model Hierarchy (M01–M32)"
-subtitle: "Architectural Design Grid & Parameter Complexity Specifications"
+title: "Methods & Model Architecture Framework"
+subtitle: "Mathematical Formulations, 3-Elo Complete Dynamics, Model M32, and Parameter Specifications"
 format:
   html:
     page-layout: full
 ---
+
+This section details the mathematical formulations and parameter estimates for the **3-Elo Complete** rating architecture and the **$M_{32}$ Bivariate Poisson GLM** forecasting model.
+
+---
+
+## 1. The 3-Elo Complete Rating Architecture (`3eloC`)
+
+The **3-Elo Complete** system decomposes national team strength into three dynamic state variables evaluated chronologically across all match dates:
+1. **Overall Rating ($R^e$)**: Aggregate winning capacity.
+2. **Offensive Rating ($R^o$)**: Goal-scoring potency.
+3. **Defensive Rating ($R^d$)**: Defensive resistance.
+
+### Mathematical Rating Update Equations
+Following match $k$ between Home Team $i$ and Away Team $j$ with match goal outcome $(g_i, g_j)$:
+
+#### Overall Rating Update ($R^e$):
+$$R^e_{i, k+1} = R^e_{i, k} + K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S_i - E_i)$$
+$$R^e_{j, k+1} = R^e_{j, k} + K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S_j - E_j)$$
+
+where expected win probability $E_i$ is computed via logistic sigmoid:
+$$E_i = \frac{1}{1 + 10^{-\frac{(R^e_{i} - R^e_{j}) + H_{\text{overall}}}{D_{\text{overall}}}}}$$
+
+#### Tactical Style Updates (Offensive $R^o$ and Defensive $R^d$):
+$$R^o_{i, k+1} = R^o_{i, k} + K_{\text{scale}} \cdot K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S^o_i - E^o_i)$$
+$$R^d_{i, k+1} = R^d_{i, k} + K_{\text{scale}} \cdot K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S^d_i - E^d_i)$$
+
+#### Goal Difference Margin Scaling Factor $\gamma(m)$:
+$$\gamma(m) = M_{\text{overall}} \cdot \ln(1 + |g_i - g_j|) \cdot \left(\frac{a_{\text{margin}}}{a_{\text{margin}} + |g_i - g_j|}\right)$$
+
+#### Tuned 3-Elo Complete Parameter Estimates:
+
+| Parameter | Description | Value |
+| :--- | :--- | :---: |
+| $K_{\text{base}}$ | Base rating volatility factor | `32.0537` |
+| $H_{\text{overall}}$ | Home venue advantage constant | `218.2097` |
+| $D_{\text{overall}}$ | Logistic scale divisor | `1267.5829` |
+| $M_{\text{overall}}$ | Goal difference margin multiplier | `2.5010` |
+| $a_{\text{margin}}$ | Margin saturation parameter | `4.3270` |
+| $b_{\text{margin}}$ | Secondary margin parameter | `3.6032` |
+| $M_{\text{style}}$ | Tactical style update factor | `1.0729` |
+| $K_{\text{scale}}$ | Style-to-overall $K$-ratio | `0.5521` |
+
+---
+
+## 2. Model $M_{32}$ Bivariate Poisson GLM & Score Distribution
+
+Model **$M_{32}$** is the top-performing forecasting architecture. It calculates expected match scorelines using the tactical interaction between Team A's Offensive rating ($R^o_A$) and Team B's Defensive rating ($R^d_B$).
+
+### Expected Goal Poisson Intensities ($\lambda_A, \lambda_B$):
+For a match between Team A and Team B:
+
+$$\lambda_A = \mu_{\text{base}} \cdot 10^{\frac{(R^o_A - R^d_B) + H_{\text{style}}}{D_{\text{style}}}}$$
+
+$$\lambda_B = \mu_{\text{base}} \cdot 10^{\frac{(R^o_B - R^d_A) - H_{\text{style}}}{D_{\text{style}}}}$$
+
+*(For neutral-venue matches, $H_{\text{style}} = 0$).*
+
+### Bivariate Dixon-Coles Goal Probability Matrix:
+The joint probability of scoreline $(x, y)$ (Team A scores $x$ goals, Team B scores $y$ goals) is given by:
+
+$$P(G_A = x, G_B = y) = \tau(x, y) \cdot \left( \frac{\lambda_A^x e^{-\lambda_A}}{x!} \right) \cdot \left( \frac{\lambda_B^y e^{-\lambda_B}}{y!} \right)$$
+
+where $\tau(x, y)$ is the Dixon-Coles low-score dependency adjustment matrix:
+
+$$\tau(x, y) = \begin{cases} 
+1 - \lambda_A \lambda_B \rho & \text{if } x = 0, y = 0 \\ 
+1 + \lambda_A \rho & \text{if } x = 1, y = 0 \\ 
+1 + \lambda_B \rho & \text{if } x = 0, y = 1 \\ 
+1 - \rho & \text{if } x = 1, y = 1 \\ 
+1 & \text{otherwise} 
+\end{cases}$$
+
+### Outcome Probabilities:
+
+$$P(\text{Win}_A) = \sum_{x > y} P(G_A = x, G_B = y)$$
+
+$$P(\text{Draw}) = \sum_{x = y} P(G_A = x, G_B = y)$$
+
+$$P(\text{Win}_B) = \sum_{x < y} P(G_A = x, G_B = y)$$
+
+### Tuned Model $M_{32}$ Parameter Estimates:
+
+| Parameter | Description | Value |
+| :--- | :--- | :---: |
+| $\mu_{\text{base}}$ | Baseline expected goal rate | `1.3500` |
+| $D_{\text{style}}$ | Tactical rating differential scale divisor | `974.5535` |
+| $H_{\text{style}}$ | Tactical home venue advantage | `60.9455` |
+| $\rho$ | Dixon-Coles low-score dependency factor | `-0.0821` |
+
+---
+
+## 3. Systematic 32 Poisson GLM Feature Grid ($M_{01}$–$M_{32}$)
 
 We systematically evaluate a 5-dimensional binary feature grid of 32 GLM specifications ($M_{01}$ through $M_{32}$):
 
