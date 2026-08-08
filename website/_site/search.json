@@ -53,14 +53,14 @@
     "href": "index.html#authors-development",
     "title": "Multi-Dimensional Elo Ratings & Forecasting",
     "section": "👨‍💻 Authors & Development",
-    "text": "👨‍💻 Authors & Development\nThe MultiElo Football package, multi-dimensional rating architectures, and Poisson forecasting models were created and developed by:\n\n\n👨‍🔬 César Rênno-Costa & László\n\n\nFor contributions, issue reporting, or research inquiries, visit the official repository on GitHub."
+    "text": "👨‍💻 Authors & Development\nThe MultiElo Football package, multi-dimensional rating architectures, and Poisson forecasting models were created and developed by:\n\n\n👨‍🔬 César Rennó-Costa & László Csató\n\n\nFor contributions, issue reporting, or research inquiries, visit the official repository on GitHub."
   },
   {
     "objectID": "index.html#scientific-citation",
     "href": "index.html#scientific-citation",
     "title": "Multi-Dimensional Elo Ratings & Forecasting",
     "section": "📜 Scientific Citation",
-    "text": "📜 Scientific Citation\nIf you use multielo-football or the 3-Elo rating datasets in scientific research, academic papers, or publications, please cite the framework using the following BibTeX entry:\n@article{rennocosta2026multielo,\n  title={MultiElo Football: Multi-Dimensional Rating Architectures and Bivariate Poisson GLMs for International Football Forecasting},\n  author={R{\\^e}nno-Costa, C{'e}sar and L{'a}szl{'o}},\n  journal={GitHub Repository},\n  year={2026},\n  url={https://github.com/cesarrennocosta/multielo-football}\n}"
+    "text": "📜 Scientific Citation\nIf you use multielo-football or the 3-Elo rating datasets in scientific research, academic papers, or publications, please cite the framework using the following BibTeX entry:\n@article{rennocosta2026multielo,\n  title={MultiElo Football: Multi-Dimensional Rating Architectures and Bivariate Poisson GLMs for International Football Forecasting},\n  author={Renn{'o}-Costa, C{'e}sar and Csat{'o}, L{'a}szl{'o}},\n  journal={GitHub Repository},\n  year={2026},\n  url={https://github.com/cesarrennocosta/multielo-football}\n}"
   },
   {
     "objectID": "ratings_norm.html",
