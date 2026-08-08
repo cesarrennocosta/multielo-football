@@ -418,8 +418,8 @@ window.Quarto = {
 <p>Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Models (<span class="math inline">\(M_{01}\)</span>–<span class="math inline">\(M_{32}\)</span>) for national team football forecasting (1872–2026).</p>
 <p><a href="rankings.html" class="btn btn-primary btn-lg" role="button">View Global Rankings</a> <a href="world_no1.html" class="btn btn-outline-light btn-lg" role="button">Explore World #1 Style Space</a></p>
 </section>
-<div style="background: #f8fafc; padding: 8px 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px; font-weight: 600; color: #475569; display: inline-block;">
-  📅 <strong>Data Last Updated:</strong> July 19, 2026 &nbsp;|&nbsp; ⚽ <strong>Total Match Records:</strong> 49,520
+<div style="background: #f8fafc; padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 24px; font-weight: 600; color: #475569; display: inline-block;">
+  📅 <strong>Data Last Updated:</strong> July 19, 2026 &nbsp;|&nbsp; ⚽ <strong>Total Match Records:</strong> 49,520 &nbsp;|&nbsp; 📊 <strong>Data Source:</strong> <a href="https://www.kaggle.com/datasets/martj42/international-results-p1" target="_blank" style="color: #2563eb; text-decoration: none;">Kaggle International Football Results (1872–2026)</a>
 </div>
 
 ::: {.row}
@@ -505,48 +505,59 @@ window.Quarto = {
 <tr class="header" style="color: #64748b;">
 <th data-quarto-table-cell-role="th">Team</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Offense Pts</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">MoM</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><strong>🥇 Germany</strong></td>
 <td style="text-align: right;"><strong>2097.0</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+53.3)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 1</span></td>
 </tr>
 <tr class="even">
 <td><strong>🥈 Brazil</strong></td>
 <td style="text-align: right;"><strong>2090.8</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+7.0)</span></td>
+<td style="text-align: center;"><span style="color: #dc2626; font-weight: 600;">▼ 1</span></td>
 </tr>
 <tr class="odd">
 <td><strong>🥉 Belgium</strong></td>
 <td style="text-align: right;"><strong>2088.3</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+46.1)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 1</span></td>
 </tr>
 <tr class="even">
 <td><strong>4. Argentina</strong></td>
 <td style="text-align: right;"><strong>2069.6</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+93.5)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 4</span></td>
 </tr>
 <tr class="odd">
 <td><strong>5. Norway</strong></td>
 <td style="text-align: right;"><strong>2063.3</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+54.3)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 1</span></td>
 </tr>
 <tr class="even">
 <td><strong>6. France</strong></td>
 <td style="text-align: right;"><strong>2057.9</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+84.5)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 3</span></td>
 </tr>
 <tr class="odd">
 <td><strong>7. Netherlands</strong></td>
 <td style="text-align: right;"><strong>2031.3</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+64.6)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 4</span></td>
 </tr>
 <tr class="even">
 <td><strong>8. Spain</strong></td>
 <td style="text-align: right;"><strong>2029.0</strong> <span style="color: #dc2626; font-size: 0.85rem;">(-13.5)</span></td>
+<td style="text-align: center;"><span style="color: #dc2626; font-weight: 600;">▼ 5</span></td>
 </tr>
 <tr class="odd">
 <td><strong>9. Portugal</strong></td>
 <td style="text-align: right;"><strong>2009.5</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+11.7)</span></td>
+<td style="text-align: center;"><span style="color: #dc2626; font-weight: 600;">▼ 2</span></td>
 </tr>
 <tr class="even">
 <td><strong>10. England</strong></td>
 <td style="text-align: right;"><strong>1998.1</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+54.1)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 3</span></td>
 </tr>
 </tbody>
 </table>
@@ -565,48 +576,59 @@ window.Quarto = {
 <tr class="header" style="color: #64748b;">
 <th data-quarto-table-cell-role="th">Team</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Defense Pts</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">MoM</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><strong>🥇 Argentina</strong></td>
 <td style="text-align: right;"><strong>2165.1</strong> <span style="color: #dc2626; font-size: 0.85rem;">(-45.2)</span></td>
+<td style="text-align: center;"><span style="color: #94a3b8;">-</span></td>
 </tr>
 <tr class="even">
 <td><strong>🥈 Ecuador</strong></td>
 <td style="text-align: right;"><strong>2147.4</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+3.1)</span></td>
+<td style="text-align: center;"><span style="color: #94a3b8;">-</span></td>
 </tr>
 <tr class="odd">
 <td><strong>🥉 Spain</strong></td>
 <td style="text-align: right;"><strong>2092.7</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+79.7)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 3</span></td>
 </tr>
 <tr class="even">
 <td><strong>4. Morocco</strong></td>
 <td style="text-align: right;"><strong>2085.6</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+12.7)</span></td>
+<td style="text-align: center;"><span style="color: #94a3b8;">-</span></td>
 </tr>
 <tr class="odd">
 <td><strong>5. England</strong></td>
 <td style="text-align: right;"><strong>2073.0</strong> <span style="color: #dc2626; font-size: 0.85rem;">(-17.1)</span></td>
+<td style="text-align: center;"><span style="color: #dc2626; font-weight: 600;">▼ 2</span></td>
 </tr>
 <tr class="even">
 <td><strong>6. France</strong></td>
 <td style="text-align: right;"><strong>2063.0</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+63.7)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 2</span></td>
 </tr>
 <tr class="odd">
 <td><strong>7. Mexico</strong></td>
 <td style="text-align: right;"><strong>2045.4</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+47.4)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 2</span></td>
 </tr>
 <tr class="even">
 <td><strong>8. Colombia</strong></td>
 <td style="text-align: right;"><strong>2044.1</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+54.8)</span></td>
+<td style="text-align: center;"><span style="color: #16a34a; font-weight: 600;">▲ 3</span></td>
 </tr>
 <tr class="odd">
 <td><strong>9. Brazil</strong></td>
 <td style="text-align: right;"><strong>2030.5</strong> <span style="color: #16a34a; font-size: 0.85rem;">(+27.9)</span></td>
+<td style="text-align: center;"><span style="color: #dc2626; font-weight: 600;">▼ 2</span></td>
 </tr>
 <tr class="even">
 <td><strong>10. Uruguay</strong></td>
 <td style="text-align: right;"><strong>2018.3</strong> <span style="color: #dc2626; font-size: 0.85rem;">(-40.1)</span></td>
+<td style="text-align: center;"><span style="color: #dc2626; font-weight: 600;">▼ 5</span></td>
 </tr>
 </tbody>
 </table>
