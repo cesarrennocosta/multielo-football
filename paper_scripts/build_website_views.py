@@ -249,7 +249,9 @@ Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Mod
 [Explore World #1 Style Space](world_no1.html){{.btn .btn-outline-light .btn-lg role="button"}}
 :::
 
+```{{=html}}
 {leaderboards_html}
+```
 
 ---
 
@@ -310,11 +312,12 @@ format:
     page-layout: full
 ---
 
-::: {{.callout-info}}
-📅 **Data Last Updated:** {latest_match_date} &nbsp;|&nbsp; ⚽ **Total Match Records:** {total_matches_count:,}
-:::
-
 This leaderboard ranks all active national teams evaluated under the top-performing **3-Elo Complete ($M_{{32}}$)** model architecture. Month-over-Month ($\Delta_{{MoM}}$) changes evaluate rank movements ($\Delta\\text{{Rank}}$) and rating point shifts ($\Delta R$) over the last 30 calendar days.
+
+```{{=html}}
+<div style="background: #f8fafc; padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-weight: 600; color: #475569; display: inline-block;">
+  📅 <strong>Data Last Updated:</strong> {latest_match_date} &nbsp;|&nbsp; ⚽ <strong>Total Match Records Analyzed:</strong> {total_matches_count:,}
+</div>
 
 <table class="table table-striped table-hover" style="font-size: 0.95rem;">
   <thead>
@@ -322,8 +325,8 @@ This leaderboard ranks all active national teams evaluated under the top-perform
       <th style="width: 70px;">Rank</th>
       <th>National Team</th>
       <th style="text-align: right;">Overall Elo ($R^e$)</th>
-      <th style="text-align: center;">$\Delta\text{{Rank}}_{{MoM}}$</th>
-      <th style="text-align: right;">$\Delta R^e_{{MoM}}$</th>
+      <th style="text-align: center;">ΔRank (MoM)</th>
+      <th style="text-align: right;">ΔR^e (MoM)</th>
       <th style="text-align: right;">Offensive Elo ($R^o$)</th>
       <th style="text-align: right;">Defensive Elo ($R^d$)</th>
     </tr>
@@ -332,6 +335,7 @@ This leaderboard ranks all active national teams evaluated under the top-perform
     {full_rankings_rows}
   </tbody>
 </table>
+```
 """
     with open(os.path.join(website_dir, 'rankings.qmd'), 'w') as f:
         f.write(rankings_qmd)

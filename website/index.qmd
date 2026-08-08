@@ -15,6 +15,7 @@ Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Mod
 [Explore World #1 Style Space](world_no1.html){.btn .btn-outline-light .btn-lg role="button"}
 :::
 
+```{=html}
 
 <div style="background: #f8fafc; padding: 8px 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px; font-weight: 600; color: #475569; display: inline-block;">
   📅 <strong>Data Last Updated:</strong> July 19, 2026 &nbsp;|&nbsp; ⚽ <strong>Total Match Records:</strong> 49,520
@@ -210,6 +211,7 @@ Multi-dimensional Elo rating architectures and 32 Poisson Generalized Linear Mod
 :::
 :::
 
+```
 
 ---
 
