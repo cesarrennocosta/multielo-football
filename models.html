@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Poisson GLM Model Hierarchy (M01–M32) – MultiElo Football</title>
+<title>Methods &amp; Model Architecture Framework – MultiElo Football</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -321,7 +321,7 @@ window.Quarto = {
   </li>  
   <li class="nav-item">
     <a class="nav-link active" href="./models.html" aria-current="page"> 
-<span class="menu-text">Model Hierarchy</span></a>
+<span class="menu-text">Methods</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -342,22 +342,39 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-3-elo-complete-rating-architecture-3eloc" id="toc-the-3-elo-complete-rating-architecture-3eloc" class="nav-link active" data-scroll-target="#the-3-elo-complete-rating-architecture-3eloc">1. The 3-Elo Complete Rating Architecture (<code>3eloC</code>)</a>
+  <ul class="collapse">
+  <li><a href="#mathematical-rating-update-equations" id="toc-mathematical-rating-update-equations" class="nav-link" data-scroll-target="#mathematical-rating-update-equations">Mathematical Rating Update Equations</a></li>
+  </ul></li>
+  <li><a href="#model-m_32-bivariate-poisson-glm-score-distribution" id="toc-model-m_32-bivariate-poisson-glm-score-distribution" class="nav-link" data-scroll-target="#model-m_32-bivariate-poisson-glm-score-distribution">2. Model <span class="math inline">\(M_{32}\)</span> Bivariate Poisson GLM &amp; Score Distribution</a>
+  <ul class="collapse">
+  <li><a href="#expected-goal-poisson-intensities-lambda_a-lambda_b" id="toc-expected-goal-poisson-intensities-lambda_a-lambda_b" class="nav-link" data-scroll-target="#expected-goal-poisson-intensities-lambda_a-lambda_b">Expected Goal Poisson Intensities (<span class="math inline">\(\lambda_A, \lambda_B\)</span>):</a></li>
+  <li><a href="#bivariate-dixon-coles-goal-probability-matrix" id="toc-bivariate-dixon-coles-goal-probability-matrix" class="nav-link" data-scroll-target="#bivariate-dixon-coles-goal-probability-matrix">Bivariate Dixon-Coles Goal Probability Matrix:</a></li>
+  <li><a href="#outcome-probabilities" id="toc-outcome-probabilities" class="nav-link" data-scroll-target="#outcome-probabilities">Outcome Probabilities:</a></li>
+  <li><a href="#tuned-model-m_32-parameter-estimates" id="toc-tuned-model-m_32-parameter-estimates" class="nav-link" data-scroll-target="#tuned-model-m_32-parameter-estimates">Tuned Model <span class="math inline">\(M_{32}\)</span> Parameter Estimates:</a></li>
+  </ul></li>
+  <li><a href="#systematic-32-poisson-glm-feature-grid-m_01m_32" id="toc-systematic-32-poisson-glm-feature-grid-m_01m_32" class="nav-link" data-scroll-target="#systematic-32-poisson-glm-feature-grid-m_01m_32">3. Systematic 32 Poisson GLM Feature Grid (<span class="math inline">\(M_{01}\)</span>–<span class="math inline">\(M_{32}\)</span>)</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content column-page-left" id="quarto-document-content">
 
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Poisson GLM Model Hierarchy (M01–M32)</h1>
-<p class="subtitle lead">Architectural Design Grid &amp; Parameter Complexity Specifications</p>
+<h1 class="title">Methods &amp; Model Architecture Framework</h1>
+<p class="subtitle lead">Mathematical Formulations, 3-Elo Complete Dynamics, Model M32, and Parameter Specifications</p>
 </div>
 
 
 
-<div class="quarto-title-meta column-page">
+<div class="quarto-title-meta column-page-left">
 
     
   
@@ -369,6 +386,156 @@ window.Quarto = {
 </header>
 
 
+<p>This section details the mathematical formulations and parameter estimates for the <strong>3-Elo Complete</strong> rating architecture and the <strong><span class="math inline">\(M_{32}\)</span> Bivariate Poisson GLM</strong> forecasting model.</p>
+<hr>
+<section id="the-3-elo-complete-rating-architecture-3eloc" class="level2">
+<h2 class="anchored" data-anchor-id="the-3-elo-complete-rating-architecture-3eloc">1. The 3-Elo Complete Rating Architecture (<code>3eloC</code>)</h2>
+<p>The <strong>3-Elo Complete</strong> system decomposes national team strength into three dynamic state variables evaluated chronologically across all match dates: 1. <strong>Overall Rating (<span class="math inline">\(R^e\)</span>)</strong>: Aggregate winning capacity. 2. <strong>Offensive Rating (<span class="math inline">\(R^o\)</span>)</strong>: Goal-scoring potency. 3. <strong>Defensive Rating (<span class="math inline">\(R^d\)</span>)</strong>: Defensive resistance.</p>
+<section id="mathematical-rating-update-equations" class="level3">
+<h3 class="anchored" data-anchor-id="mathematical-rating-update-equations">Mathematical Rating Update Equations</h3>
+<p>Following match <span class="math inline">\(k\)</span> between Home Team <span class="math inline">\(i\)</span> and Away Team <span class="math inline">\(j\)</span> with match goal outcome <span class="math inline">\((g_i, g_j)\)</span>:</p>
+<section id="overall-rating-update-re" class="level4">
+<h4 class="anchored" data-anchor-id="overall-rating-update-re">Overall Rating Update (<span class="math inline">\(R^e\)</span>):</h4>
+<p><span class="math display">\[R^e_{i, k+1} = R^e_{i, k} + K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S_i - E_i)\]</span> <span class="math display">\[R^e_{j, k+1} = R^e_{j, k} + K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S_j - E_j)\]</span></p>
+<p>where expected win probability <span class="math inline">\(E_i\)</span> is computed via logistic sigmoid: <span class="math display">\[E_i = \frac{1}{1 + 10^{-\frac{(R^e_{i} - R^e_{j}) + H_{\text{overall}}}{D_{\text{overall}}}}}\]</span></p>
+</section>
+<section id="tactical-style-updates-offensive-ro-and-defensive-rd" class="level4">
+<h4 class="anchored" data-anchor-id="tactical-style-updates-offensive-ro-and-defensive-rd">Tactical Style Updates (Offensive <span class="math inline">\(R^o\)</span> and Defensive <span class="math inline">\(R^d\)</span>):</h4>
+<p><span class="math display">\[R^o_{i, k+1} = R^o_{i, k} + K_{\text{scale}} \cdot K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S^o_i - E^o_i)\]</span> <span class="math display">\[R^d_{i, k+1} = R^d_{i, k} + K_{\text{scale}} \cdot K_{\text{base}} \cdot W_c \cdot \gamma(m) \cdot (S^d_i - E^d_i)\]</span></p>
+</section>
+<section id="goal-difference-margin-scaling-factor-gammam" class="level4">
+<h4 class="anchored" data-anchor-id="goal-difference-margin-scaling-factor-gammam">Goal Difference Margin Scaling Factor <span class="math inline">\(\gamma(m)\)</span>:</h4>
+<p><span class="math display">\[\gamma(m) = M_{\text{overall}} \cdot \ln(1 + |g_i - g_j|) \cdot \left(\frac{a_{\text{margin}}}{a_{\text{margin}} + |g_i - g_j|}\right)\]</span></p>
+</section>
+<section id="tuned-3-elo-complete-parameter-estimates" class="level4">
+<h4 class="anchored" data-anchor-id="tuned-3-elo-complete-parameter-estimates">Tuned 3-Elo Complete Parameter Estimates:</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: center;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(K_{\text{base}}\)</span></td>
+<td style="text-align: left;">Base rating volatility factor</td>
+<td style="text-align: center;"><code>32.0537</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(H_{\text{overall}}\)</span></td>
+<td style="text-align: left;">Home venue advantage constant</td>
+<td style="text-align: center;"><code>218.2097</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(D_{\text{overall}}\)</span></td>
+<td style="text-align: left;">Logistic scale divisor</td>
+<td style="text-align: center;"><code>1267.5829</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(M_{\text{overall}}\)</span></td>
+<td style="text-align: left;">Goal difference margin multiplier</td>
+<td style="text-align: center;"><code>2.5010</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(a_{\text{margin}}\)</span></td>
+<td style="text-align: left;">Margin saturation parameter</td>
+<td style="text-align: center;"><code>4.3270</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(b_{\text{margin}}\)</span></td>
+<td style="text-align: left;">Secondary margin parameter</td>
+<td style="text-align: center;"><code>3.6032</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(M_{\text{style}}\)</span></td>
+<td style="text-align: left;">Tactical style update factor</td>
+<td style="text-align: center;"><code>1.0729</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(K_{\text{scale}}\)</span></td>
+<td style="text-align: left;">Style-to-overall <span class="math inline">\(K\)</span>-ratio</td>
+<td style="text-align: center;"><code>0.5521</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+</section>
+<section id="model-m_32-bivariate-poisson-glm-score-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="model-m_32-bivariate-poisson-glm-score-distribution">2. Model <span class="math inline">\(M_{32}\)</span> Bivariate Poisson GLM &amp; Score Distribution</h2>
+<p>Model <strong><span class="math inline">\(M_{32}\)</span></strong> is the top-performing forecasting architecture. It calculates expected match scorelines using the tactical interaction between Team A’s Offensive rating (<span class="math inline">\(R^o_A\)</span>) and Team B’s Defensive rating (<span class="math inline">\(R^d_B\)</span>).</p>
+<section id="expected-goal-poisson-intensities-lambda_a-lambda_b" class="level3">
+<h3 class="anchored" data-anchor-id="expected-goal-poisson-intensities-lambda_a-lambda_b">Expected Goal Poisson Intensities (<span class="math inline">\(\lambda_A, \lambda_B\)</span>):</h3>
+<p>For a match between Team A and Team B:</p>
+<p><span class="math display">\[\lambda_A = \mu_{\text{base}} \cdot 10^{\frac{(R^o_A - R^d_B) + H_{\text{style}}}{D_{\text{style}}}}\]</span></p>
+<p><span class="math display">\[\lambda_B = \mu_{\text{base}} \cdot 10^{\frac{(R^o_B - R^d_A) - H_{\text{style}}}{D_{\text{style}}}}\]</span></p>
+<p><em>(For neutral-venue matches, <span class="math inline">\(H_{\text{style}} = 0\)</span>).</em></p>
+</section>
+<section id="bivariate-dixon-coles-goal-probability-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="bivariate-dixon-coles-goal-probability-matrix">Bivariate Dixon-Coles Goal Probability Matrix:</h3>
+<p>The joint probability of scoreline <span class="math inline">\((x, y)\)</span> (Team A scores <span class="math inline">\(x\)</span> goals, Team B scores <span class="math inline">\(y\)</span> goals) is given by:</p>
+<p><span class="math display">\[P(G_A = x, G_B = y) = \tau(x, y) \cdot \left( \frac{\lambda_A^x e^{-\lambda_A}}{x!} \right) \cdot \left( \frac{\lambda_B^y e^{-\lambda_B}}{y!} \right)\]</span></p>
+<p>where <span class="math inline">\(\tau(x, y)\)</span> is the Dixon-Coles low-score dependency adjustment matrix:</p>
+<p><span class="math display">\[\tau(x, y) = \begin{cases}
+1 - \lambda_A \lambda_B \rho &amp; \text{if } x = 0, y = 0 \\
+1 + \lambda_A \rho &amp; \text{if } x = 1, y = 0 \\
+1 + \lambda_B \rho &amp; \text{if } x = 0, y = 1 \\
+1 - \rho &amp; \text{if } x = 1, y = 1 \\
+1 &amp; \text{otherwise}
+\end{cases}\]</span></p>
+</section>
+<section id="outcome-probabilities" class="level3">
+<h3 class="anchored" data-anchor-id="outcome-probabilities">Outcome Probabilities:</h3>
+<p><span class="math display">\[P(\text{Win}_A) = \sum_{x &gt; y} P(G_A = x, G_B = y)\]</span></p>
+<p><span class="math display">\[P(\text{Draw}) = \sum_{x = y} P(G_A = x, G_B = y)\]</span></p>
+<p><span class="math display">\[P(\text{Win}_B) = \sum_{x &lt; y} P(G_A = x, G_B = y)\]</span></p>
+</section>
+<section id="tuned-model-m_32-parameter-estimates" class="level3">
+<h3 class="anchored" data-anchor-id="tuned-model-m_32-parameter-estimates">Tuned Model <span class="math inline">\(M_{32}\)</span> Parameter Estimates:</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: center;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\mu_{\text{base}}\)</span></td>
+<td style="text-align: left;">Baseline expected goal rate</td>
+<td style="text-align: center;"><code>1.3500</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(D_{\text{style}}\)</span></td>
+<td style="text-align: left;">Tactical rating differential scale divisor</td>
+<td style="text-align: center;"><code>974.5535</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(H_{\text{style}}\)</span></td>
+<td style="text-align: left;">Tactical home venue advantage</td>
+<td style="text-align: center;"><code>60.9455</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\rho\)</span></td>
+<td style="text-align: left;">Dixon-Coles low-score dependency factor</td>
+<td style="text-align: center;"><code>-0.0821</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="systematic-32-poisson-glm-feature-grid-m_01m_32" class="level2">
+<h2 class="anchored" data-anchor-id="systematic-32-poisson-glm-feature-grid-m_01m_32">3. Systematic 32 Poisson GLM Feature Grid (<span class="math inline">\(M_{01}\)</span>–<span class="math inline">\(M_{32}\)</span>)</h2>
 <p>We systematically evaluate a 5-dimensional binary feature grid of 32 GLM specifications (<span class="math inline">\(M_{01}\)</span> through <span class="math inline">\(M_{32}\)</span>):</p>
 <table class="caption-top table">
 <colgroup>
@@ -650,6 +817,7 @@ window.Quarto = {
 </table>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
