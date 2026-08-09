@@ -85,36 +85,36 @@ plt.subplots_adjust(top=0.90, bottom=0.18, left=0.08, right=0.92)
 x_indices = np.arange(len(df))
 model_labels = df['label'].tolist()
 
-# Metric configurations including raw min/max and AIC in legend labels
+# Metric configurations with clean, unambiguous legend labels
 METRICS_CONFIG = [
     {
         'col': 'Joint_ALL_norm',
-        'label': f"Joint ALL (5-Fold CV)  [min: {min_max_dict['Joint_ALL']['min']:.5f}, max: {min_max_dict['Joint_ALL']['max']:.5f} | AIC min: {min_max_dict['AIC']['min']:.0f}, max: {min_max_dict['AIC']['max']:.0f}]",
+        'label': f"Joint ALL (5-Fold CV)  [min: {min_max_dict['Joint_ALL']['min']:.5f}, max: {min_max_dict['Joint_ALL']['max']:.5f}]",
         'color': '#9467bd', 'marker': 'p', 'linestyle': '-', 'linewidth': 2.8, 'markersize': 8.5
     },
     {
         'col': 'AIC_norm',
-        'label': f"AIC (Akaike Criterion)  [min: {min_max_dict['AIC']['min']:.0f}, max: {min_max_dict['AIC']['max']:.0f}]",
+        'label': f"AIC (Joint Likelihood Fit)  [min: {min_max_dict['AIC']['min']:.0f}, max: {min_max_dict['AIC']['max']:.0f}]",
         'color': '#d62728', 'marker': 'v', 'linestyle': '-.', 'linewidth': 2.5, 'markersize': 8.0
     },
     {
         'col': 'Fast+ESD_norm',
-        'label': f"Fast+ESD Combined (5-Fold CV)  [min: {min_max_dict['Fast+ESD']['min']:.5f}, max: {min_max_dict['Fast+ESD']['max']:.5f} | AIC min: {min_max_dict['AIC']['min']:.0f}, max: {min_max_dict['AIC']['max']:.0f}]",
+        'label': f"Fast+ESD Combined (5-Fold CV)  [min: {min_max_dict['Fast+ESD']['min']:.5f}, max: {min_max_dict['Fast+ESD']['max']:.5f}]",
         'color': '#2ca02c', 'marker': 's', 'linestyle': '--', 'linewidth': 2.4, 'markersize': 7.5
     },
     {
         'col': 'ESD_fast_norm',
-        'label': f"ESD Scoreline (5-Fold CV)  [min: {min_max_dict['ESD_fast']['min']:.4f}, max: {min_max_dict['ESD_fast']['max']:.4f} | AIC min: {min_max_dict['AIC']['min']:.0f}, max: {min_max_dict['AIC']['max']:.0f}]",
+        'label': f"ESD Scoreline (5-Fold CV)  [min: {min_max_dict['ESD_fast']['min']:.4f}, max: {min_max_dict['ESD_fast']['max']:.4f}]",
         'color': '#e377c2', 'marker': 'D', 'linestyle': ':', 'linewidth': 2.2, 'markersize': 6.5
     },
     {
         'col': 'RPS_fast_norm',
-        'label': f"RPS Fast (5-Fold CV)  [min: {min_max_dict['RPS_fast']['min']:.5f}, max: {min_max_dict['RPS_fast']['max']:.5f} | AIC min: {min_max_dict['AIC']['min']:.0f}, max: {min_max_dict['AIC']['max']:.0f}]",
+        'label': f"RPS Fast (5-Fold CV)  [min: {min_max_dict['RPS_fast']['min']:.5f}, max: {min_max_dict['RPS_fast']['max']:.5f}]",
         'color': '#1f77b4', 'marker': 'o', 'linestyle': '-', 'linewidth': 2.0, 'markersize': 6.5
     },
     {
         'col': 'RPS_slow_norm',
-        'label': f"RPS Slow (5-Fold CV)  [min: {min_max_dict['RPS_slow']['min']:.5f}, max: {min_max_dict['RPS_slow']['max']:.5f} | AIC min: {min_max_dict['AIC']['min']:.0f}, max: {min_max_dict['AIC']['max']:.0f}]",
+        'label': f"RPS Slow (5-Fold CV)  [min: {min_max_dict['RPS_slow']['min']:.5f}, max: {min_max_dict['RPS_slow']['max']:.5f}]",
         'color': '#ff7f0e', 'marker': '^', 'linestyle': '-.', 'linewidth': 2.0, 'markersize': 6.5
     }
 ]
