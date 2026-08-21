@@ -9,19 +9,13 @@ build/
 .eggs/
 .pytest_cache/
 
-# Ignore generated datasets, figures, and tables inside paper_scripts/
-paper_scripts/data/*
-!paper_scripts/data/.gitkeep
-!paper_scripts/data/results.csv
-!paper_scripts/data/ratings_3eloC_*.csv
-paper_scripts/data/ratings_3eloC_all_norm.csv
-paper_scripts/data/ratings_3eloC.csv
-
-paper_scripts/figures/*
-!paper_scripts/figures/.gitkeep
-
-paper_scripts/tables/*
-!paper_scripts/tables/.gitkeep
+# Ignore paper/ and paper_scripts/ research files, datasets, and Optuna DBs
+paper/
+paper_scripts/
+*.csv
+*.db
+*.json
+!multielo/
 
 # OS and IDE temporary files
 .DS_Store
