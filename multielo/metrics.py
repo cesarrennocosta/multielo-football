@@ -233,12 +233,12 @@ def ensure_6mo_lag_ratings(df, rating_col='elo_diff', rating_col_6mo=None):
     res_6mo = col_6mo_list if isinstance(rating_col, (list, tuple)) else col_6mo_list[0]
     return df_out, res_6mo
 
-def evaluate_5cv(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=None, tourn_col='tourn_weight', k_rating=14, eval_weight_mode='fifa_topology', use_balanced_dataset=True, weighted_training=True):
+def evaluate_5cv(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=None, tourn_col='tourn_weight', k_rating=14, eval_weight_mode='fifa_topology', use_balanced_dataset=True, weighted_training=True, year_min=1950, year_max=None):
     """
     Perform 5-fold cross-validation loss evaluation post-1950 (inclusive).
     
     Default Configuration:
-      - use_balanced_dataset=True: Evaluates on the Stratified 4x-Expanded Balanced Learning Dataset (9,110 matches) with pre-assigned 5-CV folds.
+      - use_balanced_dataset=True: Evaluates on the Stratified 4x-Expanded Balanced Learning Dataset with pre-assigned 5-CV folds.
       - Fast metrics (RPS & ESD): Weighted by FIFA topology base weights * class_factor (0.25 for 4x sampled qualifiers & friendlies).
       - Slow metrics (RPS & ESD 6-month lag): Keeps FIFA weights but EXCLUDES friendlies (w_slow = 0 for friendlies).
     """
@@ -250,7 +250,10 @@ def evaluate_5cv(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=Non
     if 'result' not in df_eval.columns:
         df_eval['result'] = ['H' if gh > ga else ('D' if gh == ga else 'A') for gh, ga in zip(df_eval['home_score'], df_eval['away_score'])]
         
-    df_eval = df_eval[df_eval['year'] >= 1950].sort_values('date').reset_index(drop=True)
+    df_eval = df_eval[df_eval['year'] >= year_min]
+    if year_max is not None:
+        df_eval = df_eval[df_eval['year'] <= year_max]
+    df_eval = df_eval.sort_values('date').reset_index(drop=True)
     
     # Load balanced dataset if requested
     if use_balanced_dataset:
@@ -440,7 +443,7 @@ def evaluate_aics(df, model_code='M32', rating_col='fifa_diff', rating_col_6mo=N
         'k_tot': k_tot
     }
 
-def evaluate_model(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=None, tourn_col='tourn_weight', k_rating=14, eval_weight_mode='fifa_topology', use_balanced_dataset=True, weighted_training=True):
+def evaluate_model(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=None, tourn_col='tourn_weight', k_rating=14, eval_weight_mode='fifa_topology', use_balanced_dataset=True, weighted_training=True, year_min=1950, year_max=None):
     """
     Consolidated evaluation function computing 5-CV metrics and AICs.
     Supports Scheme A (weighted_training=True, M01-M32) and Scheme B (weighted_training=False, M33-M64).
@@ -455,7 +458,7 @@ def evaluate_model(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=N
         base_code = f"M{m_num:02d}"
 
     mod = train_model(df, model_code=base_code, rating_col=rating_col, tourn_col=tourn_col, k_rating=k_rating, weighted_training=weighted_training)
-    cv_dict = evaluate_5cv(df, model_code=base_code, rating_col=rating_col, rating_col_6mo=rating_col_6mo, tourn_col=tourn_col, k_rating=k_rating, eval_weight_mode=eval_weight_mode, use_balanced_dataset=use_balanced_dataset, weighted_training=weighted_training)
+    cv_dict = evaluate_5cv(df, model_code=base_code, rating_col=rating_col, rating_col_6mo=rating_col_6mo, tourn_col=tourn_col, k_rating=k_rating, eval_weight_mode=eval_weight_mode, use_balanced_dataset=use_balanced_dataset, weighted_training=weighted_training, year_min=year_min, year_max=year_max)
     aic_dict = evaluate_aics(df, model_code=base_code, rating_col=rating_col, rating_col_6mo=rating_col_6mo, tourn_col=tourn_col, k_rating=k_rating, trained_model=mod, eval_weight_mode=eval_weight_mode, use_balanced_dataset=use_balanced_dataset)
     
     res = {
