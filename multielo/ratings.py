@@ -425,18 +425,18 @@ def _get_1elo_complete_ktier(tourn, params):
 
 def _compute_1elo_complete(df, teams, params):
     p = params or {}
-    kwc = float(p.get('K_WC', 60.0))
-    kmaj = float(p.get('K_major', 50.0))
-    kqual = float(p.get('K_qual', 40.0))
-    kmin = float(p.get('K_minor', 30.0))
-    kfri = float(p.get('K_friendly', 20.0))
+    kwc = float(p.get('K_WC', 104.0967))
+    kmaj = float(p.get('K_major', 9.8454))
+    kqual = float(p.get('K_qual', 44.9754))
+    kmin = float(p.get('K_minor', 19.0613))
+    kfri = float(p.get('K_friendly', 56.7246))
 
-    G2 = float(p.get('G2', 1.5))
-    am = float(p.get('a_margin', 1.75))
-    bm = float(p.get('b_margin', 0.125))
+    G2 = float(p.get('G2', 1.8937))
+    am = float(p.get('a_margin', 1.6031))
+    bm = float(p.get('b_margin', 0.5030))
 
-    Ho = float(p.get('H_overall', 100.0))
-    Div = float(p.get('divisor_overall', 400.0))
+    Ho = float(p.get('H_overall', 85.5177))
+    Div = float(p.get('divisor_overall', 656.0022))
 
     params_dict = {
         'K_WC': kwc, 'K_major': kmaj, 'K_qual': kqual, 'K_minor': kmin, 'K_friendly': kfri,
@@ -828,18 +828,18 @@ def _compute_2elo_odc(df, teams, params):
     2eloODC System: Complete Decoupled Offense+Defense (2eloOD) ratings with multi-tier K-factors AND non-linear goal margin G(g_h, g_a) (11 free parameters).
     """
     p = params or {}
-    kwc = float(p.get('K_WC_od', p.get('K_WC', 60.0)))
-    kmaj = float(p.get('K_major_od', p.get('K_major', 50.0)))
-    kqual = float(p.get('K_qual_od', p.get('K_qual', 40.0)))
-    kmin = float(p.get('K_minor_od', p.get('K_minor', 30.0)))
-    kfri = float(p.get('K_friendly_od', p.get('K_friendly', 20.0)))
+    kwc = float(p.get('K_WC_od', p.get('K_WC', 25.8337)))
+    kmaj = float(p.get('K_major_od', p.get('K_major', 17.8809)))
+    kqual = float(p.get('K_qual_od', p.get('K_qual', 15.8883)))
+    kmin = float(p.get('K_minor_od', p.get('K_minor', 9.9016)))
+    kfri = float(p.get('K_friendly_od', p.get('K_friendly', 21.8012)))
     
-    g2_v = float(p.get('G2_od', p.get('G2', 1.5)))
-    am_v = float(p.get('a_margin_od', p.get('a_margin', 1.75)))
-    bm_v = float(p.get('b_margin_od', p.get('b_margin', 0.125)))
+    g2_v = float(p.get('G2_od', p.get('G2', 2.3272)))
+    am_v = float(p.get('a_margin_od', p.get('a_margin', 1.4794)))
+    bm_v = float(p.get('b_margin_od', p.get('b_margin', 0.1036)))
     
-    Hs = float(p.get('H_od', p.get('H_style', 93.19)))
-    Ds = float(p.get('divisor_od', p.get('divisor_style', p.get('divisor', 1274.07))))
+    Hs = float(p.get('H_od', p.get('H_style', 143.6307)))
+    Ds = float(p.get('divisor_od', p.get('divisor_style', p.get('divisor', 1763.9776))))
     mu = float(p.get('mu', 1.35))
     
     ktier_params = {'K_WC': kwc, 'K_major': kmaj, 'K_qual': kqual, 'K_minor': kmin, 'K_friendly': kfri}
