@@ -443,9 +443,49 @@ def evaluate_aics(df, model_code='M32', rating_col='fifa_diff', rating_col_6mo=N
         'k_tot': k_tot
     }
 
+SURROGATE_CHANCE_BASELINES_10K = {
+    'RPS_fast':  {'mean': 0.294277, 'std': 0.003113},
+    'RPS_slow':  {'mean': 0.294277, 'std': 0.003328},
+    'ESD_fast':  {'mean': 5.728059, 'std': 0.005018},
+    'Fast+ESD':  {'mean': 0.637961, 'std': 0.003132},
+    'Joint_ALL': {'mean': 0.932238, 'std': 0.006449}
+}
+
+def compute_metric_zscores(metrics_dict):
+    """
+    Compute Z-score performance standardizations relative to the 10,000-run Monte Carlo chance baseline.
+    
+    Since all metrics are loss values (where lower score = better performance),
+    Z-score is defined as:
+        Z = (mean_chance_baseline - score) / std_deviation
+    
+    A positive Z-score indicates outperformance vs chance in standard deviations (e.g., +36.0 sigma).
+    """
+    z_scores = {}
+    mapping = {
+        'RPS_fast': ['CV_RPS_fast', 'RPS_fast', 'Val_CV_RPS_fast', 'Holdout_Test_RPS_fast'],
+        'RPS_slow': ['CV_RPS_slow', 'RPS_slow', 'Val_CV_RPS_slow', 'Holdout_Test_RPS_slow'],
+        'ESD_fast': ['CV_ESD_fast', 'ESD_fast'],
+        'Fast+ESD': ['CV_Fast+ESD', 'Fast+ESD'],
+        'Joint_ALL': ['CV_Joint_ALL', 'Joint_ALL', 'Val_CV_Joint_ALL', 'Holdout_Test_Joint_ALL']
+    }
+
+    for metric_name, keys in mapping.items():
+        base = SURROGATE_CHANCE_BASELINES_10K[metric_name]
+        mu0, std0 = base['mean'], base['std']
+        
+        for k in keys:
+            if k in metrics_dict:
+                val = float(metrics_dict[k])
+                z_val = (mu0 - val) / std0
+                z_key = f"Z_{k}" if not k.startswith("Z_") else k
+                z_scores[z_key] = float(z_val)
+
+    return z_scores
+
 def evaluate_model(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=None, tourn_col='tourn_weight', k_rating=14, eval_weight_mode='fifa_topology', use_balanced_dataset=True, weighted_training=True, year_min=1950, year_max=None):
     """
-    Consolidated evaluation function computing 5-CV metrics and AICs.
+    Consolidated evaluation function computing 5-CV metrics, AICs, and Chance Z-Scores.
     Supports Scheme A (weighted_training=True, M01-M32) and Scheme B (weighted_training=False, M33-M64).
     """
     raw_code = str(model_code).upper().strip()
@@ -460,6 +500,7 @@ def evaluate_model(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=N
     mod = train_model(df, model_code=base_code, rating_col=rating_col, tourn_col=tourn_col, k_rating=k_rating, weighted_training=weighted_training)
     cv_dict = evaluate_5cv(df, model_code=base_code, rating_col=rating_col, rating_col_6mo=rating_col_6mo, tourn_col=tourn_col, k_rating=k_rating, eval_weight_mode=eval_weight_mode, use_balanced_dataset=use_balanced_dataset, weighted_training=weighted_training, year_min=year_min, year_max=year_max)
     aic_dict = evaluate_aics(df, model_code=base_code, rating_col=rating_col, rating_col_6mo=rating_col_6mo, tourn_col=tourn_col, k_rating=k_rating, trained_model=mod, eval_weight_mode=eval_weight_mode, use_balanced_dataset=use_balanced_dataset)
+    z_dict = compute_metric_zscores(cv_dict)
     
     res = {
         'model_code': raw_code,
@@ -468,6 +509,7 @@ def evaluate_model(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=N
         'k_params': mod.k_tot,
         'scheme': 'Scheme B (Category/Unweighted)' if m_num > 32 else 'Scheme A (Weighted FIFA)',
         **cv_dict,
+        **z_dict,
         **aic_dict
     }
     return res
