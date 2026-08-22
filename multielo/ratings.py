@@ -1053,7 +1053,8 @@ def _compute_2elo_fsg(df, teams, params):
         sh.append(r_slow[h]); sa.append(r_slow[a])
         
         s_h = 1.0 if gh > ga else (0.0 if gh < ga else 0.5)
-        N = abs(gh - ga)
+        max_m = params.get('max_margin', None) if params else None
+        N = min(abs(gh - ga), int(max_m)) if max_m is not None else abs(gh - ga)
         
         # Fast Update (NO 5-tier K, WITH G)
         G_f = 1.0 if N <= 1 else (g2_f if N == 2 else am_f + bm_f * float(N))
