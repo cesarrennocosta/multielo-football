@@ -458,7 +458,8 @@ def _compute_1elo_complete(df, teams, params):
         we_h = 1.0 / (1.0 + 10.0 ** exp_val)
         sh = 1.0 if gh > ga else (0.0 if gh < ga else 0.5)
 
-        N = min(abs(gh - ga), 5)
+        max_m = params_dict.get('max_margin', None) if params_dict else None
+        N = min(abs(gh - ga), int(max_m)) if max_m is not None else abs(gh - ga)
         if N <= 1:
             G = 1.0
         elif N == 2:
@@ -857,7 +858,8 @@ def _compute_2elo_odc(df, teams, params):
         oh.append(r_off[h]); oa.append(r_off[a])
         dh.append(r_def[h]); da.append(r_def[a])
         
-        N = min(abs(gh - ga), 5)
+        max_m = ktier_params.get('max_margin', None) if ktier_params else None
+        N = min(abs(gh - ga), int(max_m)) if max_m is not None else abs(gh - ga)
         if N <= 1:
             G_mult = 1.0
         elif N == 2:
