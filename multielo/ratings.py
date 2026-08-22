@@ -458,13 +458,13 @@ def _compute_1elo_complete(df, teams, params):
         we_h = 1.0 / (1.0 + 10.0 ** exp_val)
         sh = 1.0 if gh > ga else (0.0 if gh < ga else 0.5)
 
-        N = abs(gh - ga)
+        N = min(abs(gh - ga), 5)
         if N <= 1:
             G = 1.0
         elif N == 2:
             G = G2
         else:
-            G = am + bm * N
+            G = am + bm * float(N)
 
         K_tier = _get_1elo_complete_ktier(tourn, params_dict)
         K_eff = K_tier * G
@@ -857,7 +857,7 @@ def _compute_2elo_odc(df, teams, params):
         oh.append(r_off[h]); oa.append(r_off[a])
         dh.append(r_def[h]); da.append(r_def[a])
         
-        N = abs(gh - ga)
+        N = min(abs(gh - ga), 5)
         if N <= 1:
             G_mult = 1.0
         elif N == 2:
