@@ -509,13 +509,14 @@ def _compute_1elo_g(df, teams, params):
         sh = 1.0 if gh > ga else (0.0 if gh < ga else 0.5)
 
         # 1eloC Goal Margin Component
-        N = abs(gh - ga)
+        max_m = params.get('max_margin', None) if params else None
+        N = min(abs(gh - ga), int(max_m)) if max_m is not None else abs(gh - ga)
         if N <= 1:
             G = 1.0
         elif N == 2:
             G = G2
         else:
-            G = am + bm * N
+            G = am + bm * float(N)
 
         # 1eloS K-Factor Component
         k_base = Kb * Mo if is_comp else Kb
@@ -740,7 +741,8 @@ def _compute_2elo_odg(df, teams, params):
         oh.append(r_off[h]); oa.append(r_off[a])
         dh.append(r_def[h]); da.append(r_def[a])
         
-        N = abs(gh - ga)
+        max_m = params.get('max_margin', None) if params else None
+        N = min(abs(gh - ga), int(max_m)) if max_m is not None else abs(gh - ga)
         if N <= 1:
             G_mult = 1.0
         elif N == 2:
