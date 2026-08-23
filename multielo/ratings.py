@@ -42,10 +42,10 @@ def compute_ratings(df, system='3elo-complete', params=None):
     elif system_key in ['1elo-simple', '1elo-s', '1elof', '1elos']:
         res = _compute_1elo_simple(df_out, teams, params)
         return _compute_6mo_lag(res, rating_col_h='elo_home', rating_col_a='elo_away', out_diff_col='elo_diff_6mo')
-    elif system_key in ['1elo-complete', '1elo-c', '1eloc']:
+    elif system_key in ['1elo-complete', '1elo-c', '1eloc', '1elocc', '1elo-cc']:
         res = _compute_1elo_complete(df_out, teams, params)
         return _compute_6mo_lag(res, rating_col_h='elo_home', rating_col_a='elo_away', out_diff_col='elo_diff_6mo')
-    elif system_key in ['1elog', '1elo-g']:
+    elif system_key in ['1elog', '1elo-g', '1elogc', '1elo-gc']:
         res = _compute_1elo_g(df_out, teams, params)
         return _compute_6mo_lag(res, rating_col_h='elo_home', rating_col_a='elo_away', out_diff_col='elo_diff_6mo')
     elif system_key in ['2elog', '2elo-g']:
@@ -65,7 +65,7 @@ def compute_ratings(df, system='3elo-complete', params=None):
         res['diff_def_6mo'] = res['off_away_6mo'] - res['def_home_6mo'] if 'off_away_6mo' in res.columns and 'def_home_6mo' in res.columns else res['diff_def']
         res['elo_diff_6mo'] = res['diff_off_6mo'] - res['diff_def_6mo']
         return res
-    elif system_key in ['2eloodg', '2elo-odg', '2elo_odg']:
+    elif system_key in ['2eloodg', '2elo-odg', '2elo_odg', '2eloodgc', '2elo-odgc']:
         res = _compute_2elo_odg(df_out, teams, params)
         res = _compute_6mo_lag(res, rating_col_h='off_home', rating_col_a='off_away', out_diff_col='off_diff_6mo')
         res = _compute_6mo_lag(res, rating_col_h='def_home', rating_col_a='def_away', out_diff_col='def_diff_6mo')
