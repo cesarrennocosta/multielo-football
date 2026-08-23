@@ -65,7 +65,7 @@ def compute_ratings(df, system='3elo-complete', params=None):
         res['diff_def_6mo'] = res['off_away_6mo'] - res['def_home_6mo'] if 'off_away_6mo' in res.columns and 'def_home_6mo' in res.columns else res['diff_def']
         res['elo_diff_6mo'] = res['diff_off_6mo'] - res['diff_def_6mo']
         return res
-    elif system_key in ['2eloodg', '2elo-odg', '2elo_odg', '2eloodgc', '2elo-odgc']:
+    elif system_key in ['2eloodg', '2elo-odg', '2elo_odg', '2eloodgc', '2elo-odgc', '2eloodc', '2elo-odc', '2elo_odc', '2eloodcc', '2elo-odcc']:
         res = _compute_2elo_odg(df_out, teams, params)
         res = _compute_6mo_lag(res, rating_col_h='off_home', rating_col_a='off_away', out_diff_col='off_diff_6mo')
         res = _compute_6mo_lag(res, rating_col_h='def_home', rating_col_a='def_away', out_diff_col='def_diff_6mo')

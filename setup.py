@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="multielo-football",
-    version="0.2.17",
+    version="0.2.18",
     packages=find_packages(),
     install_requires=[
         "numpy>=1.20.0",
