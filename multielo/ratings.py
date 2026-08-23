@@ -404,13 +404,14 @@ def _compute_1elo_simple(df, teams, params):
     return df
 
 
-def _get_1elo_complete_ktier(tourn, params):
+def _get_1elo_complete_ktier(tourn, params, prefix=""):
     t = str(tourn).lower() if tourn and not pd.isna(tourn) else "friendly"
-    kwc = float(params.get('K_WC', 60.0))
-    kmaj = float(params.get('K_major', 50.0))
-    kqual = float(params.get('K_qual', 40.0))
-    kmin = float(params.get('K_minor', 30.0))
-    kfri = float(params.get('K_friendly', 20.0))
+    p = params or {}
+    kfri = float(p.get(f'K_friendly{prefix}', p.get('K_friendly', 20.0)))
+    kmin = float(p.get(f'K_minor{prefix}', p.get('K_minor', kfri + float(p.get(f'gap_minor{prefix}', p.get('gap_minor', 10.0))))))
+    kqual = float(p.get(f'K_qual{prefix}', p.get('K_qual', kmin + float(p.get(f'gap_qual{prefix}', p.get('gap_qual', 10.0))))))
+    kmaj = float(p.get(f'K_major{prefix}', p.get('K_major', kqual + float(p.get(f'gap_major{prefix}', p.get('gap_major', 10.0))))))
+    kwc = float(p.get(f'K_WC{prefix}', p.get('K_WC', kmaj + float(p.get(f'gap_WC{prefix}', p.get('gap_WC', 10.0))))))
 
     if 'world cup' in t:
         return kqual if ('qualif' in t or 'q' in t) else kwc
