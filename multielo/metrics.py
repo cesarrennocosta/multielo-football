@@ -355,7 +355,7 @@ def evaluate_5cv(df, model_code='M32', rating_col='elo_diff', rating_col_6mo=Non
         'CV_Joint_ALL': float(means[5])
     }
 
-def evaluate_aics(df, model_code='M32', rating_col='fifa_diff', rating_col_6mo=None, tourn_col='tourn_weight', k_rating=14, trained_model=None, eval_weight_mode='fifa_topology', use_balanced_dataset=True):
+def evaluate_aics(df, model_code='M32', rating_col='fifa_diff', rating_col_6mo=None, tourn_col='tourn_weight', k_rating=14, trained_model=None, eval_weight_mode='fifa_topology', use_balanced_dataset=True, year_min=1950, year_max=2018):
     """
     Compute full-dataset log-likelihoods and calculate Metric-Specific Dixon-Coles AICs.
     """
@@ -365,7 +365,7 @@ def evaluate_aics(df, model_code='M32', rating_col='fifa_diff', rating_col_6mo=N
     if 'year' not in df_eval.columns:
         df_eval['year'] = df_eval['date'].dt.year
         
-    df_eval = df_eval[df_eval['year'] >= 1950].sort_values('date').reset_index(drop=True)
+    df_eval = df_eval[(df_eval['year'] >= year_min) & (df_eval['year'] <= year_max)].sort_values('date').reset_index(drop=True)
     
     if use_balanced_dataset:
         df_bal = get_balanced_learning_dataset()
