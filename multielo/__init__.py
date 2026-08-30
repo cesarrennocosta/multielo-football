@@ -9,7 +9,7 @@ from .predict import predict
 from .metrics import compute_rps, compute_esd, compute_aic, evaluate_5cv, evaluate_aics, evaluate_model, compute_metric_zscores
 from .models import get_model_specs, GLM_TAXONOMY, train_model, TrainedModel, build_design_matrix
 
-__version__ = "0.2.62"
+__version__ = "0.2.63"
 __author__ = "César Rennó-Costa, László Csató"
 
 __all__ = [
